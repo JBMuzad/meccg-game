@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MECCG Regio Editor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:#060c14;color:#f0e0b8;font-family:Georgia,serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.bar{display:flex;align-items:center;gap:5px;padding:5px 8px;background:#040810;border-bottom:1px solid rgba(212,168,75,.3);flex-shrink:0;flex-wrap:wrap;}
+h1{font-size:12px;color:#d4a84b;white-space:nowrap;}
+.b{font-size:9.5px;padding:3px 9px;border:1px solid rgba(212,168,75,.35);background:transparent;color:rgba(240,224,184,.6);cursor:pointer;border-radius:2px;transition:all .12s;}
+.b:hover,.b.on{background:rgba(212,168,75,.2);color:#d4a84b;border-color:#d4a84b;}
+.b.r{border-color:rgba(255,80,80,.4);color:rgba(255,150,150,.7);}
+.b.r:hover{background:rgba(255,60,60,.18);color:#ff9999;}
+.b.g{border-color:rgba(80,200,80,.5);color:rgba(140,255,140,.8);}
+.b.g:hover{background:rgba(60,180,60,.18);color:#88ff88;}
+.sep{width:1px;height:18px;background:rgba(212,168,75,.2);flex-shrink:0;}
+.st{font-size:9px;color:rgba(212,168,75,.45);font-style:italic;}
+
+.ws{display:flex;flex:1;overflow:hidden;}
+.mw{flex:1;overflow:hidden;position:relative;background:#050e18;}
+.mw.pan{cursor:grab;}
+.mw.pan:active{cursor:grabbing;}
+.mw.click{cursor:crosshair;}
+.mw.free{cursor:crosshair;}
+.mi{position:absolute;top:0;left:0;transform-origin:0 0;}
+.mi img{display:block;pointer-events:none;user-select:none;}
+.mi svg{position:absolute;top:0;left:0;}
+
+/* saved regions */
+.reg polygon{fill:transparent;stroke:transparent;stroke-width:2;transition:fill .12s,stroke .12s;}
+.reg:hover polygon{fill:rgba(255,200,80,.22);stroke:rgba(255,220,80,.85);stroke-width:2;}
+.reg.sel polygon{fill:rgba(255,220,80,.32);stroke:#ffe060;stroke-width:3;}
+
+/* draw styles */
+.dp{fill:rgba(70,220,70,.15);stroke:#44ff44;stroke-width:2;pointer-events:none;}
+.dl{stroke:#44ff44;stroke-width:1.5;stroke-dasharray:6,4;fill:none;pointer-events:none;}
+.dpt{fill:#44ff44;stroke:#fff;stroke-width:1.2;pointer-events:none;}
+.fline{fill:rgba(70,220,70,.15);stroke:#44ff44;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;pointer-events:none;}
+
+.zi{position:absolute;bottom:10px;left:10px;display:flex;flex-direction:column;gap:3px;z-index:20;}
+.zb{width:30px;height:30px;background:rgba(4,8,16,.92);border:1px solid rgba(212,168,75,.4);color:#d4a84b;font-size:15px;cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;}
+.zb:hover{background:rgba(212,168,75,.18);}
+.cd{position:absolute;bottom:10px;right:6px;font-size:8.5px;color:rgba(212,168,75,.38);font-family:monospace;background:rgba(4,8,16,.85);padding:2px 5px;border-radius:2px;pointer-events:none;}
+.loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(212,168,75,.6);font-size:13px;text-align:center;}
+
+/* simplify slider */
+.srow{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.srow label{font-size:9px;color:rgba(212,168,75,.6);white-space:nowrap;min-width:58px;}
+.srow input[type=range]{flex:1;accent-color:#d4a84b;}
+.srow span{font-size:9px;color:rgba(240,224,184,.5);min-width:24px;text-align:right;}
+
+.sb{width:230px;flex-shrink:0;border-left:1px solid rgba(212,168,75,.18);background:#040810;display:flex;flex-direction:column;}
+.sbh{padding:8px 12px;border-bottom:1px solid rgba(212,168,75,.18);font-size:10.5px;color:#d4a84b;}
+.sbb{flex:1;overflow-y:auto;padding:9px 12px;}
+.sbb::-webkit-scrollbar{width:3px;}
+.sbb::-webkit-scrollbar-thumb{background:rgba(212,168,75,.25);}
+.hint{background:rgba(212,168,75,.05);border:1px solid rgba(212,168,75,.14);border-radius:3px;padding:7px;font-size:9.5px;color:rgba(240,224,184,.48);line-height:1.65;margin-bottom:7px;}
+.ir{display:flex;gap:4px;align-items:center;margin-bottom:4px;}
+.ir label{font-size:9px;color:rgba(212,168,75,.6);white-space:nowrap;min-width:40px;}
+.ir input,.ir select{flex:1;background:rgba(0,0,0,.55);border:1px solid rgba(212,168,75,.22);color:#f0e0b8;font-size:9.5px;padding:2px 5px;border-radius:2px;}
+.ri{display:flex;align-items:center;justify-content:space-between;padding:4px 7px;border:1px solid rgba(212,168,75,.1);border-radius:2px;margin-bottom:2px;cursor:pointer;transition:background .12s;}
+.ri:hover{background:rgba(212,168,75,.09);}
+.ri.on{background:rgba(212,168,75,.17);border-color:#d4a84b;}
+.rn{font-size:9px;color:#f0e0b8;}
+.ri.on .rn{color:#ffe080;}
+.rp{font-size:8.5px;color:rgba(240,224,184,.3);}
+.rd{color:rgba(255,100,100,.45);cursor:pointer;font-size:12px;padding:0 3px;}
+.rd:hover{color:#ff6666;}
+.eb{background:rgba(0,0,0,.4);border:1px solid rgba(212,168,75,.18);border-radius:3px;padding:6px;font-size:8px;font-family:monospace;color:rgba(240,224,184,.6);white-space:pre-wrap;word-break:break-all;max-height:150px;overflow-y:auto;margin-top:5px;}
+.modetag{font-size:9px;padding:2px 6px;border-radius:2px;margin-left:4px;}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>&#9876; MECCG Editor</h1>
+  <div class="sep"></div>
+  <!-- Mode buttons -->
+  <button class="b" id="bPan" onclick="chMode('pan')">&#128400; Pan</button>
+  <button class="b on" id="bFree" onclick="chMode('free')">&#9999; Vrij tekenen</button>
+  <button class="b" id="bClick" onclick="chMode('click')">&#8901; Punten</button>
+  <div class="sep"></div>
+  <button class="b" onclick="undo()">&#8617; Undo</button>
+  <button class="b r" onclick="cancel()">&#10005; Wis</button>
+  <button class="b g" onclick="finish()">&#10003; Sluiten</button>
+  <div class="sep"></div>
+  <button class="b" onclick="doExp()">&#8681; Export</button>
+  <button class="b" onclick="doImp()">&#8679; Import</button>
+  <input type="file" id="impFile" accept=".json" style="display:none" onchange="loadFile(this)">
+  <button class="b g" id="bCp" onclick="doCopy()" style="display:none">&#128203; Kopieer</button>
+  <button class="b r" onclick="clearAll()">&#128465;</button>
+  <div class="sep"></div>
+  <span class="st" id="st">Sleep langs de rode grenslijn om een regio te tekenen</span>
+</div>
+
+<div class="ws">
+  <div class="mw free" id="mw">
+    <div class="mi" id="mi">
+      <img id="mapimg" draggable="false" crossorigin="anonymous"/>
+      <svg id="sv" style="pointer-events:none">
+        <g id="rl" style="pointer-events:all"></g>
+        <g id="dl"></g>
+      </svg>
+    </div>
+    <div class="loading" id="loading">Kaart laden van imgur...<br><small style="opacity:.6;font-size:11px">Even geduld</small></div>
+    <div class="zi">
+      <button class="zb" onclick="dz(1.3)">+</button>
+      <button class="zb" onclick="dz(.77)">&#8722;</button>
+      <button class="zb" style="font-size:10px" onclick="rv()">&#8635;</button>
+    </div>
+    <div class="cd" id="cd">0,0</div>
+  </div>
+
+  <div class="sb">
+    <div class="sbh">Regio beheer</div>
+    <div class="sbb">
+
+      <div class="hint">
+        <b style="color:#d4a84b">3 modi:</b><br>
+        &#9999; <b>Vrij</b>: sleep langs rode lijn<br>
+        &#8901; <b>Punten</b>: klik per punt<br>
+        &#128400; <b>Pan</b>: beweeg de kaart<br><br>
+        Dubbelklik of <b>&#10003;</b> om te sluiten<br>
+        <b>Vereenvoudig</b> = minder punten
+      </div>
+
+      <!-- Simplification slider (only for freehand) -->
+      <div class="srow">
+        <label>Vereenvoudig:</label>
+        <input type="range" id="simplify" min="1" max="20" value="4" oninput="document.getElementById('sval').textContent=this.value"/>
+        <span id="sval">4</span>
+      </div>
+
+      <div class="ir"><label>Naam:</label><input id="rn" placeholder="bv. Rohan"/></div>
+      <div class="ir">
+        <label>Type:</label>
+        <select id="rt">
+          <option value="W">Wilderness</option>
+          <option value="B">Border-land</option>
+          <option value="S">Shadow-land</option>
+          <option value="D">Dark-domain</option>
+          <option value="F">Free-domain</option>
+          <option value="C">Coastal</option>
+        </select>
+      </div>
+      <div class="ir">
+        <label>Route:</label>
+        <select id="rr">
+          <option value="">Geen</option>
+          <option value="R1">Glorfindel</option>
+          <option value="R2">Adrazar+Sam</option>
+          <option value="RS">Saruman</option>
+        </select>
+      </div>
+
+      <div id="rl2" style="margin-top:7px"></div>
+      <div id="ea"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var IMG_URL = 'https://i.imgur.com/Bi7iBGH.jpeg';
+var imgW = 0, imgH = 0;
+var NS = 'http://www.w3.org/2000/svg';
+
+var TC = {W:'rgba(60,160,40,.25)',B:'rgba(180,120,20,.25)',S:'rgba(160,30,50,.28)',D:'rgba(30,30,100,.32)',F:'rgba(20,80,180,.25)',C:'rgba(10,80,110,.25)'};
+var TS = {W:'#50c030',B:'#c89030',S:'#c03050',D:'#5050c0',F:'#3080d0',C:'#30a0b0'};
+
+// State
+var mode = 'free';
+var pts = [];           // current polygon points
+var rawPts = [];        // raw freehand points before simplification
+var freeDrawing = false;
+var regs = [], selI = -1, expJson = '';
+
+// Pan/zoom state
+var sc = 1, tx = 0, ty = 0, panning = false, lx = 0, ly = 0, mx = 0, my = 0, lct = 0;
+
+var mw = document.getElementById('mw');
+var mi = document.getElementById('mi');
+var sv = document.getElementById('sv');
+var RL = document.getElementById('rl');
+var DL = document.getElementById('dl');
+var img = document.getElementById('mapimg');
+
+// Load image
+img.onload = function() {
+  imgW = img.naturalWidth;
+  imgH = img.naturalHeight;
+  img.width = imgW; img.height = imgH;
+  sv.setAttribute('width', imgW);
+  sv.setAttribute('height', imgH);
+  sv.setAttribute('viewBox', '0 0 ' + imgW + ' ' + imgH);
+  document.getElementById('loading').style.display = 'none';
+  iv();
+};
+img.onerror = function() {
+  document.getElementById('loading').innerHTML = 'Fout bij laden van imgur.<br><small>Controleer internetverbinding of probeer opnieuw.</small>';
+};
+img.src = IMG_URL;
+
+// View
+function iv() {
+  if (!imgW) return;
+  var ww = mw.clientWidth, wh = mw.clientHeight;
+  sc = Math.min(ww / imgW, wh / imgH) * 0.97;
+  tx = (ww - imgW * sc) / 2;
+  ty = (wh - imgH * sc) / 2;
+  apT();
+}
+function apT() { mi.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + sc + ')'; }
+function dz(f, cx, cy) {
+  if (!imgW) return;
+  cx = (cx != null) ? cx : mw.clientWidth / 2;
+  cy = (cy != null) ? cy : mw.clientHeight / 2;
+  var ns = Math.min(Math.max(sc * f, .05), 15);
+  tx = cx - (cx - tx) * (ns / sc);
+  ty = cy - (cy - ty) * (ns / sc);
+  sc = ns; apT();
+}
+function rv() { iv(); }
+window.addEventListener('resize', iv);
+
+// Mode switching
+function chMode(m) {
+  mode = m;
+  ['Pan','Free','Click'].forEach(function(x) {
+    document.getElementById('b'+x).classList.toggle('on', m === x.toLowerCase());
+  });
+  mw.className = 'mw ' + m;
+  updSt();
+}
+
+function updSt() {
+  var n = pts.length;
+  var msg = mode === 'pan' ? 'Pan \u2014 sleep de kaart' :
+    mode === 'free' ? (freeDrawing ? 'Loslaten = klaar met lijn' : 'Klik en sleep langs de rode grenslijn') :
+    n === 0 ? 'Klik punten langs de rode grenslijn' :
+    n < 3 ? n + ' punt(en) \u2014 klik voor meer' :
+    n + ' punten \u2014 dubbelklik of \u2713 om te sluiten';
+  document.getElementById('st').textContent = msg;
+}
+
+// Coords
+function c2s(cx, cy) {
+  var r = mw.getBoundingClientRect();
+  return [Math.round((cx - r.left - tx) / sc), Math.round((cy - r.top - ty) / sc)];
+}
+
+// ── RAMER-DOUGLAS-PEUCKER SIMPLIFICATION ──
+function rdp(pts, epsilon) {
+  if (pts.length <= 2) return pts;
+  var maxDist = 0, idx = 0;
+  var start = pts[0], end = pts[pts.length - 1];
+  for (var i = 1; i < pts.length - 1; i++) {
+    var d = perpDist(pts[i], start, end);
+    if (d > maxDist) { maxDist = d; idx = i; }
+  }
+  if (maxDist > epsilon) {
+    var l = rdp(pts.slice(0, idx + 1), epsilon);
+    var r = rdp(pts.slice(idx), epsilon);
+    return l.slice(0, -1).concat(r);
+  }
+  return [start, end];
+}
+function perpDist(p, a, b) {
+  var dx = b[0] - a[0], dy = b[1] - a[1];
+  if (dx === 0 && dy === 0) return Math.hypot(p[0]-a[0], p[1]-a[1]);
+  var t = ((p[0]-a[0])*dx + (p[1]-a[1])*dy) / (dx*dx+dy*dy);
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p[0]-(a[0]+t*dx), p[1]-(a[1]+t*dy));
+}
+
+function getEpsilon() {
+  var slider = parseInt(document.getElementById('simplify').value);
+  // Scale epsilon relative to image size and current zoom
+  return slider * (imgW / 500) / sc;
+}
+
+// ── MOUSE EVENTS ──
+mw.addEventListener('mousedown', function(e) {
+  if (mode === 'pan') { panning = true; lx = e.clientX; ly = e.clientY; return; }
+  if (mode === 'free') {
+    freeDrawing = true;
+    rawPts = [c2s(e.clientX, e.clientY)];
+    updSt();
+  }
+});
+
+mw.addEventListener('mousemove', function(e) {
+  var p = c2s(e.clientX, e.clientY);
+  mx = p[0]; my = p[1];
+  document.getElementById('cd').textContent = mx + ',' + my;
+
+  if (panning && mode === 'pan') {
+    tx += e.clientX - lx; ty += e.clientY - ly;
+    lx = e.clientX; ly = e.clientY; apT();
+  }
+
+  if (freeDrawing && mode === 'free') {
+    // Only add point if moved enough (reduce raw points)
+    var last = rawPts[rawPts.length - 1];
+    var dist = Math.hypot(p[0]-last[0], p[1]-last[1]);
+    if (dist > 2 / sc) {
+      rawPts.push(p);
+      renderFreePreview();
+    }
+  }
+
+  if (mode === 'click') updPrev();
+});
+
+mw.addEventListener('mouseup', function(e) {
+  if (panning) { panning = false; return; }
+  if (freeDrawing && mode === 'free') {
+    freeDrawing = false;
+    // Simplify and add to pts
+    var simplified = rdp(rawPts, getEpsilon());
+    pts = pts.concat(simplified);
+    rawPts = [];
+    renderDL();
+    updSt();
+  }
+});
+
+mw.addEventListener('mouseleave', function() {
+  panning = false;
+  if (freeDrawing && mode === 'free') {
+    freeDrawing = false;
+    var simplified = rdp(rawPts, getEpsilon());
+    pts = pts.concat(simplified);
+    rawPts = [];
+    renderDL();
+    updSt();
+  }
+});
+
+// Click mode
+mw.addEventListener('click', function(e) {
+  if (mode !== 'click') return;
+  var now = Date.now();
+  if (now - lct < 320) { finish(); return; }
+  lct = now;
+  pts.push(c2s(e.clientX, e.clientY));
+  updSt(); renderDL();
+});
+
+// Double-click to finish (both modes)
+mw.addEventListener('dblclick', function(e) {
+  if (mode === 'free' || mode === 'click') finish();
+});
+
+mw.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  var r = mw.getBoundingClientRect();
+  dz(e.deltaY < 0 ? 1.13 : .88, e.clientX - r.left, e.clientY - r.top);
+}, {passive: false});
+
+// ── TOUCH EVENTS ──
+var ltd = 0, tpan = false, tlx = 0, tly = 0, ltap = 0, tfree = false;
+
+mw.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    tlx = e.touches[0].clientX; tly = e.touches[0].clientY;
+    if (mode === 'pan') { tpan = true; }
+    else if (mode === 'free') { tfree = true; rawPts = [c2s(tlx, tly)]; updSt(); }
+  }
+  if (e.touches.length === 2) {
+    tpan = false; tfree = false;
+    ltd = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+  }
+}, {passive:false});
+
+mw.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    var cx = e.touches[0].clientX, cy = e.touches[0].clientY;
+    if (tpan) { tx += cx-tlx; ty += cy-tly; apT(); }
+    if (tfree && mode === 'free') {
+      var p = c2s(cx, cy);
+      var last = rawPts[rawPts.length-1];
+      if (Math.hypot(p[0]-last[0], p[1]-last[1]) > 2/sc) {
+        rawPts.push(p); renderFreePreview();
+      }
+    }
+    tlx = cx; tly = cy;
+  }
+  if (e.touches.length === 2) {
+    var d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    var cx2 = (e.touches[0].clientX+e.touches[1].clientX)/2;
+    var cy2 = (e.touches[0].clientY+e.touches[1].clientY)/2;
+    var r = mw.getBoundingClientRect();
+    dz(d/ltd, cx2-r.left, cy2-r.top); ltd = d;
+  }
+}, {passive:false});
+
+mw.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  if (tfree && mode === 'free') {
+    tfree = false;
+    var simplified = rdp(rawPts, getEpsilon());
+    pts = pts.concat(simplified);
+    rawPts = [];
+    renderDL(); updSt();
+  }
+  if (mode === 'click' && e.changedTouches.length === 1) {
+    var now = Date.now();
+    var p = c2s(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    if (now - ltap < 350) { finish(); }
+    else { pts.push(p); updSt(); renderDL(); }
+    ltap = now;
+  }
+  tpan = false;
+}, {passive:false});
+
+// ── DRAW LAYER ──
+function mk(tag, attrs) {
+  var el = document.createElementNS(NS, tag);
+  for (var k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+function renderFreePreview() {
+  // Show raw freehand line while drawing
+  var existing = DL.querySelector('.fraw');
+  if (existing) existing.remove();
+  if (rawPts.length < 2) return;
+  var all = pts.concat(rawPts);
+  var el = mk('polyline', {
+    points: all.map(function(p){return p.join(',');}).join(' '),
+    fill: 'rgba(70,220,70,.12)', stroke:'#44ff44', 'stroke-width':'2',
+    'stroke-linejoin':'round','stroke-linecap':'round'
+  });
+  el.classList.add('fraw');
+  DL.appendChild(el);
+}
+
+function renderDL() {
+  DL.innerHTML = '';
+  if (!pts.length) return;
+
+  // Main polygon/line
+  if (pts.length >= 3) {
+    DL.appendChild(mk('polygon', {
+      points: pts.map(function(p){return p.join(',');}).join(' '),
+      class: 'fline'
+    }));
+  } else if (pts.length === 2) {
+    DL.appendChild(mk('line', {x1:pts[0][0],y1:pts[0][1],x2:pts[1][0],y2:pts[1][1],stroke:'#44ff44','stroke-width':'2'}));
+  }
+
+  // Show individual points only in click mode
+  if (mode === 'click') {
+    pts.forEach(function(p, i) {
+      DL.appendChild(mk('circle', {cx:p[0],cy:p[1],r:5,class:'dpt'}));
+      var t = mk('text', {x:p[0]+8,y:p[1]-4,fill:'#88ff88','font-size':'14','font-weight':'bold'});
+      t.textContent = i+1; DL.appendChild(t);
+    });
+    updPrev();
+  }
+
+  // Point count indicator
+  var cx = Math.round(pts.reduce(function(a,p){return a+p[0];},0)/pts.length);
+  var cy = Math.round(pts.reduce(function(a,p){return a+p[1];},0)/pts.length);
+  var badge = mk('text', {x:cx,y:cy,'text-anchor':'middle','dominant-baseline':'middle',
+    fill:'#88ff88','font-size':'14',stroke:'rgba(0,0,0,.7)','stroke-width':'3','paint-order':'stroke fill'});
+  badge.textContent = pts.length + 'pt';
+  DL.appendChild(badge);
+}
+
+function updPrev() {
+  var old = DL.querySelector('.dl'); if (old) old.remove();
+  if (pts.length >= 1 && mode === 'click') {
+    DL.appendChild(mk('line', {x1:pts[pts.length-1][0],y1:pts[pts.length-1][1],x2:mx,y2:my,class:'dl'}));
+  }
+}
+
+// ── REGION OPERATIONS ──
+function finish() {
+  if (pts.length < 3) { alert('Minimaal 3 punten!'); return; }
+  var nm = document.getElementById('rn').value || 'Regio ' + (regs.length+1);
+  var tp = document.getElementById('rt').value;
+  var ro = document.getElementById('rr').value;
+  regs.push({name:nm, type:tp, route:ro, points:pts.slice()});
+  pts = []; rawPts = []; DL.innerHTML = '';
+  document.getElementById('rn').value = '';
+  renderRL(); renderList(); updSt();
+}
+
+function undo() {
+  // In free mode: remove last stroke segment
+  // In click mode: remove last point
+  if (mode === 'click' && pts.length) {
+    pts.pop(); renderDL(); updSt();
+  } else if (pts.length) {
+    // Remove last ~10% of points (last stroke)
+    pts = pts.slice(0, Math.max(0, pts.length - Math.max(1, Math.floor(pts.length * 0.3))));
+    renderDL(); updSt();
+  }
+}
+
+function cancel() { pts = []; rawPts = []; DL.innerHTML = ''; updSt(); }
+function delReg(i) { regs.splice(i,1); if (selI >= regs.length) selI = regs.length-1; renderRL(); renderList(); }
+function clearAll() { if (confirm('Alles wissen?')) { regs=[]; pts=[]; rawPts=[]; DL.innerHTML=''; renderRL(); renderList(); updSt(); } }
+
+function renderRL() {
+  RL.innerHTML = '';
+  regs.forEach(function(r, i) {
+    var g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'reg' + (selI===i?' sel':''));
+    g.addEventListener('click', function(ev) { ev.stopPropagation(); selI=i; renderRL(); renderList(); });
+    var poly = mk('polygon', {
+      points: r.points.map(function(p){return p.join(',');}).join(' '),
+      fill: TC[r.type]||'rgba(200,200,200,.2)',
+      stroke: selI===i?'#ffe060':(TS[r.type]||'#aaa'),
+      'stroke-width': selI===i?'3':'2'
+    });
+    g.appendChild(poly);
+    var cx = Math.round(r.points.reduce(function(a,p){return a+p[0];},0)/r.points.length);
+    var cy = Math.round(r.points.reduce(function(a,p){return a+p[1];},0)/r.points.length);
+    var t = mk('text', {x:cx,y:cy,'text-anchor':'middle','dominant-baseline':'middle',
+      fill:'rgba(255,240,190,.9)','font-size':'18',
+      stroke:'rgba(0,0,0,.8)','stroke-width':'4','paint-order':'stroke fill'});
+    t.textContent = r.name;
+    g.appendChild(t);
+    RL.appendChild(g);
+  });
+}
+
+function renderList() {
+  var el = document.getElementById('rl2');
+  if (!regs.length) {
+    el.innerHTML = '<div style="font-size:9.5px;color:rgba(240,224,184,.25);text-align:center;padding:9px;font-style:italic">Nog geen regio\'s</div>';
+    return;
+  }
+  el.innerHTML = regs.map(function(r,i) {
+    return '<div class="ri'+(selI===i?' on':'')+'" onclick="selI='+i+';renderRL();renderList()">' +
+      '<div><div class="rn">'+r.name+'</div><div class="rp">'+r.type+(r.route?' \u00b7 '+r.route:'')+' \u00b7 '+r.points.length+'pt</div></div>' +
+      '<span class="rd" onclick="event.stopPropagation();delReg('+i+')">\u00d7</span></div>';
+  }).join('');
+}
+
+// Export
+function doExp() {
+  if (!regs.length) { alert('Geen regio\'s.'); return; }
+  var out = regs.map(function(r) {
+    return {
+      id: r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),
+      name: r.name, type: r.type, route: r.route||null,
+      points: r.points.map(function(p){return p.join(',');}).join(' ')
+    };
+  });
+  expJson = JSON.stringify(out, null, 2);
+  // Download als bestand
+  var blob = new Blob([expJson], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'meccg-regio\u0027s.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('st').textContent = regs.length + ' regio\'s geëxporteerd naar bestand.';
+  document.getElementById('ea').innerHTML =
+    '<div style="font-size:8.5px;color:rgba(212,168,75,.55);text-transform:uppercase;margin:7px 0 3px">'+regs.length+' regio\'s gedownload</div>' +
+    '<div class="eb">'+expJson.replace(/</g,'&lt;')+'</div>';
+  document.getElementById('bCp').style.display = '';
+}
+
+function doCopy() {
+  navigator.clipboard.writeText(expJson).then(function() {
+    var b = document.getElementById('bCp');
+    b.textContent = '\u2713 Gekopieerd!';
+    setTimeout(function(){ b.textContent = '\uD83D\uDCCB Kopieer'; }, 2000);
+  });
+}
+
+function doImp() {
+  document.getElementById('impFile').click();
+}
+function loadFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) throw new Error('Geen array');
+      var loaded = 0;
+      data.forEach(function(r) {
+        if (!r.points || !r.name) return;
+        // Converteer points string naar array van [x,y] pairs
+        var pts = r.points.split(' ').map(function(p) {
+          var xy = p.split(',').map(Number);
+          return xy;
+        }).filter(function(p) { return p.length === 2 && !isNaN(p[0]); });
+        if (pts.length < 3) return;
+        regs.push({
+          name: r.name,
+          type: r.type || 'W',
+          route: r.route || null,
+          points: pts,
+          closed: true
+        });
+        loaded++;
+      });
+      renderRL(); renderList();
+      document.getElementById('st').textContent = loaded + ' regio\'s geladen.';
+      input.value = '';
+    } catch(ex) {
+      alert('Fout bij laden: ' + ex.message);
+      input.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
