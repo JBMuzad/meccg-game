@@ -923,7 +923,7 @@ function selectSite(i){
       id:s._ds.id, name:s._ds.name,
       type:s._ds.type, alignment:s._ds.alignments.join(' / '),
       set:s._ds.set+' (Dream)', dreamcard:true,
-      imgUrl:'', text:s._ds.text, quote:'',
+      imgUrl:getDCImgUrl(s._ds.set,s._ds.name)||'', text:s._ds.text, quote:'',
       attrs:{Type:'Site',Subtype:SL[s._ds.type]||s._ds.type,
              Alignment:s._ds.alignments.join(' / '),Region:s._ds.region,
              Path:s._ds.path||undefined,Haven:s._ds.haven||undefined}
@@ -1214,7 +1214,7 @@ function _renderDreamSitesInOverlay(regionName){
         id:site.id, name:site.name,
         type:site.type, alignment:site.alignments.join(' / '),
         set:site.set+' (Dream)', dreamcard:true,
-        imgUrl:'', text:site.text, quote:'',
+        imgUrl:getDCImgUrl(site.set,site.name)||'', text:site.text, quote:'',
         attrs:{
           Type:'Site', Subtype:SL[site.type]||site.type,
           Alignment:site.alignments.join(' / '),
@@ -1232,6 +1232,26 @@ function _renderDreamSitesInOverlay(regionName){
 var _allCards=[], _curCardId=null, _cardsLoaded=false;
 var CARDNUM_URL='https://raw.githubusercontent.com/rezwits/cardnum/master/fdata/cards-dc.json';
 var COUNCIL_URL='https://raw.githubusercontent.com/council-of-elrond-meccg/meccg-cards-database/master/cards.json';
+
+// Dreamcard set code → folder in vastorper/dc repo
+var DC_SET_FOLDER={
+  'MEBO':'BayOrmal','MEBU':'MorgothsLegacy','MECA':'Court',
+  'MECP':'CentralPlains','MEDF':'DurinsFolk','MEFB':'Firstborn',
+  'MEGW':'GreatWyrms','MEKN':'KingdomNorth','MEML':'NorthernWaste',
+  'MENE':'Necromancer','MENW':'NorthernWaste','MERN':'RedNightfall',
+  'MESL':'SunLands','METI':'TreasonIsengard','MEWR':'WarRing',
+  'MEXW':'DurinsFolk','MEAG':'AgainstShadow','MEBA':'Balrog',
+  'MEDK':'DarkMinions','MELE':'LidlessEye','MERS':'ReturnShadow',
+  'MEMM':'MorgothsLegacy'
+};
+var DC_IMG_BASE='https://raw.githubusercontent.com/vastorper/dc/master/graphics/Metw/';
+
+function getDCImgUrl(set,name){
+  var folder=DC_SET_FOLDER[set];
+  if(!folder||!name)return '';
+  return DC_IMG_BASE+encodeURIComponent(folder)+'/'+encodeURIComponent(name)+'.jpg';
+}
+
 
 function _buildCardList(){
   if(_cardsLoaded)return;
@@ -1263,6 +1283,7 @@ function _buildCardList(){
       var name=c.NameEN||'';
       if(!name)return;
       var imgUrl=imgLookup[name.toLowerCase()]||'';
+      if(!imgUrl&&c.dreamcard&&c.Set)imgUrl=getDCImgUrl(c.Set,name);
       var attrs={};
       if(c.Primary)attrs.Type=c.Primary;
       if(c.Secondary&&c.Secondary!==c.Primary)attrs.Subtype=c.Secondary;
