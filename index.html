@@ -208,6 +208,80 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
     </div>
   </div>
 </div>
+<div id="siteOverlay">
+  <button id="soClose" onclick="closeSiteOverlay()">&#10005;</button>
+  <div id="soPanel">
+    <div id="soLeft">
+      <svg id="soSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="soRegMeta"><span id="soRegName"></span></div>
+    </div>
+    <div id="soRight">
+      <div id="soSiteName"></div>
+      <div id="soSiteType"></div>
+      <div id="soVersions"></div>
+      <div id="soHazards"></div>
+      <div id="soOtherSites"></div>
+      <div id="soImgWrap">
+        <div id="soImgLoad">Laden&#8230;</div>
+        <img id="soImg"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="routeOverlay">
+  <button id="rtClose" onclick="closeRouteOverlay()">&#10005;</button>
+  <div id="rtPanel">
+    <div id="rtLeft">
+      <svg id="rtSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="rtMapMeta"></div>
+    </div>
+    <div id="rtRight">
+      <div id="rtHeader"></div>
+      <div id="rtInfo"></div>
+      <div id="rtDests"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Card overlay -->
+<div id="cardOverlay">
+  <div id="cardPanel">
+    <button id="cardClose" onclick="closeCardOverlay()">&#10005;</button>
+    <div id="cardImgCol">
+      <img id="cdImg" src="" alt="" onerror="this.style.opacity='.3'">
+    </div>
+    <div id="cardDetailCol">
+      <div>
+        <div class="cd-title" id="cdTitle"></div>
+        <div id="cdBadges"></div>
+      </div>
+      <div class="cd-section" id="cdAttrsSection" style="display:none">
+        <div class="cd-section-label">Attributen</div>
+        <div class="cd-attrs" id="cdAttrs"></div>
+      </div>
+      <div class="cd-section" id="cdTextSection" style="display:none">
+        <div class="cd-section-label">Kaarttekst</div>
+        <div class="cd-text" id="cdText"></div>
+      </div>
+      <div class="cd-section" id="cdQuoteSection" style="display:none">
+        <div class="cd-section-label">Citaat</div>
+        <div class="cd-text" id="cdQuote"></div>
+      </div>
+      <div class="cd-section">
+        <div class="cd-section-label">Extra informatie</div>
+        <a id="cdWikiLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener">&#128269; Zoek op MECCG Wiki</a>
+        <a id="cdCouncilLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener" style="margin-left:6px;">&#127183; cardnum.net</a>
+      </div>
+      <div class="cd-section">
+        <div class="cd-section-label">Persoonlijke notities</div>
+        <textarea id="cdNotes" placeholder="Voeg hier je eigen notities toe…" oninput="saveCardNote()"></textarea>
+        <div id="cdNotesStatus"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 var SITE_MARKERS=[{"n":"Bag End","t":"free","rid":"the-shire","x":498,"y":925},{"n":"Bree","t":"border","rid":"arthedain","x":481,"y":854},{"n":"The White Towers","t":"free","rid":"arthedain","x":516,"y":914},{"n":"Weathertop","t":"ruins","rid":"arthedain","x":446,"y":914},{"n":"Cameth Brin","t":"border","rid":"rhudaur","x":766,"y":800},{"n":"Ettenmoors","t":"ruins","rid":"rhudaur","x":801,"y":860},{"n":"Rivendell","t":"haven","rid":"rhudaur","x":732,"y":860},{"n":"Grey Havens","t":"haven","rid":"lindon","x":268,"y":868},{"n":"Himring","t":"ruins","rid":"elven-shores","x":210,"y":913}];
 var SITE_SYMBOLS={"haven": "\u2694", "free": "\u25a1", "ruins": "\u25b3", "shadow": "\u25c6", "border": "\u25cb", "dark": "\u25cf"};
@@ -1558,79 +1632,5 @@ document.addEventListener('keydown',function(e){
 });
 
 </script>
-
-<div id="siteOverlay">
-  <button id="soClose" onclick="closeSiteOverlay()">&#10005;</button>
-  <div id="soPanel">
-    <div id="soLeft">
-      <svg id="soSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div id="soRegMeta"><span id="soRegName"></span></div>
-    </div>
-    <div id="soRight">
-      <div id="soSiteName"></div>
-      <div id="soSiteType"></div>
-      <div id="soVersions"></div>
-      <div id="soHazards"></div>
-      <div id="soOtherSites"></div>
-      <div id="soImgWrap">
-        <div id="soImgLoad">Laden&#8230;</div>
-        <img id="soImg"/>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="routeOverlay">
-  <button id="rtClose" onclick="closeRouteOverlay()">&#10005;</button>
-  <div id="rtPanel">
-    <div id="rtLeft">
-      <svg id="rtSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div id="rtMapMeta"></div>
-    </div>
-    <div id="rtRight">
-      <div id="rtHeader"></div>
-      <div id="rtInfo"></div>
-      <div id="rtDests"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Card overlay -->
-<div id="cardOverlay">
-  <div id="cardPanel">
-    <button id="cardClose" onclick="closeCardOverlay()">&#10005;</button>
-    <div id="cardImgCol">
-      <img id="cdImg" src="" alt="" onerror="this.style.opacity='.3'">
-    </div>
-    <div id="cardDetailCol">
-      <div>
-        <div class="cd-title" id="cdTitle"></div>
-        <div id="cdBadges"></div>
-      </div>
-      <div class="cd-section" id="cdAttrsSection" style="display:none">
-        <div class="cd-section-label">Attributen</div>
-        <div class="cd-attrs" id="cdAttrs"></div>
-      </div>
-      <div class="cd-section" id="cdTextSection" style="display:none">
-        <div class="cd-section-label">Kaarttekst</div>
-        <div class="cd-text" id="cdText"></div>
-      </div>
-      <div class="cd-section" id="cdQuoteSection" style="display:none">
-        <div class="cd-section-label">Citaat</div>
-        <div class="cd-text" id="cdQuote"></div>
-      </div>
-      <div class="cd-section">
-        <div class="cd-section-label">Extra informatie</div>
-        <a id="cdWikiLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener">&#128269; Zoek op MECCG Wiki</a>
-        <a id="cdCouncilLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener" style="margin-left:6px;">&#127183; cardnum.net</a>
-      </div>
-      <div class="cd-section">
-        <div class="cd-section-label">Persoonlijke notities</div>
-        <textarea id="cdNotes" placeholder="Voeg hier je eigen notities toe…" oninput="saveCardNote()"></textarea>
-        <div id="cdNotesStatus"></div>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
