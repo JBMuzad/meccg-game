@@ -927,7 +927,7 @@ getDB(function(){});
 // ── Cards Explained ──────────────────────────────────────────────────────────
 var _allCards=[], _curCardId=null, _cardsLoaded=false;
 var CARDNUM_URL='https://raw.githubusercontent.com/rezwits/cardnum/master/fdata/cards-dc.json';
-var CARDNUM_IMG='https://cardnum.net/img/cards/';
+var COUNCIL_URL='https://raw.githubusercontent.com/council-of-elrond-meccg/meccg-cards-database/master/cards.json';
 
 function _buildCardList(){
   if(_cardsLoaded)return;
@@ -935,16 +935,33 @@ function _buildCardList(){
   var el=document.getElementById('cardResults');
   el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Databank laden…</div>';
 
-  fetch(CARDNUM_URL).then(function(r){return r.json();}).then(function(data){
+  // Laad beide databanken parallel
+  Promise.all([
+    fetch(COUNCIL_URL).then(function(r){return r.json();}).catch(function(){return {};}),
+    fetch(CARDNUM_URL).then(function(r){return r.json();}).catch(function(){return [];})
+  ]).then(function(results){
+    var councilData=results[0], cardnumData=results[1];
+
+    // Bouw image URL lookup vanuit council-of-elrond (naam → imgUrl)
+    var imgLookup={};
+    Object.values(councilData).forEach(function(set){
+      if(!set.cards)return;
+      var base=(set.imageBaseUrl&&set.imageBaseUrl.en)||'';
+      Object.values(set.cards).forEach(function(c){
+        var name=(c.name&&c.name.en)||'';
+        if(name&&c.image)imgLookup[name.toLowerCase()]=base+c.image;
+      });
+    });
+
+    // Verwerk cardnum kaarten
     _allCards=[];
-    data.forEach(function(c){
+    cardnumData.forEach(function(c){
       var name=c.NameEN||'';
       if(!name)return;
-      // Bouw attribuutobject
+      var imgUrl=imgLookup[name.toLowerCase()]||'';
       var attrs={};
       if(c.Primary)attrs.Type=c.Primary;
       if(c.Secondary&&c.Secondary!==c.Primary)attrs.Subtype=c.Secondary;
-      if(c.Alignment)attrs.Alignment=c.Alignment;
       if(c.Race)attrs.Race=c.Race;
       if(c.Skill)attrs.Skills=c.Skill;
       if(c.Mind)attrs.Mind=c.Mind;
@@ -952,8 +969,9 @@ function _buildCardList(){
       if(c.Body)attrs.Body=c.Body;
       if(c.Direct)attrs['Direct Inf.']=c.Direct;
       if(c.MPs)attrs.MPs=c.MPs;
-      if(c.Home)attrs['Home Site']=c.Home;
+      if(c.Home)attrs['Home Site']=(c.Home||'').trim();
       if(c.Rarity)attrs.Rarity=c.Rarity;
+      if(c.Artist)attrs.Artist=c.Artist;
       _allCards.push({
         id:c.MEID||c.fullCode||name,
         name:name,
@@ -961,13 +979,13 @@ function _buildCardList(){
         alignment:c.Alignment||'',
         set:c.Set||'',
         dreamcard:!!c.dreamcard,
-        imgUrl:CARDNUM_IMG+(c.ImageName||''),
+        imgUrl:imgUrl,
         text:c.Text||'',
         quote:'',
         attrs:attrs
       });
     });
-    // Herzoek met huidige query
+
     var q=document.getElementById('cardSearch').value;
     if(q&&q.length>=2)searchCards(q);
     else el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam om te zoeken.</div>';
