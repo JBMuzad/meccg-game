@@ -692,9 +692,8 @@ function switchTab(tab){
   document.getElementById('sbcards').style.display=tab==='cards'?'flex':'none';
   if(tab==='sites') renderSites(_siteFilter);
   if(tab==='routes'){
-    _routeStart=null;
-    document.getElementById('sbroutes').innerHTML=
-      '<div class="rt-placeholder">&#128336; Klik op een regio op de kaart<br>om de startpositie te kiezen.</div>';
+    _routeStart=null; _routeEnd=null;
+    updateRouteSidebar();
   }
   if(tab==='cards'){
     var q=document.getElementById('cardSearch').value;
@@ -1243,36 +1242,188 @@ var TYPE_COLORS_RT={'F':'rgba(74,143,208,.45)','W':'rgba(106,154,74,.45)','B':'r
 var TYPE_STROKE_RT={'F':'#4a8fd0','W':'#6a9a4a','B':'#b8842a','S':'#8a3a8a','D':'#7a3a3a','C':'#2a7a8a'};
 var TYPE_BG_RT={'F':'#1a3a6a','W':'#1a3a1a','B':'#4a3010','S':'#3a1a4a','D':'#3a1a1a','C':'#0a2a3a'};
 var TYPE_NAME_RT={'F':'Free-domain','W':'Wilderness','B':'Border-land','S':'Shadow-land','D':'Dark-domain','C':'Coastal Sea'};
+var MOVE_COLORS=['#d4a84b','#4a8fd0','#6a9a4a','#8a3a8a','#b8842a','#2a7a8a','#c04040','#408060'];
+
+var _routeEnd=null;
+
+// BFS kortste pad tussen twee regio's
+function bfsPath(startRid, endRid){
+  if(startRid===endRid)return[startRid];
+  var visited={};
+  var queue=[[startRid]];
+  visited[startRid]=true;
+  while(queue.length){
+    var path=queue.shift();
+    var cur=path[path.length-1];
+    var adj=ADJACENCY[cur]||[];
+    for(var i=0;i<adj.length;i++){
+      var nxt=adj[i];
+      if(visited[nxt])continue;
+      var newPath=path.concat(nxt);
+      if(nxt===endRid)return newPath;
+      visited[nxt]=true;
+      queue.push(newPath);
+    }
+  }
+  return null; // geen pad gevonden
+}
+
+// Verdeel pad in bewegingssegmenten (max 4 regio's per beweging)
+function pathToMoves(path){
+  var moves=[];
+  var i=0;
+  while(i<path.length-1){
+    var seg=path.slice(i,i+4);
+    moves.push(seg);
+    i+=3; // volgende segment begint 3 stappen verder (overlap op laatste)
+  }
+  return moves;
+}
 
 function openRouteOverlay(rid){
   var rd=RD[rid];if(!rd)return;
-  if(!rd)return;
-  _routeStart=rid;
 
-  // Update sidebar
-  document.getElementById('sbroutes').innerHTML=
-    '<div style="padding:8px 0"><div style="font-size:10px;color:rgba(212,168,75,.4);text-transform:uppercase">Start</div>'+
-    '<div style="font-size:15px;color:#d4a84b;font-weight:600">'+rd.name+'</div>'+
-    '<div style="font-size:10px;color:rgba(212,168,75,.35)">Klik op kaart voor nieuw startpunt</div></div>';
+  if(!_routeStart){
+    // Fase 1: start instellen
+    _routeStart=rid;
+    _routeEnd=null;
+    updateRouteSidebar();
+    return;
+  }
 
-  var adj=ADJACENCY[rid]||[];
+  if(rid===_routeStart){
+    // Zelfde regio → reset
+    _routeStart=null; _routeEnd=null;
+    updateRouteSidebar();
+    return;
+  }
 
-  // SVG links: bounding box over start + bereikbare regio
+  // Fase 2: einde instellen → bereken route
+  _routeEnd=rid;
+  var path=bfsPath(_routeStart,_routeEnd);
+  updateRouteSidebar(path);
+  if(path) showRouteOnMap(path);
+
+}
+
+function updateRouteSidebar(path){
+  var rdS=_routeStart?RD[_routeStart]:null;
+  var rdE=_routeEnd?RD[_routeEnd]:null;
+  var sb=document.getElementById('sbroutes');
+
+  if(!_routeStart){
+    sb.innerHTML='<div class="rt-placeholder">&#128336; Klik op een regio op de kaart<br>om de startpositie te kiezen.</div>';
+    return;
+  }
+  if(!_routeEnd){
+    sb.innerHTML=
+      '<div style="padding:6px 0 10px">'+
+      '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">Start</div>'+
+      '<div style="font-size:15px;color:#d4a84b;font-weight:700">'+rdS.name+'</div>'+
+      '<span class="rt-type-badge" style="background:'+(TYPE_BG_RT[rdS.type]||'#333')+';color:'+(TYPE_STROKE_RT[rdS.type]||'#aaa')+'">'+(TYPE_NAME_RT[rdS.type]||rdS.type)+'</span>'+
+      '</div>'+
+      '<div class="rt-placeholder" style="margin-top:8px;">Klik nu op de <b style="color:#d4a84b">eindregio</b> op de kaart.</div>'+
+      '<button onclick="_routeStart=null;_routeEnd=null;updateRouteSidebar();" style="margin-top:10px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
+    return;
+  }
+
+  if(!path){
+    sb.innerHTML='<div class="rt-placeholder">Geen pad gevonden tussen deze regio\'s.</div>'+
+      '<button onclick="_routeStart=null;_routeEnd=null;updateRouteSidebar();" style="margin-top:10px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
+    return;
+  }
+
+  var moves=pathToMoves(path);
+  var nMoves=moves.length;
+  var nRegs=path.length;
+
+  var h='<div style="padding:4px 0 10px;border-bottom:1px solid rgba(212,168,75,.1);margin-bottom:10px;">';
+  h+='<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;">';
+  h+='<div style="flex:1"><div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;">Van</div><div style="font-size:13px;color:#d4a84b;font-weight:700">'+rdS.name+'</div></div>';
+  h+='<div style="color:rgba(212,168,75,.4);padding-top:14px;">&#8594;</div>';
+  h+='<div style="flex:1;text-align:right"><div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;">Naar</div><div style="font-size:13px;color:#d4a84b;font-weight:700">'+rdE.name+'</div></div>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:10px;">';
+  h+='<div style="background:rgba(212,168,75,.08);border:1px solid rgba(212,168,75,.2);border-radius:5px;padding:6px 10px;flex:1;text-align:center;">';
+  h+='<div style="font-size:18px;color:#d4a84b;font-weight:700">'+nMoves+'</div>';
+  h+='<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;">Beweging'+(nMoves>1?'en':'')+'</div></div>';
+  h+='<div style="background:rgba(212,168,75,.08);border:1px solid rgba(212,168,75,.2);border-radius:5px;padding:6px 10px;flex:1;text-align:center;">';
+  h+='<div style="font-size:18px;color:#d4a84b;font-weight:700">'+(nRegs-1)+'</div>';
+  h+='<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;">Regio-stappen</div></div>';
+  h+='</div></div>';
+
+  // Bewegingen
+  moves.forEach(function(seg,mi){
+    var col=MOVE_COLORS[mi%MOVE_COLORS.length];
+    var lastRid=seg[seg.length-1];
+    var lastRd=RD[lastRid];
+    var allHaz=[];
+    seg.forEach(function(r){var rd2=RD[r];if(rd2&&rd2.h)allHaz=allHaz.concat(rd2.h);});
+    var uniqHaz=allHaz.filter(function(v,i,a){return a.indexOf(v)===i;});
+    var destSites=(lastRd&&lastRd.s)||[];
+
+    h+='<div style="margin-bottom:10px;border:1px solid '+col+'33;border-radius:6px;overflow:hidden;">';
+    h+='<div style="background:'+col+'22;padding:6px 10px;display:flex;align-items:center;gap:6px;">';
+    h+='<div style="width:18px;height:18px;border-radius:50%;background:'+col+';color:#000;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;">'+(mi+1)+'</div>';
+    h+='<div style="font-size:11px;font-weight:600;color:'+col+';">Beweging '+(mi+1)+'</div>';
+    h+='<div style="font-size:9px;color:rgba(255,255,255,.3);margin-left:auto;">'+seg.length+' regio\'s</div>';
+    h+='</div>';
+    h+='<div style="padding:8px 10px;">';
+
+    // Regio-keten
+    h+='<div style="display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-bottom:8px;">';
+    seg.forEach(function(r,ri){
+      var rd2=RD[r];
+      var isFirst=(mi===0&&ri===0);
+      var isLast=(ri===seg.length-1);
+      var bg=isFirst?'rgba(212,168,75,.15)':isLast?col+'33':'rgba(255,255,255,.04)';
+      var border=isFirst?'rgba(212,168,75,.4)':isLast?col:'rgba(255,255,255,.1)';
+      var textCol=isFirst?'#d4a84b':isLast?col:'rgba(240,224,184,.6)';
+      h+='<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+bg+';border:1px solid '+border+';color:'+textCol+';">'+(rd2?rd2.name:r)+'</span>';
+      if(ri<seg.length-1)h+='<span style="color:rgba(255,255,255,.2);font-size:9px;">›</span>';
+    });
+    h+='</div>';
+
+    // Sites op eindpunt
+    if(destSites.length){
+      h+='<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Sites in '+(lastRd?lastRd.name:'?')+'</div>';
+      h+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;">';
+      destSites.forEach(function(s){
+        h+='<span class="rt-site-tag" style="background:rgba(0,0,0,.3);border:1px solid '+(SC[s.t]||'#888')+';color:'+(SC[s.t]||'#888')+'">'+s.n+'</span>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div style="font-size:10px;color:rgba(240,224,184,.2);margin-bottom:6px;">Geen sites op eindpunt</div>';
+    }
+
+    // Hazards
+    if(uniqHaz.length){
+      h+='<div style="font-size:9px;color:rgba(220,80,80,.6);">&#9888; '+uniqHaz.join(', ')+'</div>';
+    }
+    h+='</div></div>';
+  });
+
+  h+='<button onclick="_routeStart=null;_routeEnd=null;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Nieuwe route</button>';
+
+  sb.innerHTML=h;
+}
+
+function showRouteOnMap(path){
   var svgEl=document.getElementById('rtSvg');
   svgEl.innerHTML='';
+  var moves=pathToMoves(path);
 
-  var allRids=[rid].concat(adj);
+  // Bounding box
   var allPts=[];
-  allRids.forEach(function(r){
+  path.forEach(function(r){
     if(!POLYS[r])return;
     POLYS[r].split(' ').forEach(function(p){var xy=p.split(',');allPts.push([+xy[0],+xy[1]]);});
   });
-  if(!allPts.length)return;
-
+  if(!allPts.length){document.getElementById('routeOverlay').classList.add('open');return;}
   var xs=allPts.map(function(p){return p[0];}),ys=allPts.map(function(p){return p[1];});
   var minX=Math.min.apply(null,xs),maxX=Math.max.apply(null,xs);
   var minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
-  var pad=Math.max(30,(maxX-minX)*0.07);
+  var pad=Math.max(40,(maxX-minX+maxY-minY)*0.06);
   svgEl.setAttribute('viewBox',(minX-pad)+' '+(minY-pad)+' '+(maxX-minX+pad*2)+' '+(maxY-minY+pad*2));
   svgEl.setAttribute('preserveAspectRatio','xMidYMid meet');
 
@@ -1284,102 +1435,83 @@ function openRouteOverlay(rid){
 
   // Donker masker
   var dark=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  dark.setAttribute('x',String(minX-pad*8));dark.setAttribute('y',String(minY-pad*8));
-  dark.setAttribute('width',String(maxX-minX+pad*16));dark.setAttribute('height',String(maxY-minY+pad*16));
-  dark.setAttribute('fill','rgba(0,0,0,.55)');svgEl.appendChild(dark);
+  dark.setAttribute('x',String(minX-pad*10));dark.setAttribute('y',String(minY-pad*10));
+  dark.setAttribute('width',String(maxX-minX+pad*20));dark.setAttribute('height',String(maxY-minY+pad*20));
+  dark.setAttribute('fill','rgba(0,0,0,.6)');svgEl.appendChild(dark);
 
-  // Bereikbare regio's
-  adj.forEach(function(adjRid){
-    if(!POLYS[adjRid])return;
-    var adjRd=RD[adjRid];
-    var defs2=document.createElementNS('http://www.w3.org/2000/svg','defs');
-    var clip2=document.createElementNS('http://www.w3.org/2000/svg','clipPath');
-    clip2.setAttribute('id','rtC_'+adjRid);
-    var cp2=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    cp2.setAttribute('points',POLYS[adjRid]);clip2.appendChild(cp2);defs2.appendChild(clip2);svgEl.appendChild(defs2);
+  // Regio's per beweging inkleuren
+  var regionMove={};
+  moves.forEach(function(seg,mi){seg.forEach(function(r){if(!regionMove[r])regionMove[r]=mi;});});
+
+  path.forEach(function(r){
+    if(!POLYS[r])return;
+    var mi=regionMove[r]||0;
+    var col=MOVE_COLORS[mi%MOVE_COLORS.length];
+    var isStart=(r===path[0]);
+    var isEnd=(r===path[path.length-1]);
+
+    var defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+    var clip=document.createElementNS('http://www.w3.org/2000/svg','clipPath');
+    clip.setAttribute('id','rtC_'+r);
+    var cp=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    cp.setAttribute('points',POLYS[r]);clip.appendChild(cp);defs.appendChild(clip);svgEl.appendChild(defs);
+
     var brt=document.createElementNS('http://www.w3.org/2000/svg','image');
     brt.setAttribute('x','0');brt.setAttribute('y','0');
     brt.setAttribute('width',String(imgW));brt.setAttribute('height',String(imgH));
-    brt.setAttribute('href',mapImg.src);brt.setAttribute('clip-path','url(#rtC_'+adjRid+')');svgEl.appendChild(brt);
-    var fill=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    fill.setAttribute('points',POLYS[adjRid]);
-    fill.setAttribute('fill',TYPE_COLORS_RT[adjRd?adjRd.type:'W']||'rgba(180,180,180,.3)');
-    svgEl.appendChild(fill);
-    var bord=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    bord.setAttribute('points',POLYS[adjRid]);bord.setAttribute('fill','none');
-    bord.setAttribute('stroke',TYPE_STROKE_RT[adjRd?adjRd.type:'W']||'#aaa');bord.setAttribute('stroke-width','2');
-    svgEl.appendChild(bord);
-  });
+    brt.setAttribute('href',mapImg.src);brt.setAttribute('clip-path','url(#rtC_'+r+')');svgEl.appendChild(brt);
 
-  // Startregio
-  if(POLYS[rid]){
-    var defs0=document.createElementNS('http://www.w3.org/2000/svg','defs');
-    var clip0=document.createElementNS('http://www.w3.org/2000/svg','clipPath');
-    clip0.setAttribute('id','rtCS');
-    var cp0=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    cp0.setAttribute('points',POLYS[rid]);clip0.appendChild(cp0);defs0.appendChild(clip0);svgEl.appendChild(defs0);
-    var brt0=document.createElementNS('http://www.w3.org/2000/svg','image');
-    brt0.setAttribute('x','0');brt0.setAttribute('y','0');
-    brt0.setAttribute('width',String(imgW));brt0.setAttribute('height',String(imgH));
-    brt0.setAttribute('href',mapImg.src);brt0.setAttribute('clip-path','url(#rtCS)');svgEl.appendChild(brt0);
-    var sf=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    sf.setAttribute('points',POLYS[rid]);sf.setAttribute('fill','rgba(212,168,75,.2)');
-    sf.setAttribute('stroke','#d4a84b');sf.setAttribute('stroke-width','3');svgEl.appendChild(sf);
-    var pa=POLYS[rid].split(' ').map(function(p){var xy=p.split(',');return[+xy[0],+xy[1]];});
+    var fill=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    fill.setAttribute('points',POLYS[r]);
+    fill.setAttribute('fill',isStart?'rgba(212,168,75,.3)':isEnd?col+'55':col+'28');
+    svgEl.appendChild(fill);
+
+    var bord=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    bord.setAttribute('points',POLYS[r]);bord.setAttribute('fill','none');
+    bord.setAttribute('stroke',isStart?'#d4a84b':col);
+    bord.setAttribute('stroke-width',isStart||isEnd?'3':'1.5');svgEl.appendChild(bord);
+
+    // Label
+    var pa=POLYS[r].split(' ').map(function(p){var xy=p.split(',');return[+xy[0],+xy[1]];});
     var cx=pa.reduce(function(a,p){return a+p[0];},0)/pa.length;
     var cy=pa.reduce(function(a,p){return a+p[1];},0)/pa.length;
-    var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    lbl.setAttribute('x',String(cx));lbl.setAttribute('y',String(cy+4));
-    lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','11');
-    lbl.setAttribute('fill','#d4a84b');lbl.setAttribute('stroke','#000');
-    lbl.setAttribute('stroke-width','2.5');lbl.setAttribute('paint-order','stroke');
-    lbl.textContent='START';svgEl.appendChild(lbl);
-  }
-
-  document.getElementById('rtMapMeta').textContent=rd.name+' (start)  \u2192  '+adj.length+' bereikbare regio\'s';
-
-  // Header rechts
-  document.getElementById('rtHeader').innerHTML=
-    '<div class="rt-start-label">Startregio</div>'+
-    '<div class="rt-start-big">'+rd.name+'</div>'+
-    '<span class="rt-type-badge" style="background:'+
-    (TYPE_BG_RT[rd.type]||'#333')+';color:'+(TYPE_STROKE_RT[rd.type]||'#aaa')+'">'+
-    (TYPE_NAME_RT[rd.type]||rd.type)+'</span>';
-
-  document.getElementById('rtInfo').innerHTML=
-    '\u21d2 Bereikbaar in 1 beurt \u2014 aangrenzende regio\'s<br>'+
-    '\u26a0 Hazard limiet = max(2, company grootte)';
-
-  // Bestemmingen
-  var destDiv=document.getElementById('rtDests');
-  destDiv.innerHTML='<div class="rt-section-title">Bereikbaar ('+adj.length+')</div>';
-
-  adj.forEach(function(adjRid){
-    var adjRd=RD[adjRid];if(!adjRd)return;
-    var item=document.createElement('div');
-    item.className='rt-dest-item';
-    var sites=adjRd.s||[];
-    var siteTags=sites.map(function(s){
-      return '<span class="rt-site-tag" style="background:rgba(0,0,0,.3);border:1px solid '+(SC[s.t]||'#888')+';color:'+(SC[s.t]||'#888')+'">'+s.n+'</span>';
-    }).join('');
-    var haz=(adjRd.h&&adjRd.h.length)?
-      '<div class="rt-hazlabel">\u26a0 '+adjRd.h.join(', ')+'</div>':'';
-    item.innerHTML=
-      '<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">'+
-      '<div class="rt-dest-name">'+adjRd.name+'</div>'+
-      '<span class="rt-type-badge" style="background:'+(TYPE_BG_RT[adjRd.type]||'#333')+
-      ';color:'+(TYPE_STROKE_RT[adjRd.type]||'#aaa')+'">'+(TYPE_NAME_RT[adjRd.type]||adjRd.type)+'</span>'+
-      '</div>'+
-      (sites.length?'<div class="rt-dest-sites">'+siteTags+'</div>':
-       '<div style="font-size:10px;color:rgba(240,224,184,.2)">Geen sites</div>')+haz;
-    item.onclick=(function(r){return function(){
-      closeRouteOverlay();
-      var d2=RD[r];var fs2=d2&&d2.s&&d2.s.length?d2.s[0]:null;
-      openRegioOverlay(r,fs2);
-    };})(adjRid);
-    destDiv.appendChild(item);
+    if(isStart||isEnd){
+      var lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x',String(cx));lbl.setAttribute('y',String(cy+4));
+      lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','12');
+      lbl.setAttribute('fill',isStart?'#d4a84b':col);
+      lbl.setAttribute('stroke','#000');lbl.setAttribute('stroke-width','3');lbl.setAttribute('paint-order','stroke');
+      lbl.textContent=isStart?'START':'EINDE';svgEl.appendChild(lbl);
+    }
   });
 
+  // Bewegingsnummer badges
+  moves.forEach(function(seg,mi){
+    var lastR=seg[seg.length-1];
+    if(!POLYS[lastR])return;
+    var col=MOVE_COLORS[mi%MOVE_COLORS.length];
+    var pa=POLYS[lastR].split(' ').map(function(p){var xy=p.split(',');return[+xy[0],+xy[1]];});
+    var cx=pa.reduce(function(a,p){return a+p[0];},0)/pa.length;
+    var cy=pa.reduce(function(a,p){return a+p[1];},0)/pa.length;
+    var circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',String(cx));circle.setAttribute('cy',String(cy-12));
+    circle.setAttribute('r','8');circle.setAttribute('fill',col);circle.setAttribute('stroke','#000');circle.setAttribute('stroke-width','1');
+    svgEl.appendChild(circle);
+    var num=document.createElementNS('http://www.w3.org/2000/svg','text');
+    num.setAttribute('x',String(cx));num.setAttribute('y',String(cy-9));
+    num.setAttribute('text-anchor','middle');num.setAttribute('font-size','9');
+    num.setAttribute('fill','#000');num.setAttribute('font-weight','bold');
+    num.textContent=String(mi+1);svgEl.appendChild(num);
+  });
+
+  var rdS=RD[_routeStart],rdE=RD[_routeEnd];
+  document.getElementById('rtMapMeta').textContent=(rdS?rdS.name:'?')+' → '+(rdE?rdE.name:'?')+' · '+moves.length+' beweging'+(moves.length>1?'en':'')+' · '+(path.length-1)+' stappen';
+
+  document.getElementById('rtHeader').innerHTML=
+    '<div style="font-size:10px;color:rgba(212,168,75,.4);margin-bottom:4px;">Route</div>'+
+    '<div style="font-size:13px;color:#d4a84b;font-weight:700">'+(rdS?rdS.name:'?')+' &#8594; '+(rdE?rdE.name:'?')+'</div>';
+  document.getElementById('rtInfo').innerHTML='Bekijk het scenario in de zijbalk.';
+  document.getElementById('rtDests').innerHTML='';
   document.getElementById('routeOverlay').classList.add('open');
 }
 
