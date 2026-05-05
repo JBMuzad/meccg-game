@@ -148,6 +148,11 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .cd-wiki-link:hover{background:rgba(212,168,75,.15);}
 #cdNotes{width:100%;box-sizing:border-box;min-height:80px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:#c8b880;font-family:Georgia,serif;font-size:12px;padding:8px 10px;resize:vertical;outline:none;}
 #cdNotesStatus{font-size:10px;color:rgba(212,168,75,.4);margin-top:4px;}
+.regio-row{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;border:1px solid rgba(212,168,75,.1);margin-bottom:4px;cursor:pointer;background:rgba(255,255,255,.02);}
+.regio-row:hover{background:rgba(212,168,75,.07);}
+.regio-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;}
+.regio-row-name{font-size:12px;color:#e8d8a0;flex:1;}
+.regio-row-type{font-size:9px;color:rgba(212,168,75,.35);}
 </style>
 </head>
 <body>
@@ -775,20 +780,20 @@ function searchRegios(q){
     clearRegioHighlight();
     return;
   }
-  var h='';
+  el.innerHTML='';
   matches.forEach(function(rid){
     var rd=RD[rid];
     var typeColor={'W':'#50c030','B':'#c09030','S':'#8030a0','D':'#c04040','F':'#3080d0','C':'#30a0b0'}[rd.type]||'#888';
     var typeName={W:'Wilderness',B:'Border',S:'Shadow',D:'Dark',F:'Free',C:'Coastal'}[rd.type]||rd.type;
-    h+='<div onclick="focusRegio(''+rid+'')" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;border:1px solid rgba(212,168,75,.1);margin-bottom:4px;cursor:pointer;background:rgba(255,255,255,.02);" '+
-       'onmouseover="this.style.background='rgba(212,168,75,.07)'" onmouseout="this.style.background='rgba(255,255,255,.02)'">';
-    h+='<span style="width:8px;height:8px;border-radius:50%;background:'+typeColor+';flex-shrink:0;display:inline-block;"></span>';
-    h+='<span style="font-size:12px;color:#e8d8a0;flex:1">'+rd.name+'</span>';
-    h+='<span style="font-size:9px;color:rgba(212,168,75,.35);">'+typeName+'</span>';
-    h+='</div>';
+    var row=document.createElement('div');
+    row.className='regio-row';
+    row.dataset.rid=rid;
+    row.innerHTML='<span class="regio-dot" style="background:'+typeColor+'"></span>'+
+      '<span class="regio-row-name">'+rd.name+'</span>'+
+      '<span class="regio-row-type">'+typeName+'</span>';
+    row.onclick=function(){focusRegio(this.dataset.rid);};
+    el.appendChild(row);
   });
-  el.innerHTML=h;
-  // Auto-highlight if exactly one match
   if(matches.length===1) focusRegio(matches[0]);
 }
 
