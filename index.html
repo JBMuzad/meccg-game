@@ -677,7 +677,7 @@ function toggleSiteMarkers(btn){
 }
 
 // -- Tabs --
-var _curTab='regio', _siteFilter='ALL', _siteList=[];
+var _curTab='regio', _siteFilter='ALL', _siteList=[], _routeMode=false;
 
 function switchTab(tab){
   _curTab=tab;
@@ -1244,7 +1244,7 @@ var TYPE_BG_RT={'F':'#1a3a6a','W':'#1a3a1a','B':'#4a3010','S':'#3a1a4a','D':'#3a
 var TYPE_NAME_RT={'F':'Free-domain','W':'Wilderness','B':'Border-land','S':'Shadow-land','D':'Dark-domain','C':'Coastal Sea'};
 var MOVE_COLORS=['#d4a84b','#4a8fd0','#6a9a4a','#8a3a8a','#b8842a','#2a7a8a','#c04040','#408060'];
 
-var _routeEnd=null;
+var _routeStart=null, _routeEnd=null;
 
 // BFS kortste pad tussen twee regio's
 function bfsPath(startRid, endRid){
