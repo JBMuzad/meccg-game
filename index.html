@@ -770,9 +770,9 @@ function openSiteOverlay(s){
 
   if(hasSite){
     var versions=SITES_DB.filter(function(x){return x.n===s.n;}).map(function(x){
-      return {n:x.n,a:x.a,t:x.t,img:x.img,_loc:x.loc};
+      return {n:x.n,a:x.a,t:x.t,img:x.img,_loc:x.loc,_cdn:x.cdn};
     });
-    if(!versions.length) versions=[{n:s.n,a:s.a,t:s.t,img:s.img,_loc:s.loc}];
+    if(!versions.length) versions=[{n:s.n,a:s.a,t:s.t,img:s.img,_loc:s.loc,_cdn:s.cdn}];
     var vdiv=document.getElementById('soVersions');
     var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10'};
     versions.forEach(function(v,vi){
@@ -806,7 +806,7 @@ function openSiteOverlay(s){
         row.onclick=(function(site){return function(){
           // Haal rid op en open overlay voor deze site
           var ns={n:site.n,t:site.t,img:site.img,loc:site.loc,rid:rid,
-                  _loc:site.loc,reg:rd?rd.name:''};
+                  _loc:site.loc,_cdn:site.cdn,reg:rd?rd.name:''};
           // Markeer actieve rij
           document.querySelectorAll('.soOtherRow').forEach(function(r){r.classList.remove('active');});
           row.classList.add('active');
@@ -816,7 +816,7 @@ function openSiteOverlay(s){
           var vdiv2=document.getElementById('soVersions');
           vdiv2.innerHTML='';
           var vs=SITES_DB.filter(function(x){return x.n===site.n;}).map(function(x){
-            return {n:x.n,a:x.a,t:x.t,img:x.img,_loc:x.loc};
+            return {n:x.n,a:x.a,t:x.t,img:x.img,_loc:x.loc,_cdn:x.cdn};
           });
           if(!vs.length) vs=[ns];
           var ACOLOR2={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10'};
