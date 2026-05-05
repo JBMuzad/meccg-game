@@ -1281,7 +1281,16 @@ function pathToMoves(path){
 }
 
 function openRouteOverlay(rid){
-  var rd=RD[rid];if(!rd)return;
+  var sb=document.getElementById('sbroutes');
+  var rd=RD[rid];
+  if(!rd){sb.innerHTML='<div style="color:red;padding:10px;">FOUT: regio "'+rid+'" niet gevonden in RD</div>';return;}
+  // Als start al gekozen en eind nog niet → stel dit in als eindregio
+  if(_routeStart && rid!==_routeStart && !_routeEnd){
+    setRouteEnd(rid);
+    return;
+  }
+  // Als route al volledig → reset en begin opnieuw met nieuwe startregio
+  // Of als dit de eerste klik is → stel in als startregio
   _routeStart=rid;
   _routeEnd=null;
   updateRouteSidebar();
@@ -1339,7 +1348,8 @@ function updateRouteSidebar(path){
       '<span class="rt-type-badge" style="background:'+(TYPE_BG_RT[rdS.type]||'#333')+';color:'+(TYPE_STROKE_RT[rdS.type]||'#aaa')+'">'+(TYPE_NAME_RT[rdS.type]||rdS.type)+'</span>'+
       '</div>'+
       '<div style="margin-bottom:8px;">'+
-      '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Kies eindregio</div>'+
+      '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Kies eindregio</div>'+
+      '<div style="font-size:10px;color:rgba(212,168,75,.5);margin-bottom:6px;">Klik op de kaart of zoek hieronder</div>'+
       '<input id="rtEndSearch" type="text" placeholder="Zoek regio…" oninput="filterRouteEnds(this.value)" autocomplete="off"'+
       ' style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;margin-bottom:6px;">'+
       '<div id="rtEndList" style="overflow-y:auto;max-height:300px;"></div>'+
