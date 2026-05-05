@@ -925,49 +925,76 @@ updateCacheStatus();
 getDB(function(){});
 
 // ── Cards Explained ──────────────────────────────────────────────────────────
-var _allCards=[], _curCardId=null;
+var _allCards=[], _curCardId=null, _cardsLoaded=false;
+var CARDNUM_URL='https://raw.githubusercontent.com/rezwits/cardnum/master/fdata/cards-dc.json';
+var CARDNUM_IMG='https://cardnum.net/img/cards/';
 
 function _buildCardList(){
-  if(_allCards.length)return;
-  fetch(DB_URL).then(function(r){return r.json();}).then(function(data){
-    Object.values(data).forEach(function(set){
-      if(!set.cards)return;
-      var baseEn=(set.imageBaseUrl&&set.imageBaseUrl.en)||'';
-      var setName=(set.name&&set.name.en)||set.id||'';
-      Object.values(set.cards).forEach(function(c){
-        var name=(c.name&&c.name.en)||'';
-        if(!name)return;
-        _allCards.push({
-          id:c.id, name:name, type:c.type||'', alignment:c.alignment||'',
-          set:setName, setId:set.id,
-          imgUrl:baseEn+(c.image||''),
-          image:c.image||'',
-          text:(c.text&&c.text.en)||'',
-          quote:(c.quote&&c.quote.en)||'',
-          attrs:c.attributes||{}
-        });
+  if(_cardsLoaded)return;
+  _cardsLoaded=true;
+  var el=document.getElementById('cardResults');
+  el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Databank laden…</div>';
+
+  fetch(CARDNUM_URL).then(function(r){return r.json();}).then(function(data){
+    _allCards=[];
+    data.forEach(function(c){
+      var name=c.NameEN||'';
+      if(!name)return;
+      // Bouw attribuutobject
+      var attrs={};
+      if(c.Primary)attrs.Type=c.Primary;
+      if(c.Secondary&&c.Secondary!==c.Primary)attrs.Subtype=c.Secondary;
+      if(c.Alignment)attrs.Alignment=c.Alignment;
+      if(c.Race)attrs.Race=c.Race;
+      if(c.Skill)attrs.Skills=c.Skill;
+      if(c.Mind)attrs.Mind=c.Mind;
+      if(c.Prowess)attrs.Prowess=c.Prowess;
+      if(c.Body)attrs.Body=c.Body;
+      if(c.Direct)attrs['Direct Inf.']=c.Direct;
+      if(c.MPs)attrs.MPs=c.MPs;
+      if(c.Home)attrs['Home Site']=c.Home;
+      if(c.Rarity)attrs.Rarity=c.Rarity;
+      _allCards.push({
+        id:c.MEID||c.fullCode||name,
+        name:name,
+        type:c.Primary||'',
+        alignment:c.Alignment||'',
+        set:c.Set||'',
+        dreamcard:!!c.dreamcard,
+        imgUrl:CARDNUM_IMG+(c.ImageName||''),
+        text:c.Text||'',
+        quote:'',
+        attrs:attrs
       });
     });
-  }).catch(function(){});
+    // Herzoek met huidige query
+    var q=document.getElementById('cardSearch').value;
+    if(q&&q.length>=2)searchCards(q);
+    else el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam om te zoeken.</div>';
+  }).catch(function(){
+    el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Kon databank niet laden.</div>';
+    _cardsLoaded=false;
+  });
 }
 
 function searchCards(q){
-  _buildCardList();
+  if(!_cardsLoaded){_buildCardList();return;}
   var el=document.getElementById('cardResults');
   if(!q||q.length<2){
     el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ minstens 2 tekens.</div>';
     return;
   }
   var ql=q.toLowerCase();
-  var results=_allCards.filter(function(c){return c.name.toLowerCase().indexOf(ql)!==-1;}).slice(0,40);
+  var results=_allCards.filter(function(c){return c.name.toLowerCase().indexOf(ql)!==-1;}).slice(0,50);
   if(!results.length){el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Geen kaarten gevonden.</div>';return;}
   el.innerHTML='';
   results.forEach(function(c){
     var div=document.createElement('div');
     div.className='card-result-item';
+    var dcBadge=c.dreamcard?'<span style="font-size:9px;color:#7a9fd4;margin-left:4px;">dream</span>':'';
     div.innerHTML=
       '<img class="card-result-thumb" src="'+c.imgUrl+'" alt="" onerror="this.style.display=\'none\'">'+
-      '<div><div class="card-result-name">'+c.name+'</div>'+
+      '<div><div class="card-result-name">'+c.name+dcBadge+'</div>'+
       '<div class="card-result-meta">'+(c.type||'')+(c.alignment?' · '+c.alignment:'')+(c.set?' · '+c.set:'')+'</div></div>';
     div.onclick=function(){openCardOverlay(c);};
     el.appendChild(div);
@@ -988,12 +1015,10 @@ function openCardOverlay(c){
   document.getElementById('cdBadges').innerHTML=badges;
 
   // Attributen
-  var attrs=Object.entries(c.attrs).filter(function(kv){return kv[1]&&typeof kv[1]==='string'||typeof kv[1]==='number';});
+  var attrs=Object.entries(c.attrs).filter(function(kv){return kv[1]!==null&&kv[1]!==''&&kv[1]!==undefined;});
   if(attrs.length){
     var html=attrs.map(function(kv){
-      var key=kv[0].replace(/([A-Z])/g,' $1').toLowerCase().trim();
-      var val=typeof kv[1]==='object'?(kv[1].en||JSON.stringify(kv[1])):kv[1];
-      return '<span class="cd-attr"><b>'+key+'</b>: '+val+'</span>';
+      return '<span class="cd-attr"><b>'+kv[0]+'</b>: '+kv[1]+'</span>';
     }).join('');
     document.getElementById('cdAttrs').innerHTML=html;
     document.getElementById('cdAttrsSection').style.display='';
@@ -1010,9 +1035,9 @@ function openCardOverlay(c){
   else document.getElementById('cdQuoteSection').style.display='none';
 
   // Links
-  var wikiQ=encodeURIComponent(c.name+' MECCG card');
+  var wikiQ=encodeURIComponent(c.name+' MECCG');
   document.getElementById('cdWikiLink').href='https://www.google.com/search?q='+wikiQ;
-  document.getElementById('cdCouncilLink').href='https://www.councilofelrond.com/card/'+encodeURIComponent(c.image.replace(/\.jpg$/i,''));
+  document.getElementById('cdCouncilLink').href='https://cardnum.net/cards';
 
   // Notities
   var note=localStorage.getItem('meccg_note_'+c.id)||'';
@@ -1260,7 +1285,7 @@ document.addEventListener('keydown',function(e){
       <div class="cd-section">
         <div class="cd-section-label">Extra informatie</div>
         <a id="cdWikiLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener">&#128269; Zoek op MECCG Wiki</a>
-        <a id="cdCouncilLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener" style="margin-left:6px;">&#127758; Council of Elrond</a>
+        <a id="cdCouncilLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener" style="margin-left:6px;">&#127183; cardnum.net</a>
       </div>
       <div class="cd-section">
         <div class="cd-section-label">Persoonlijke notities</div>
