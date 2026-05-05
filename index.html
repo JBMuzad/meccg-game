@@ -185,7 +185,13 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <button class="sbtab" id="tabRoutes" onclick="switchTab('routes')">&#128336; Routes</button>
       <button class="sbtab" id="tabCards" onclick="switchTab('cards')">&#127183; Cards</button>
     </div>
-    <div class="sbb" id="sbody"><div class="placeholder">Klik op een regio voor details.</div></div>
+    <div id="sbody" style="display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:10px 10px 6px;flex-shrink:0;">
+        <input id="regioSearch" type="text" placeholder="Zoek regio&#8230;" oninput="searchRegios(this.value)" autocomplete="off"
+          style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;">
+      </div>
+      <div id="regioResults" style="overflow-y:auto;flex:1;padding:0 6px 6px;"><div class="placeholder" style="padding:10px 6px;">Typ een regionaam om te zoeken.</div></div>
+    </div>
     <div class="sbb" id="sbsites" style="display:none"></div>
     <div class="sbb" id="sbroutes" style="display:none"></div>
     <div class="sbb" id="sbcards" style="display:none;padding:0;flex-direction:column;">
@@ -750,6 +756,68 @@ function toggleSiteMarkers(btn){
   if(_siteMarkerGroup) _siteMarkerGroup.style.display = _showSites ? '' : 'none';
 }
 
+// -- Regio zoeken --
+var _regioHighlight=null;
+
+function searchRegios(q){
+  var el=document.getElementById('regioResults');
+  var ql=(q||'').toLowerCase().trim();
+  if(!ql){
+    el.innerHTML='<div class="placeholder" style="padding:10px 6px;">Typ een regionaam om te zoeken.</div>';
+    clearRegioHighlight();
+    return;
+  }
+  var matches=Object.keys(RD).filter(function(rid){
+    return RD[rid].name.toLowerCase().indexOf(ql)!==-1;
+  }).sort(function(a,b){return RD[a].name.localeCompare(RD[b].name);});
+  if(!matches.length){
+    el.innerHTML='<div class="placeholder" style="padding:10px 6px;">Geen regio gevonden.</div>';
+    clearRegioHighlight();
+    return;
+  }
+  var h='';
+  matches.forEach(function(rid){
+    var rd=RD[rid];
+    var typeColor={'W':'#50c030','B':'#c09030','S':'#8030a0','D':'#c04040','F':'#3080d0','C':'#30a0b0'}[rd.type]||'#888';
+    var typeName={W:'Wilderness',B:'Border',S:'Shadow',D:'Dark',F:'Free',C:'Coastal'}[rd.type]||rd.type;
+    h+='<div onclick="focusRegio(''+rid+'')" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;border:1px solid rgba(212,168,75,.1);margin-bottom:4px;cursor:pointer;background:rgba(255,255,255,.02);" '+
+       'onmouseover="this.style.background='rgba(212,168,75,.07)'" onmouseout="this.style.background='rgba(255,255,255,.02)'">';
+    h+='<span style="width:8px;height:8px;border-radius:50%;background:'+typeColor+';flex-shrink:0;display:inline-block;"></span>';
+    h+='<span style="font-size:12px;color:#e8d8a0;flex:1">'+rd.name+'</span>';
+    h+='<span style="font-size:9px;color:rgba(212,168,75,.35);">'+typeName+'</span>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+  // Auto-highlight if exactly one match
+  if(matches.length===1) focusRegio(matches[0]);
+}
+
+function focusRegio(rid){
+  _regioHighlight=rid;
+  // Dim all, un-dim target
+  document.querySelectorAll('.reg').forEach(function(el){
+    if(el.dataset.rid===rid) el.classList.remove('dimmed');
+    else el.classList.add('dimmed');
+  });
+  // Select visually (show label)
+  if(sel){sel.classList.remove('sel');var pt=sel.querySelector('text.rlabel');if(pt)pt.setAttribute('opacity','0');}
+  var target=document.querySelector('.reg[data-rid="'+rid+'"]');
+  if(target){target.classList.add('sel');var nt=target.querySelector('text.rlabel');if(nt)nt.setAttribute('opacity','1');sel=target;}
+  // Pan map to region center
+  if(POLYS[rid]){
+    var pa=POLYS[rid].split(' ').map(function(p){var xy=p.split(',');return[+xy[0],+xy[1]];});
+    var cx=pa.reduce(function(a,p){return a+p[0];},0)/pa.length;
+    var cy=pa.reduce(function(a,p){return a+p[1];},0)/pa.length;
+    tx=mw.clientWidth/2-cx*sc; ty=mw.clientHeight/2-cy*sc; apT();
+  }
+}
+
+function clearRegioHighlight(){
+  _regioHighlight=null;
+  document.querySelectorAll('.reg').forEach(function(el){el.classList.remove('dimmed');});
+}
+
+
 // -- Tabs --
 var _curTab='regio', _siteFilter='ALL', _siteList=[], _routeMode=false;
 
@@ -760,11 +828,12 @@ function switchTab(tab){
   document.getElementById('tabSites').classList.toggle('on',tab==='sites');
   document.getElementById('tabRoutes').classList.toggle('on',tab==='routes');
   document.getElementById('tabCards').classList.toggle('on',tab==='cards');
-  document.getElementById('sbody').style.display=tab==='regio'?'':'none';
+  document.getElementById('sbody').style.display=tab==='regio'?'flex':'none';
   document.getElementById('sbsites').style.display=tab==='sites'?'':'none';
   document.getElementById('sbroutes').style.display=tab==='routes'?'':'none';
   document.getElementById('sbcards').style.display=tab==='cards'?'flex':'none';
   if(tab==='sites') renderSites(_siteFilter);
+  if(tab!=='regio'){clearRegioHighlight();document.getElementById('regioSearch').value='';}
   if(tab==='routes'){
     _routeStart=null; _routeEnd=null;
     updateRouteSidebar();
