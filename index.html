@@ -703,29 +703,57 @@ function switchTab(tab){
   }
 }
 
+var _showDreamSites=false;
+
 function renderSites(f){
   _siteFilter=f;
   var rdNames={};
   Object.keys(RD).forEach(function(rid){(RD[rid].s||[]).forEach(function(s){rdNames[s.n]=rid;});});
   var sites=SITES_DB.map(function(s){
-    return {n:s.n,a:s.a,t:s.t,img:s.img,loc:s.loc,cdn:s.cdn,set:s.set,reg:s.reg,nh:s.nh,rid:rdNames[s.n]||null};
+    return {n:s.n,a:s.a,t:s.t,img:s.img,loc:s.loc,cdn:s.cdn,set:s.set,reg:s.reg,nh:s.nh,rid:rdNames[s.n]||null,dream:false};
   });
+
+  // Voeg dream sites toe indien actief
+  if(_showDreamSites){
+    _buildRdByName();
+    _dreamSites.forEach(function(ds){
+      if(f!=='ALL'&&ds.type!==f)return;
+      var regLow=(ds.region||'').toLowerCase();
+      var rid=_rdByName[regLow]||null;
+      ds.alignments.forEach(function(al){
+        sites.push({n:ds.name,a:al,t:ds.type,img:'',loc:'',cdn:'',set:ds.set,reg:ds.region,nh:ds.haven,rid:rid,dream:true,_ds:ds});
+      });
+    });
+  }
+
   if(f!=='ALL') sites=sites.filter(function(s){return s.t===f;});
   _siteList=sites;
+
   var h='<div class="ssite-filt">';
   [{k:'ALL',l:'Alles'},{k:'haven',l:'Haven'},{k:'free',l:'Free-hold'},
    {k:'ruins',l:'Ruins'},{k:'border',l:'Border'},{k:'shadow',l:'Shadow'},{k:'dark',l:'Dark'}
   ].forEach(function(ft){
     h+='<button class="sfbtn'+(f===ft.k?' on':'')+'" onclick="renderSites(\''+ft.k+'\')">'+ft.l+'</button>';
   });
+  h+='<button class="sfbtn'+(_showDreamSites?' on':'')+'" onclick="toggleDreamSites()" style="'+(_showDreamSites?'color:#7ab0e0;border-color:#7ab0e0;':'')+'">&#9733; Dream</button>';
   h+='</div>';
+
+  if(_showDreamSites&&!_dreamLoaded){
+    h+='<div style="color:rgba(100,160,220,.4);font-size:11px;text-align:center;padding-top:16px;">Dream sites laden…</div>';
+    document.getElementById('sbsites').innerHTML=h;
+    loadDreamSites(function(){renderSites(_siteFilter);});
+    return;
+  }
+
   if(!sites.length){h+='<div class="placeholder">Geen sites.</div>';}
   sites.forEach(function(s,i){
-    var alignLabel={'Hero':'H','Minion':'M','Balrog':'B','Fallen-wizard':'FW'}[s.a]||s.a;
-    var alignColor={'Hero':'#4080c0','Minion':'#c04040','Balrog':'#804040','Fallen-wizard':'#806040'}[s.a]||'#888';
+    var alignLabel={'Hero':'H','Minion':'M','Balrog':'B','Fallen-wizard':'FW','Elf-lord':'EL','Fallen/Lord':'FL'}[s.a]||s.a;
+    var alignColor={'Hero':'#4080c0','Minion':'#c04040','Balrog':'#804040','Fallen-wizard':'#806040','Elf-lord':'#408060','Fallen/Lord':'#806040'}[s.a]||'#888';
     h+='<div class="ssite-row" onclick="selectSite('+i+')">';
-    h+='<div class="sdot" style="background:'+(SC[s.t]||'#888')+'"></div>';
-    h+='<div style="flex:1"><div class="sname">'+s.n+' <span style="font-size:9px;padding:0 3px;border-radius:2px;background:'+alignColor+';color:#fff;opacity:.8">'+alignLabel+'</span></div>';
+    h+='<div class="sdot" style="background:'+(SC[s.t]||'#888')+(s.dream?';opacity:.6':'')+'"></div>';
+    h+='<div style="flex:1"><div class="sname">'+s.n;
+    if(s.dream)h+=' <span style="font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
+    h+=' <span style="font-size:9px;padding:0 3px;border-radius:2px;background:'+alignColor+';color:#fff;opacity:.8">'+alignLabel+'</span></div>';
     var regText=(s.reg||'')+(s.nh?' · '+s.nh:'');
     h+='<div class="ssite-reg">'+(regText||s.set.toUpperCase())+'</div></div>';
     h+='<div style="font-size:10px;color:rgba(212,168,75,.35)">'+(s.rid?'&#9654;':'&#9900;')+'</div></div>';
@@ -733,9 +761,27 @@ function renderSites(f){
   document.getElementById('sbsites').innerHTML=h;
 }
 
+function toggleDreamSites(){
+  _showDreamSites=!_showDreamSites;
+  renderSites(_siteFilter);
+}
+
 function selectSite(i){
   var s=_siteList[i];
-  if(s) openSiteOverlay(s);
+  if(!s)return;
+  if(s.dream&&s._ds){
+    openCardOverlay({
+      id:s._ds.id, name:s._ds.name,
+      type:s._ds.type, alignment:s._ds.alignments.join(' / '),
+      set:s._ds.set+' (Dream)', dreamcard:true,
+      imgUrl:'', text:s._ds.text, quote:'',
+      attrs:{Type:'Site',Subtype:SL[s._ds.type]||s._ds.type,
+             Alignment:s._ds.alignments.join(' / '),Region:s._ds.region,
+             Path:s._ds.path||undefined,Haven:s._ds.haven||undefined}
+    });
+  } else {
+    openSiteOverlay(s);
+  }
 }
 
 function openRegioOverlay(rid, firstSite){
@@ -885,6 +931,23 @@ function openSiteOverlay(s){
     }
   }
 
+  // Dream sites voor deze regio
+  if(rd){
+    if(_dreamLoaded){
+      _renderDreamSitesInOverlay(rd.name);
+    } else {
+      var pendingRd=rd;
+      var dreamPlaceholder=document.createElement('div');
+      dreamPlaceholder.style.cssText='font-size:10px;color:rgba(100,160,220,.3);padding:8px 0 4px;';
+      dreamPlaceholder.textContent='Dream sites laden…';
+      document.getElementById('soOtherSites').appendChild(dreamPlaceholder);
+      loadDreamSites(function(){
+        dreamPlaceholder.remove();
+        _renderDreamSitesInOverlay(pendingRd.name);
+      });
+    }
+  }
+
   document.getElementById('siteOverlay').classList.add('open');
 
   // Pan kaart naar regio
@@ -923,6 +986,98 @@ document.addEventListener('keydown',function(e){
 });
 updateCacheStatus();
 getDB(function(){});
+
+// ── Dream Sites ──────────────────────────────────────────────────────────────
+var _dreamSites=[], _dreamByRegion={}, _dreamLoaded=false;
+var _rdByName={};  // region name (lower) → rid
+
+function _buildRdByName(){
+  if(Object.keys(_rdByName).length)return;
+  Object.keys(RD).forEach(function(rid){_rdByName[RD[rid].name.toLowerCase()]=rid;});
+}
+
+function _siteTypeFromSecondary(sec){
+  sec=(sec||'').toLowerCase();
+  if(sec==='haven')return'haven';
+  if(sec==='free-hold'||sec==='free hold')return'free';
+  if(sec==='ruins & lairs'||sec==='ruins')return'ruins';
+  if(sec==='shadow-hold'||sec==='shadow hold')return'shadow';
+  if(sec==='dark-hold'||sec==='dark hold')return'dark';
+  return'border'; // border-hold, port, site, etc.
+}
+
+function loadDreamSites(cb){
+  if(_dreamLoaded){if(cb)cb();return;}
+  _dreamLoaded=true;
+  _buildRdByName();
+  fetch(CARDNUM_URL).then(function(r){return r.json();}).then(function(data){
+    _dreamSites=[];
+    _dreamByRegion={};
+    // Group by name+region to merge hero/minion versions
+    var byName={};
+    data.forEach(function(c){
+      if(c.Primary!=='Site'||!c.dreamcard)return;
+      var name=c.NameEN||''; if(!name)return;
+      var reg=(c.Region||'').trim();
+      var key=name+'|'+reg;
+      if(!byName[key]){
+        byName[key]={
+          name:name, region:reg,
+          type:_siteTypeFromSecondary(c.Secondary),
+          text:c.Text||'', path:c.Path||'',
+          haven:c.Haven||'', set:c.Set||'',
+          id:c.MEID||name,
+          alignments:[]
+        };
+      }
+      byName[key].alignments.push(c.Alignment||'Hero');
+    });
+    Object.values(byName).forEach(function(s){
+      _dreamSites.push(s);
+      var rl=(s.region||'').toLowerCase();
+      if(!_dreamByRegion[rl])_dreamByRegion[rl]=[];
+      _dreamByRegion[rl].push(s);
+    });
+    if(cb)cb();
+  }).catch(function(){_dreamLoaded=false;if(cb)cb();});
+}
+
+function _renderDreamSitesInOverlay(regionName){
+  var key=(regionName||'').toLowerCase();
+  var sites=_dreamByRegion[key]||[];
+  var otherDiv=document.getElementById('soOtherSites');
+  if(!sites.length)return;
+  var label=document.createElement('div');
+  label.id='soDreamLabel';
+  label.style.cssText='font-size:10px;color:rgba(100,160,220,.6);text-transform:uppercase;letter-spacing:.1em;margin-top:10px;margin-bottom:5px;';
+  label.textContent='Dream Card Sites in '+regionName;
+  otherDiv.appendChild(label);
+  sites.forEach(function(ds){
+    var row=document.createElement('div');
+    row.className='soOtherRow';
+    row.style.borderColor='rgba(100,160,220,.2)';
+    var dot='<div class="sdot" style="background:'+(SC[ds.type]||'#555')+';flex-shrink:0;opacity:.7"></div>';
+    var badge='<span style="font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(100,160,220,.15);color:#7ab0e0;margin-left:4px;">dream</span>';
+    var nm='<div><div class="soOtherName">'+ds.name+badge+'</div><div class="soOtherType">'+(SL[ds.type]||ds.type)+(ds.alignments.length?' · '+ds.alignments.join('/'):'')+'</div></div>';
+    row.innerHTML=dot+nm;
+    row.onclick=(function(site){return function(){
+      openCardOverlay({
+        id:site.id, name:site.name,
+        type:site.type, alignment:site.alignments.join(' / '),
+        set:site.set+' (Dream)', dreamcard:true,
+        imgUrl:'', text:site.text, quote:'',
+        attrs:{
+          Type:'Site', Subtype:SL[site.type]||site.type,
+          Alignment:site.alignments.join(' / '),
+          Region:site.region,
+          Path:site.path||undefined,
+          Haven:site.haven||undefined
+        }
+      });
+    };})(ds);
+    otherDiv.appendChild(row);
+  });
+}
 
 // ── Cards Explained ──────────────────────────────────────────────────────────
 var _allCards=[], _curCardId=null, _cardsLoaded=false;
