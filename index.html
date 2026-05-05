@@ -453,6 +453,8 @@ function getImage(s,cb){
 
 function getImageEl(s,el){
   var urls=[];
+  if(s._cdn) urls.push(s._cdn);
+  if(s.cdn)  urls.push(s.cdn);
   if(s._loc) urls.push('meccg-images/'+s._loc);
   if(s.img)  urls.push('meccg-images/'+s.img);
   tryUrls(el,urls,0);
