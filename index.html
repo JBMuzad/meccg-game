@@ -1046,42 +1046,8 @@ function openSiteOverlay(s){
   }
 
   // Speelbare resources
-  var playDiv=document.getElementById('soPlayable');
-  playDiv.innerHTML='';
-  if(hasSite){
-    var SITE_PLAY={
-      'haven': ['Karakter','Bondgenoot','Minor Item'],
-      'free':  ['Factie','Major Item','Special Item'],
-      'ruins': ['Greater Item','Major Item','Gold Ring'],
-      'shadow':['Factie','Major Item','Gold Ring'],
-      'dark':  ['Factie','Major Item','Gold Ring'],
-      'border':['Factie','Minor Item']
-    };
-    var playTypes=SITE_PLAY[s.t]||[];
-    var ph='<div class="soHazLabel" style="margin-top:6px;">&#9670; Speelbaar</div>';
-    playTypes.forEach(function(pt){
-      ph+='<span class="htag" style="background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.2);color:rgba(212,168,75,.75);">'+pt+'</span>';
-    });
-    // Home site karakters/facties (alleen als kaarten geladen zijn)
-    var _soHomeCards=[];
-    if(_cardsLoaded){
-      var sNameL=(s.n||'').toLowerCase();
-      _soHomeCards=_allCards.filter(function(c){
-        return ((c.attrs&&c.attrs['Home Site'])||'').toLowerCase()===sNameL;
-      });
-      if(_soHomeCards.length){
-        ph+='<div class="soHazLabel" style="margin-top:8px;">&#127968; Home site voor</div>';
-        _soHomeCards.forEach(function(c,i){
-          ph+='<span class="htag so-hc" data-idx="'+i+'" style="cursor:pointer;background:rgba(100,140,200,.08);border-color:rgba(100,140,200,.25);color:rgba(160,190,230,.8);">'+c.name+'</span>';
-        });
-      }
-    }
-    playDiv.innerHTML=ph;
-    // Voeg click handlers toe na innerHTML (vermijdt JSON-in-attribuut probleem)
-    playDiv.querySelectorAll('.so-hc').forEach(function(el){
-      el.addEventListener('click',function(){openCardOverlay(_soHomeCards[+this.dataset.idx]);});
-    });
-  }
+  if(hasSite) _updateSoPlayable(s.n, s.t);
+  else document.getElementById('soPlayable').innerHTML='';
 
   // Andere sites in dezelfde regio
   var otherDiv=document.getElementById('soOtherSites');
@@ -1137,6 +1103,8 @@ function openSiteOverlay(s){
                     attrs:{Type:'Site',Subtype:SL[site.t]||site.t}};
             openCardOverlay(cd);
           };
+          // Speelbaar bijwerken voor deze site
+          _updateSoPlayable(site.n, site.t);
         };})(os);
         otherDiv.appendChild(row);
       });
@@ -1254,6 +1222,40 @@ function loadDreamSites(cb){
   }).catch(function(){_dreamLoaded=false;if(cb)cb();});
 }
 
+function _updateSoPlayable(siteName, siteType){
+  var SITE_PLAY={
+    'haven': ['Karakter','Bondgenoot','Minor Item'],
+    'free':  ['Factie','Major Item','Special Item'],
+    'ruins': ['Greater Item','Major Item','Gold Ring'],
+    'shadow':['Factie','Major Item','Gold Ring'],
+    'dark':  ['Factie','Major Item','Gold Ring'],
+    'border':['Factie','Minor Item']
+  };
+  var playTypes=SITE_PLAY[siteType]||[];
+  var ph='<div class="soHazLabel" style="margin-top:6px;">&#9670; Speelbaar</div>';
+  playTypes.forEach(function(pt){
+    ph+='<span class="htag" style="background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.2);color:rgba(212,168,75,.75);">'+pt+'</span>';
+  });
+  var _soHomeCards=[];
+  if(_cardsLoaded){
+    var sNameL=(siteName||'').toLowerCase();
+    _soHomeCards=_allCards.filter(function(c){
+      return ((c.attrs&&c.attrs['Home Site'])||'').toLowerCase()===sNameL;
+    });
+    if(_soHomeCards.length){
+      ph+='<div class="soHazLabel" style="margin-top:8px;">&#127968; Home site voor</div>';
+      _soHomeCards.forEach(function(c,i){
+        ph+='<span class="htag so-hc" data-idx="'+i+'" style="cursor:pointer;background:rgba(100,140,200,.08);border-color:rgba(100,140,200,.25);color:rgba(160,190,230,.8);">'+c.name+'</span>';
+      });
+    }
+  }
+  var playDiv=document.getElementById('soPlayable');
+  playDiv.innerHTML=ph;
+  playDiv.querySelectorAll('.so-hc').forEach(function(el){
+    el.addEventListener('click',function(){openCardOverlay(_soHomeCards[+this.dataset.idx]);});
+  });
+}
+
 function _renderDreamSitesInOverlay(regionName){
   var key=(regionName||'').toLowerCase();
   var sites=_dreamByRegion[key]||[];
@@ -1286,6 +1288,8 @@ function _renderDreamSitesInOverlay(regionName){
       var wrap=document.getElementById('soImgWrap');
       wrap.style.cursor='pointer';
       wrap.onclick=(function(cd){return function(){openCardOverlay(cd);};})(sObj._cardData);
+      // Speelbaar bijwerken voor deze dreamcard site
+      _updateSoPlayable(site.name, site.type);
     };})(ds);
     otherDiv.appendChild(row);
   });
