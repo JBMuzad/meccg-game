@@ -1874,45 +1874,49 @@ function saveCardEdit(){
 
 // ── Resources tab ─────────────────────────────────────────────────────────────
 
-// Resource type groepen (Primary-veld uit cardnum)
+// Resource type groepen
+// Primary = "Resource" / "Character" / "Hazard" / "Site" / "Region"
+// Secondary = specifiek subtype (Faction, Minor Item, Permanent-event, Ally, …)
 var RES_GROUPS = [
-  {id:'char',   label:'Karakter',   match:function(t){return /wizard|character|agent/i.test(t);}},
-  {id:'ally',   label:'Bondgenoot', match:function(t){return /^ally$/i.test(t);}},
-  {id:'item',   label:'Item',       match:function(t){return /item|ring/i.test(t);}},
-  {id:'faction',label:'Factie',     match:function(t){return /^faction$/i.test(t);}},
-  {id:'event',  label:'Event',      match:function(t){return /event/i.test(t);}}
+  {id:'char',    label:'Karakter',   match:function(p,s){return p==='character'||/character|agent|avatar|leader/i.test(s);}},
+  {id:'ally',    label:'Bondgenoot', match:function(p,s){return /^ally$/i.test(s);}},
+  {id:'item',    label:'Item',       match:function(p,s){return /item|gold ring/i.test(s);}},
+  {id:'faction', label:'Factie',     match:function(p,s){return /^faction$/i.test(s);}},
+  {id:'event',   label:'Event',      match:function(p,s){return /event/i.test(s);}}
 ];
 
-// Item → speellocatie (MECCG-regels)
+// Item subtype → speellocatie (MECCG-regels)
 var ITEM_SITES = {
   'minor item':  'Elke site met aanvallen',
   'major item':  'Free-hold · Ruins & Lairs · Shadow/Dark-hold',
   'greater item':'Ruins & Lairs',
-  'gold ring':   'Ruins & Lairs · Free/Shadow/Dark-hold',
-  'special item':'Zie kaarttekst',
-  'ring':        'Ruins & Lairs · Free/Shadow/Dark-hold'
+  'gold ring item':'Ruins & Lairs · Free/Shadow/Dark-hold',
+  'special item':'Zie kaarttekst'
 };
 
-var _resFilters = [];   // actieve groep-ids (leeg = alles)
+var _resFilters = [];
 var _resQuery   = '';
 
 function _resGroupOf(card){
-  var t = (card.type||'').toLowerCase();
+  var p = (card.type||'').toLowerCase().trim();
+  var s = ((card.attrs&&card.attrs.Subtype)||'').toLowerCase().trim();
   for(var i=0;i<RES_GROUPS.length;i++){
-    if(RES_GROUPS[i].match(t)) return RES_GROUPS[i].id;
+    if(RES_GROUPS[i].match(p,s)) return RES_GROUPS[i].id;
   }
   return null;
 }
 
 function _isResource(card){
+  var p=(card.type||'').toLowerCase();
+  if(p==='hazard'||p==='site'||p==='region') return false;
   return _resGroupOf(card) !== null;
 }
 
 function _resPlayLocation(card){
-  var t=(card.type||'').toLowerCase();
+  var sub=((card.attrs&&card.attrs.Subtype)||'').toLowerCase().trim();
   // Item
   for(var k in ITEM_SITES){
-    if(t.indexOf(k)>=0) return {label:ITEM_SITES[k], site:null};
+    if(sub.indexOf(k)>=0) return {label:ITEM_SITES[k], site:null};
   }
   // Home site (Karakter, Bondgenoot, Factie)
   var home=(card.attrs&&card.attrs['Home Site'])||'';
