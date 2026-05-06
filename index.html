@@ -579,6 +579,7 @@ var _dataReady=false,_imgReady=false;
 function _tryInit(){if(_dataReady&&_imgReady){document.getElementById('loading').style.display='none';buildRegions();buildSiteMarkers();iv();}}
 mapImg.onload=function(){imgW=this.naturalWidth;imgH=this.naturalHeight;this.width=imgW;this.height=imgH;sv.setAttribute('width',imgW);sv.setAttribute('height',imgH);sv.setAttribute('viewBox','0 0 '+imgW+' '+imgH);_imgReady=true;_tryInit();};
 loadSupabaseData(function(){_dataReady=true;_tryInit();});
+_buildCardList(); // laad kaartdata op achtergrond zodat site types altijd beschikbaar zijn
 mapImg.src='https://btupnjyvsltowbynqhxz.supabase.co/storage/v1/object/public/meccg/meccg-map.jpg';
 mw.addEventListener('mousedown',function(e){pan=true;lx=e.clientX;ly=e.clientY;});
 document.addEventListener('mousemove',function(e){if(!pan)return;tx+=e.clientX-lx;ty+=e.clientY-ly;lx=e.clientX;ly=e.clientY;apT();});
