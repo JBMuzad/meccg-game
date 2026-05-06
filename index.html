@@ -281,6 +281,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="soSiteName"></div>
       <div id="soSiteType"></div>
       <div id="soVersions"></div>
+      <div id="soPlayable"></div>
       <div id="soHazards"></div>
       <div id="soEditPanel" class="ep">
         <div class="ep-title">&#9998; Regio bewerken</div>
@@ -986,6 +987,39 @@ function openSiteOverlay(s){
       vdiv.appendChild(btn);
     });
     loadSiteImg(versions[0]);
+  }
+
+  // Speelbare resources
+  var playDiv=document.getElementById('soPlayable');
+  playDiv.innerHTML='';
+  if(hasSite){
+    var SITE_PLAY={
+      'haven': ['Karakter','Bondgenoot','Minor Item'],
+      'free':  ['Factie','Major Item','Special Item'],
+      'ruins': ['Greater Item','Major Item','Gold Ring'],
+      'shadow':['Factie','Major Item','Gold Ring'],
+      'dark':  ['Factie','Major Item','Gold Ring'],
+      'border':['Factie','Minor Item']
+    };
+    var playTypes=SITE_PLAY[s.t]||[];
+    var ph='<div class="soHazLabel" style="margin-top:6px;">&#9670; Speelbaar</div>';
+    playTypes.forEach(function(pt){
+      ph+='<span class="htag" style="background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.2);color:rgba(212,168,75,.75);">'+pt+'</span>';
+    });
+    // Home site karakters/facties (alleen als kaarten geladen zijn)
+    if(_cardsLoaded){
+      var sNameL=(s.n||'').toLowerCase();
+      var homeCards=_allCards.filter(function(c){
+        return ((c.attrs&&c.attrs['Home Site'])||'').toLowerCase()===sNameL;
+      });
+      if(homeCards.length){
+        ph+='<div class="soHazLabel" style="margin-top:8px;">&#127968; Home site voor</div>';
+        homeCards.forEach(function(c){
+          ph+='<span class="htag" style="cursor:pointer;background:rgba(100,140,200,.08);border-color:rgba(100,140,200,.25);color:rgba(160,190,230,.8);" onclick="openCardOverlay('+JSON.stringify(c).replace(/</g,'\\u003c')+')">'+c.name+'</span>';
+        });
+      }
+    }
+    playDiv.innerHTML=ph;
   }
 
   // Andere sites in dezelfde regio
