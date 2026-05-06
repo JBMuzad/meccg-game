@@ -1002,7 +1002,8 @@ function openSiteOverlay(s){
   // Sitenaam + versies + afbeelding
   var hasSite=!!(s.n&&s.n!=='');
   document.getElementById('soSiteName').textContent=s.n||'';
-  document.getElementById('soSiteType').textContent=hasSite?(SL[s.t]||s.t):'';
+  var _siteT=hasSite?_resolveSiteType(s.n,s.a,s.t):s.t;
+  document.getElementById('soSiteType').textContent=hasSite?(SL[_siteT]||_siteT):'';
   document.getElementById('soVersions').innerHTML='';
   document.getElementById('soImgWrap').style.display=hasSite?'flex':'none';
 
@@ -1062,7 +1063,7 @@ function openSiteOverlay(s){
   }
 
   // Speelbare resources
-  if(hasSite) _updateSoPlayable(s.n, s.t);
+  if(hasSite) _updateSoPlayable(s.n, _siteT);
   else document.getElementById('soPlayable').innerHTML='';
 
   // Andere sites in dezelfde regio
@@ -1086,7 +1087,8 @@ function openSiteOverlay(s){
           row.classList.add('active');
           // Update sitename/type/versies/afbeelding zonder SVG opnieuw te tekenen
           document.getElementById('soSiteName').textContent=site.n;
-          document.getElementById('soSiteType').textContent=SL[site.t]||site.t;
+          var _rT=_resolveSiteType(site.n,site.a,site.t);
+          document.getElementById('soSiteType').textContent=SL[_rT]||_rT;
           var vdiv2=document.getElementById('soVersions');
           vdiv2.innerHTML='';
           var vs=SITES_DB.filter(function(x){return x.n===site.n;}).map(function(x){
@@ -1127,7 +1129,7 @@ function openSiteOverlay(s){
             };
           })(vs);
           // Speelbaar bijwerken voor deze site
-          _updateSoPlayable(site.n, site.t);
+          _updateSoPlayable(site.n, _rT);
         };})(os);
         otherDiv.appendChild(row);
       });
@@ -1243,6 +1245,18 @@ function loadDreamSites(cb){
     });
     if(cb)cb();
   }).catch(function(){_dreamLoaded=false;if(cb)cb();});
+}
+
+function _resolveSiteType(name, alignment, fallback){
+  if(!_cardsLoaded||!_allCards.length) return fallback;
+  var nl=name.toLowerCase();
+  var match=_allCards.filter(function(c){
+    return c.name.toLowerCase()===nl&&c.type.toLowerCase()==='site'&&(!alignment||c.alignment===alignment);
+  })[0]||_allCards.filter(function(c){
+    return c.name.toLowerCase()===nl&&c.type.toLowerCase()==='site';
+  })[0];
+  if(match&&match.attrs&&match.attrs.Subtype) return _normSiteType(match.attrs.Subtype);
+  return fallback;
 }
 
 function _updateSoPlayable(siteName, siteType){
