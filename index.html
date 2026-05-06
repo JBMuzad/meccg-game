@@ -1267,13 +1267,14 @@ function loadDreamSites(cb){
   }).catch(function(){_dreamLoaded=false;if(cb)cb();});
 }
 
+function _normName(n){ return (n||'').toLowerCase().replace(/[\u2018\u2019\u201a\u201b\u2032\u0060]/g,"'"); }
 function _resolveSiteType(name, alignment, fallback){
   if(!_cardsLoaded||!_allCards.length) return fallback;
-  var nl=name.toLowerCase();
+  var nl=_normName(name);
   var match=_allCards.filter(function(c){
-    return c.name.toLowerCase()===nl&&c.type.toLowerCase()==='site'&&(!alignment||c.alignment===alignment);
+    return _normName(c.name)===nl&&c.type.toLowerCase()==='site'&&(!alignment||c.alignment===alignment);
   })[0]||_allCards.filter(function(c){
-    return c.name.toLowerCase()===nl&&c.type.toLowerCase()==='site';
+    return _normName(c.name)===nl&&c.type.toLowerCase()==='site';
   })[0];
   if(match&&match.attrs&&match.attrs['Site Type']) return _normSiteType(match.attrs['Site Type']);
   if(match&&match.attrs&&match.attrs.Subtype) return _normSiteType(match.attrs.Subtype);
