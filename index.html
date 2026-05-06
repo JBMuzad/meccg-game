@@ -1052,7 +1052,7 @@ function openSiteOverlay(s){
   // Andere sites in dezelfde regio
   var otherDiv=document.getElementById('soOtherSites');
   otherDiv.innerHTML='';
-  if(rd&&rd.s&&rd.s.length>1){
+  if(rd&&rd.s&&rd.s.length){
     if(rd.s&&rd.s.length){
       otherDiv.innerHTML='<div id="soOtherLabel">Sites in '+rd.name+'</div>';
       rd.s.forEach(function(os){
