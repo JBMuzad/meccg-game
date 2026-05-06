@@ -310,6 +310,10 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="soEditPanel" class="ep">
         <div class="ep-title">&#9998; Regio bewerken</div>
         <div class="ef">
+          <label>Naam</label>
+          <input id="soEditName" type="text" placeholder="Regio naam"/>
+        </div>
+        <div class="ef">
           <label>Tweede naam</label>
           <input id="soEditName2" type="text" placeholder="bijv. The Black Country"/>
         </div>
@@ -1971,6 +1975,7 @@ var _editRid=null;
 function _fillRegionEditForm(rid){
   _editRid=rid;
   var rd=RD[rid]||{};
+  document.getElementById('soEditName').value=rd.name||'';
   document.getElementById('soEditName2').value=rd.name2||'';
   document.getElementById('soEditType').value=rd.type||'W';
   document.getElementById('soEditHazards').value=(rd.h||[]).join(', ');
@@ -1979,6 +1984,7 @@ function _fillRegionEditForm(rid){
 }
 function saveRegionEdit(){
   if(!_editRid)return;
+  var name=document.getElementById('soEditName').value.trim();
   var name2=document.getElementById('soEditName2').value.trim();
   var type=document.getElementById('soEditType').value;
   var hStr=document.getElementById('soEditHazards').value;
@@ -1986,15 +1992,17 @@ function saveRegionEdit(){
   var st=document.getElementById('soEditStatus');
   st.textContent='Opslaan…';
   sbPatch('regions','rid=eq.'+encodeURIComponent(_editRid),
-    {name2:name2,type:type,hazards:hazards},
+    {name:name||undefined,name2:name2,type:type,hazards:hazards},
     function(err){
       if(err){st.textContent='Fout!';return;}
-      // Update geheugen
       if(RD[_editRid]){
+        if(name) RD[_editRid].name=name;
         RD[_editRid].name2=name2;
         RD[_editRid].type=type;
         RD[_editRid].h=hazards;
       }
+      // Update zichtbare regio naam
+      if(name) document.getElementById('soRegName').textContent=name+(name2?' / '+name2:'');
       st.textContent='Opgeslagen \u2713';
       setTimeout(function(){st.style.opacity='0';setTimeout(function(){st.textContent='';st.style.opacity='1';},600);},2000);
     }
