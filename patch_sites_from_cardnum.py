@@ -21,6 +21,17 @@ print(f"  {len(cards)} kaarten geladen.")
 sites = [c for c in cards if (c.get('Primary') or '').strip().lower() == 'site']
 print(f"  {len(sites)} sitekaarten gevonden.")
 
+# Dedupliceer: één entry per naam (voorkeur Hero, anders eerste)
+seen = {}
+for c in sites:
+    name = (c.get('NameEN') or '').strip()
+    if not name or not c.get('Site'):
+        continue
+    if name not in seen or c.get('Alignment') == 'Hero':
+        seen[name] = c
+sites = list(seen.values())
+print(f"  {len(sites)} unieke sitenamen.")
+
 def esc(val):
     """Escape single quotes voor SQL."""
     if val is None:
@@ -68,8 +79,10 @@ for c in sites:
     if region is not None:
         set_parts.append(f"region={esc(region)}")
 
-    # Geen alignment in WHERE: type is hetzelfde voor alle versies van dezelfde site
-    sql = f"UPDATE sites SET {', '.join(set_parts)} WHERE name={esc(name)};"
+    # Normaliseer apostrofs in name-kolom bij vergelijking (chr(8217)=U+2019, chr(8216)=U+2018)
+    norm_name = esc(name)
+    where = f"replace(replace(name,chr(8217),chr(39)),chr(8216),chr(39))={norm_name}"
+    sql = f"UPDATE sites SET {', '.join(set_parts)} WHERE {where};"
     lines.append(sql)
     updated += 1
 

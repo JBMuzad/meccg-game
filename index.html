@@ -417,7 +417,7 @@ var NS='http://www.w3.org/2000/svg';
 var DB_URL='https://raw.githubusercontent.com/council-of-elrond-meccg/meccg-cards-database/master/cards.json';
 var TL={W:'Wilderness',B:'Border-land',S:'Shadow-land',D:'Dark-domain',F:'Free-domain',C:'Coastal Sea'};
 var SC={haven:'#c8a020',free:'#1060c0',border:'#9a6510',ruins:'#606060',shadow:'#8a1525',dark:'#1a1848'};
-var SL={haven:'Haven',free:'Free-hold',border:'Border-hold',ruins:'Ruins & Lairs',shadow:'Shadow-hold',dark:'Dark-hold',unknown:'?'};
+var SL={haven:'Haven',free:'Free-hold',border:'Border-hold',ruins:'Ruins & Lairs',shadow:'Shadow-hold',dark:'Dark-hold',darkhaven:'Darkhaven',lordhaven:'Lordhaven',wizardhaven:'Wizardhaven','elf-hold':'Elf-hold',unknown:'?'};
 var sc=.5,tx=0,ty=0,pan=false,lx=0,ly=0,sel=null,imgW=0,imgH=0,_sc=[];
 
 
@@ -475,6 +475,11 @@ function loadSupabaseData(cb){
       'ruins':'ruins','ruins & lairs':'ruins','ruins &amp; lairs':'ruins','ruins and lairs':'ruins',
       'shadow':'shadow','shadow-hold':'shadow','shadow-holds':'shadow','shadow hold':'shadow','shadow holds':'shadow',
       'dark':'dark','dark-hold':'dark','dark-holds':'dark','dark hold':'dark','dark holds':'dark',
+      'darkhaven':'darkhaven','dark-haven':'darkhaven',
+      'elf-hold':'elf-hold','elf hold':'elf-hold','elfhold':'elf-hold',
+      'lordhaven':'lordhaven','lord-haven':'lordhaven','lord haven':'lordhaven',
+      'wizardhaven':'wizardhaven','wizard-haven':'wizardhaven','wizard haven':'wizardhaven',
+      'boarder-hold':'border','boarder hold':'border',
       'unknown':'dark'
     };
     return map[t.toLowerCase().trim()]||t.toLowerCase().trim();
@@ -1275,12 +1280,16 @@ function _resolveSiteType(name, alignment, fallback){
 
 function _updateSoPlayable(siteName, siteType){
   var SITE_PLAY={
-    'haven': ['Karakter','Bondgenoot'],
-    'free':  ['Factie','Major Item','Gold Ring','Special Item'],
-    'border':['Factie','Minor Item'],
-    'ruins': ['Minor Item','Major Item','Greater Item','Gold Ring'],
-    'shadow':['Factie','Minor Item','Major Item','Gold Ring'],
-    'dark':  ['Factie','Minor Item','Major Item','Gold Ring']
+    'haven':       ['Karakter','Bondgenoot'],
+    'free':        ['Factie','Major Item','Gold Ring','Special Item'],
+    'border':      ['Factie','Minor Item'],
+    'ruins':       ['Minor Item','Major Item','Greater Item','Gold Ring'],
+    'shadow':      ['Factie','Minor Item','Major Item','Gold Ring'],
+    'dark':        ['Factie','Minor Item','Major Item','Gold Ring'],
+    'darkhaven':   ['Karakter','Bondgenoot'],
+    'lordhaven':   ['Karakter','Bondgenoot'],
+    'wizardhaven': ['Karakter','Bondgenoot'],
+    'elf-hold':    ['Factie','Major Item','Gold Ring','Special Item']
   };
   var playTypes=SITE_PLAY[siteType]||[];
   var ph='<div class="soHazLabel" style="margin-top:6px;">&#9670; Speelbaar</div>';
