@@ -355,6 +355,10 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <div class="cd-section-label">Citaat</div>
         <div class="cd-text" id="cdQuote"></div>
       </div>
+      <div class="cd-section" id="cdPlayableSection" style="display:none">
+        <div class="cd-section-label">&#9670; Speelbaar bij</div>
+        <div id="cdPlayable"></div>
+      </div>
       <div class="cd-section">
         <div class="cd-section-label">Extra informatie</div>
         <a id="cdWikiLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener">&#128269; Zoek op MECCG Wiki</a>
@@ -1389,6 +1393,32 @@ function openCardOverlay(c){
   // Citaat
   if(c.quote){document.getElementById('cdQuote').innerHTML=c.quote;document.getElementById('cdQuoteSection').style.display='';}
   else document.getElementById('cdQuoteSection').style.display='none';
+
+  // Speelbaar bij
+  var loc=_resPlayLocation(c);
+  var playEl=document.getElementById('cdPlayable');
+  var playSection=document.getElementById('cdPlayableSection');
+  if(loc){
+    playSection.style.display='';
+    playEl.innerHTML='';
+    if(loc.site||loc.rid){
+      // Klikbare site
+      var sObj=loc.site;
+      var rObj={n:sObj?sObj.n:loc.label,a:sObj?sObj.a:'',t:sObj?sObj.t:'',
+                img:sObj?sObj.img:'',loc:sObj?sObj.loc:'',cdn:sObj?sObj.cdn:'',
+                set:sObj?sObj.set:'',reg:sObj?sObj.reg:'',nh:sObj?sObj.nh:'',rid:loc.rid};
+      var btn=document.createElement('span');
+      btn.className='htag';
+      btn.style.cssText='cursor:pointer;background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.25);color:rgba(212,168,75,.8);';
+      btn.textContent='\u25b6 '+loc.label;
+      btn.onclick=function(){closeCardOverlay();openSiteOverlay(rObj);};
+      playEl.appendChild(btn);
+    } else {
+      playEl.innerHTML='<span class="htag" style="background:rgba(212,168,75,.06);border-color:rgba(212,168,75,.15);color:rgba(212,168,75,.6);">'+loc.label+'</span>';
+    }
+  } else {
+    playSection.style.display='none';
+  }
 
   // Links
   var wikiQ=encodeURIComponent(c.name+' MECCG');
