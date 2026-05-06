@@ -448,9 +448,20 @@ function loadSupabaseData(cb){
   });
 
   // 3. Sites (alleen SITES_DB vullen; koppeling aan RD.s in done())
+  function _normSiteType(t){
+    if(!t)return '';
+    var tl=t.toLowerCase().trim().replace(/[_\s]+/g,'-');
+    if(/^h(aven)?$/.test(tl))return 'haven';
+    if(/^f(ree)?(-hold)?$/.test(tl)||tl==='free-domain')return 'free';
+    if(/^b(order)?(-hold)?$/.test(tl)||tl==='border-land')return 'border';
+    if(/^r(uins)?(-?&?-?lairs?)?$/.test(tl)||tl==='ruins-&-lairs'||tl==='ruins-and-lairs')return 'ruins';
+    if(/^s(hadow)?(-hold)?$/.test(tl)||tl==='shadow-land')return 'shadow';
+    if(/^d(ark)?(-hold)?$/.test(tl)||tl==='dark-domain')return 'dark';
+    return tl;
+  }
   _sbFetch('sites','select=*&limit=1000',function(rows){
     SITES_DB=rows.map(function(s){
-      return {n:s.name,a:s.alignment,t:s.type,img:s.img,loc:s.loc,cdn:s.cdn,set:s.set_code,reg:s.region,nh:s.near_haven||''};
+      return {n:s.name,a:s.alignment,t:_normSiteType(s.type),img:s.img,loc:s.loc,cdn:s.cdn,set:s.set_code,reg:s.region,nh:s.near_haven||''};
     });
     done();
   });
