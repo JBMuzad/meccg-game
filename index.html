@@ -1274,6 +1274,7 @@ function _resolveSiteType(name, alignment, fallback){
   })[0]||_allCards.filter(function(c){
     return c.name.toLowerCase()===nl&&c.type.toLowerCase()==='site';
   })[0];
+  if(match&&match.attrs&&match.attrs['Site Type']) return _normSiteType(match.attrs['Site Type']);
   if(match&&match.attrs&&match.attrs.Subtype) return _normSiteType(match.attrs.Subtype);
   return fallback;
 }
@@ -1418,9 +1419,11 @@ function _buildCardList(){
       if(c.Direct)attrs['Direct Inf.']=c.Direct;
       if(c.MPs)attrs.MPs=c.MPs;
       if(c.Home)attrs['Home Site']=(c.Home||'').trim();
-      if(c.Nearest)attrs['Nearest Haven']=c.Nearest;
-      if(c.Path)attrs.Path=c.Path;
+      if(c.Haven)attrs['Nearest Haven']=(c.Haven||'').trim();  // c.Haven = nearest haven voor sites
+      if(c.Site)attrs['Site Type']=c.Site;                     // c.Site = Free-hold / Haven / ...
+      if(c.Path)attrs.Path=(c.Path||'').trim().toUpperCase();
       if(c.Playable)attrs.Playable=c.Playable;
+      if(c.Region)attrs.Region=c.Region;
       if(c.Rarity)attrs.Rarity=c.Rarity;
       if(c.Artist)attrs.Artist=c.Artist;
       _allCards.push({
