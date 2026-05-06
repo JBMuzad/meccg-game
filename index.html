@@ -228,7 +228,15 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       </div>
       <div id="regioResults" style="overflow-y:auto;flex:1;padding:0 6px 6px;"><div class="placeholder" style="padding:10px 6px;">Typ een regionaam om te zoeken.</div></div>
     </div>
-    <div class="sbb" id="sbsites" style="display:none"></div>
+    <div class="sbb" id="sbsites" style="display:none;flex-direction:column;padding:0;">
+      <div style="padding:6px 8px 4px;flex-shrink:0;">
+        <input id="siteSearchInput" type="text" placeholder="&#128269; Zoek site of regio&#8230;" autocomplete="off"
+          oninput="_siteQuery=this.value;renderSites(_siteFilter)"
+          style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;">
+      </div>
+      <div id="ssiteFilts" style="flex-shrink:0;"></div>
+      <div id="ssiteList" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
+    </div>
     <div class="sbb" id="sbroutes" style="display:none"></div>
     <div class="sbb" id="sbcards" style="display:none;padding:0;flex-direction:column;">
       <div style="padding:10px 10px 6px;flex-shrink:0;">
@@ -758,7 +766,7 @@ function switchTab(tab){
   document.getElementById('tabRoutes').classList.toggle('on',tab==='routes');
   document.getElementById('tabCards').classList.toggle('on',tab==='cards');
   document.getElementById('sbody').style.display=tab==='regio'?'flex':'none';
-  document.getElementById('sbsites').style.display=tab==='sites'?'':'none';
+  document.getElementById('sbsites').style.display=tab==='sites'?'flex':'none';
   document.getElementById('sbroutes').style.display=tab==='routes'?'':'none';
   document.getElementById('sbcards').style.display=tab==='cards'?'flex':'none';
   if(tab==='sites') renderSites(_siteFilter);
@@ -779,19 +787,17 @@ var _siteQuery='';
 
 function renderSites(f){
   _siteFilter=f;
-  var rdNames={};
-  Object.keys(RD).forEach(function(rid){(RD[rid].s||[]).forEach(function(s){rdNames[s.n]=rid;});});
+  _buildRdByName();
   var sites=SITES_DB.map(function(s){
-    return {n:s.n,a:s.a,t:s.t,img:s.img,loc:s.loc,cdn:s.cdn,set:s.set,reg:s.reg,nh:s.nh,rid:rdNames[s.n]||null,dream:false};
+    var rid=_rdByName[(s.reg||'').toLowerCase()]||null;
+    return {n:s.n,a:s.a,t:s.t,img:s.img,loc:s.loc,cdn:s.cdn,set:s.set,reg:s.reg,nh:s.nh,rid:rid,dream:false};
   });
 
   // Voeg dream sites toe indien actief
   if(_showDreamSites){
-    _buildRdByName();
     _dreamSites.forEach(function(ds){
       if(f!=='ALL'&&ds.type!==f)return;
-      var regLow=(ds.region||'').toLowerCase();
-      var rid=_rdByName[regLow]||null;
+      var rid=_rdByName[(ds.region||'').toLowerCase()]||null;
       ds.alignments.forEach(function(al){
         sites.push({n:ds.name,a:al,t:ds.type,img:'',loc:'',cdn:'',set:ds.set,reg:ds.region,nh:ds.haven,rid:rid,dream:true,_ds:ds});
       });
@@ -808,41 +814,39 @@ function renderSites(f){
 
   _siteList=sites;
 
-  var h='<div style="padding:6px 8px 4px;">'
-    +'<input id="siteSearchInput" type="text" placeholder="&#128269; Zoek site of regio…" value="'+_siteQuery.replace(/"/g,'&quot;')+'"'
-    +' oninput="_siteQuery=this.value;renderSites(_siteFilter)"'
-    +' style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:#e8dcc8;font-size:12px;padding:5px 8px;outline:none;font-family:inherit;">'
-    +'</div>';
-  h+='<div class="ssite-filt">';
+  // Filterknoppen
+  var fh='<div class="ssite-filt">';
   [{k:'ALL',l:'Alles'},{k:'haven',l:'Haven'},{k:'free',l:'Free-hold'},
    {k:'ruins',l:'Ruins'},{k:'border',l:'Border'},{k:'shadow',l:'Shadow'},{k:'dark',l:'Dark'}
   ].forEach(function(ft){
-    h+='<button class="sfbtn'+(f===ft.k?' on':'')+'" onclick="renderSites(\''+ft.k+'\')">'+ft.l+'</button>';
+    fh+='<button class="sfbtn'+(f===ft.k?' on':'')+'" onclick="renderSites(\''+ft.k+'\')">'+ft.l+'</button>';
   });
-  h+='<button class="sfbtn'+(_showDreamSites?' on':'')+'" onclick="toggleDreamSites()" style="'+(_showDreamSites?'color:#7ab0e0;border-color:#7ab0e0;':'')+'">&#9733; Dream</button>';
-  h+='</div>';
+  fh+='<button class="sfbtn'+(_showDreamSites?' on':'')+'" onclick="toggleDreamSites()" style="'+(_showDreamSites?'color:#7ab0e0;border-color:#7ab0e0;':'')+'">&#9733; Dream</button>';
+  fh+='</div>';
+  document.getElementById('ssiteFilts').innerHTML=fh;
 
+  // Lijst
   if(_showDreamSites&&!_dreamLoaded){
-    h+='<div style="color:rgba(100,160,220,.4);font-size:11px;text-align:center;padding-top:16px;">Dream sites laden…</div>';
-    document.getElementById('sbsites').innerHTML=h;
+    document.getElementById('ssiteList').innerHTML='<div style="color:rgba(100,160,220,.4);font-size:11px;text-align:center;padding-top:16px;">Dream sites laden…</div>';
     loadDreamSites(function(){renderSites(_siteFilter);});
     return;
   }
 
-  if(!sites.length){h+='<div class="placeholder">Geen sites.</div>';}
+  var lh='';
+  if(!sites.length){lh='<div class="placeholder">Geen sites.</div>';}
   sites.forEach(function(s,i){
     var alignLabel={'Hero':'H','Minion':'M','Balrog':'B','Fallen-wizard':'FW','Elf-lord':'EL','Fallen/Lord':'FL'}[s.a]||s.a;
     var alignColor={'Hero':'#4080c0','Minion':'#c04040','Balrog':'#804040','Fallen-wizard':'#806040','Elf-lord':'#408060','Fallen/Lord':'#806040'}[s.a]||'#888';
-    h+='<div class="ssite-row" onclick="selectSite('+i+')">';
-    h+='<div class="sdot" style="background:'+(SC[s.t]||'#888')+(s.dream?';opacity:.6':'')+'"></div>';
-    h+='<div style="flex:1"><div class="sname">'+s.n;
-    if(s.dream)h+=' <span style="font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
-    h+=' <span style="font-size:9px;padding:0 3px;border-radius:2px;background:'+alignColor+';color:#fff;opacity:.8">'+alignLabel+'</span></div>';
+    lh+='<div class="ssite-row" onclick="selectSite('+i+')">';
+    lh+='<div class="sdot" style="background:'+(SC[s.t]||'#888')+(s.dream?';opacity:.6':'')+'"></div>';
+    lh+='<div style="flex:1"><div class="sname">'+s.n;
+    if(s.dream)lh+=' <span style="font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
+    lh+=' <span style="font-size:9px;padding:0 3px;border-radius:2px;background:'+alignColor+';color:#fff;opacity:.8">'+alignLabel+'</span></div>';
     var regText=(s.reg||'')+(s.nh?' · '+s.nh:'');
-    h+='<div class="ssite-reg">'+(regText||s.set.toUpperCase())+'</div></div>';
-    h+='<div style="font-size:10px;color:rgba(212,168,75,.35)">'+(s.rid?'&#9654;':'&#9900;')+'</div></div>';
+    lh+='<div class="ssite-reg">'+(regText||s.set.toUpperCase())+'</div></div>';
+    lh+='<div style="font-size:10px;color:rgba(212,168,75,.35)">'+(s.rid?'&#9654;':'&#9900;')+'</div></div>';
   });
-  document.getElementById('sbsites').innerHTML=h;
+  document.getElementById('ssiteList').innerHTML=lh;
 }
 
 function toggleDreamSites(){
