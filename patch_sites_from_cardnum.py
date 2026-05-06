@@ -68,11 +68,8 @@ for c in sites:
     if region is not None:
         set_parts.append(f"region={esc(region)}")
 
-    where_parts = [f"name={esc(name)}"]
-    if alignment:
-        where_parts.append(f"alignment={esc(alignment)}")
-
-    sql = f"UPDATE sites SET {', '.join(set_parts)} WHERE {' AND '.join(where_parts)};"
+    # Geen alignment in WHERE: type is hetzelfde voor alle versies van dezelfde site
+    sql = f"UPDATE sites SET {', '.join(set_parts)} WHERE name={esc(name)};"
     lines.append(sql)
     updated += 1
 

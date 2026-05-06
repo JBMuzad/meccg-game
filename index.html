@@ -1446,6 +1446,15 @@ function _buildCardList(){
     if(q&&q.length>=2)searchCards(q);
     else el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam om te zoeken.</div>';
     if(_curTab==='res') renderResources();
+    // Als site overlay open is, herlaad het type nu kaartdata beschikbaar is
+    if(document.getElementById('siteOverlay').classList.contains('open')){
+      var _soName=document.getElementById('soSiteName').textContent;
+      if(_soName){
+        var _soT=_resolveSiteType(_soName,'',_normSiteType(document.getElementById('soSiteType').textContent));
+        document.getElementById('soSiteType').textContent=SL[_soT]||_soT;
+        _updateSoPlayable(_soName,_soT);
+      }
+    }
   }).catch(function(){
     el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Kon databank niet laden.</div>';
     _cardsLoaded=false;
