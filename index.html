@@ -2114,14 +2114,15 @@ function renderResources(){
   // Sorteer op naam
   cards.sort(function(a,b){return a.name.localeCompare(b.name);});
 
-  function _makeResRow(c){
-    var loc=_resPlayLocation(c);
+  // Bouw locatie-objecten op (parallel met cards, voor event listeners)
+  var _resLocObjs=cards.map(function(c){return _resPlayLocation(c);});
+
+  function _makeResRow(c,ci){
+    var loc=_resLocObjs[ci];
     var locHtml='';
     if(loc){
       if(loc.site||loc.rid){
-        var sObj=loc.site;
-        var rObj={n:sObj?sObj.n:loc.label,a:sObj?sObj.a:'',t:sObj?sObj.t:'',img:sObj?sObj.img:'',loc:sObj?sObj.loc:'',cdn:sObj?sObj.cdn:'',set:sObj?sObj.set:'',reg:sObj?sObj.reg:'',nh:sObj?sObj.nh:'',rid:loc.rid};
-        locHtml='<div class="res-loc" onclick="event.stopPropagation();openSiteOverlay('+JSON.stringify(rObj)+')" style="cursor:pointer;">'
+        locHtml='<div class="res-loc res-loc-site" data-loc-idx="'+ci+'" style="cursor:pointer;">'
           +'<span style="color:rgba(212,168,75,.45);font-size:9px;">&#9654; </span>'
           +'<span style="color:rgba(212,168,75,.7);font-size:10px;">'+loc.label+'</span></div>';
       } else {
@@ -2129,7 +2130,7 @@ function renderResources(){
       }
     }
     var alignColor={'Hero':'#4080c0','Minion':'#c04040','Balrog':'#804040','Fallen-wizard':'#806040','Elf-lord':'#408060'}[c.alignment]||'#666';
-    return '<div class="ssite-row" onclick="openCardOverlay('+JSON.stringify(c).replace(/</g,'\\u003c')+')" style="flex-wrap:wrap;align-items:flex-start;padding:6px 8px;">'
+    return '<div class="ssite-row res-card-row" data-idx="'+ci+'" style="flex-wrap:wrap;align-items:flex-start;padding:6px 8px;cursor:pointer;">'
       +'<div class="sdot" style="background:'+alignColor+';margin-top:3px;flex-shrink:0;"></div>'
       +'<div style="flex:1;min-width:0;">'
         +'<div class="sname" style="white-space:normal;">'+c.name
@@ -2141,8 +2142,26 @@ function renderResources(){
   }
 
   var lh='<div style="color:rgba(255,255,255,.2);font-size:9px;padding:4px 8px 2px;">'+cards.length+' resources</div>';
-  cards.forEach(function(c){lh+=_makeResRow(c);});
-  document.getElementById('resList').innerHTML=lh;
+  cards.forEach(function(c,ci){lh+=_makeResRow(c,ci);});
+  var listEl=document.getElementById('resList');
+  listEl.innerHTML=lh;
+
+  // Event listeners (vermijdt JSON-in-attribuut problemen)
+  listEl.querySelectorAll('.res-card-row').forEach(function(el){
+    el.addEventListener('click',function(){openCardOverlay(cards[+this.dataset.idx]);});
+  });
+  listEl.querySelectorAll('.res-loc-site').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var loc=_resLocObjs[+this.dataset.locIdx];
+      if(!loc)return;
+      var sObj=loc.site;
+      var rObj={n:sObj?sObj.n:loc.label,a:sObj?sObj.a:'',t:sObj?sObj.t:'',img:sObj?sObj.img:'',
+                loc:sObj?sObj.loc:'',cdn:sObj?sObj.cdn:'',set:sObj?sObj.set:'',
+                reg:sObj?sObj.reg:'',nh:sObj?sObj.nh:'',rid:loc.rid};
+      openSiteOverlay(rObj);
+    });
+  });
 }
 
 // .res-loc stijl
