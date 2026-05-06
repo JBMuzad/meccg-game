@@ -450,14 +450,15 @@ function loadSupabaseData(cb){
   // 3. Sites (alleen SITES_DB vullen; koppeling aan RD.s in done())
   function _normSiteType(t){
     if(!t)return '';
-    var tl=t.toLowerCase().trim().replace(/s$/,'').replace(/[_\s]+/g,'-');
-    if(/^h(aven)?$/.test(tl))return 'haven';
-    if(/^f(ree)?(-hold)?$/.test(tl)||tl==='free-domain')return 'free';
-    if(/^b(order)?(-hold)?$/.test(tl)||tl==='border-land')return 'border';
-    if(/^ruin(-?&?-?lair)?$/.test(tl)||tl==='ruin-&-lair'||tl==='ruin-and-lair'||tl==='ruins-&-lairs'||tl==='ruins-&-lair')return 'ruins';
-    if(/^s(hadow)?(-hold)?$/.test(tl)||tl==='shadow-land')return 'shadow';
-    if(/^d(ark)?(-hold)?$/.test(tl)||tl==='dark-domain')return 'dark';
-    return tl;
+    var map={
+      'haven':'haven','havens':'haven',
+      'free':'free','free-hold':'free','free-holds':'free','free hold':'free','free holds':'free',
+      'border':'border','border-hold':'border','border-holds':'border','border hold':'border','border holds':'border',
+      'ruins':'ruins','ruins & lairs':'ruins','ruins &amp; lairs':'ruins','ruins and lairs':'ruins',
+      'shadow':'shadow','shadow-hold':'shadow','shadow-holds':'shadow','shadow hold':'shadow','shadow holds':'shadow',
+      'dark':'dark','dark-hold':'dark','dark-holds':'dark','dark hold':'dark','dark holds':'dark'
+    };
+    return map[t.toLowerCase().trim()]||t.toLowerCase().trim();
   }
   _sbFetch('sites','select=*&limit=1000',function(rows){
     SITES_DB=rows.map(function(s){
