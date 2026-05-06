@@ -1705,14 +1705,16 @@ function bfsPathExcluding(startRid,endRid,excludeRids){
   return null;
 }
 function _renderRouteTabs(){
-  if(_routes.length<=1)return'';
+  // Toon de balk alleen als er een volledig pad beschikbaar is
+  if(!_routeStart||!_routeEnd||!_routes.length)return'';
   var h='<div style="display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid rgba(212,168,75,.1);flex-shrink:0;">';
   _routes.forEach(function(p,i){
     var active=i===_activeRouteIdx;
-    var label='Route '+(i+1)+(p?'\u00b7'+(p.length-1)+'st':'?');
+    var label='Route '+(i+1)+(p?' \u00b7 '+(p.length-1)+' st':'?');
     h+='<div style="display:flex;flex:1;min-width:0;">';
     h+='<button onclick="_switchRoute('+i+')" style="flex:1;min-width:0;padding:3px 5px;font-size:9px;border-radius:3px 0 0 3px;border:1px solid rgba(212,168,75,'+(active?'.4':'.15')+');border-right:none;background:'+(active?'rgba(212,168,75,.15)':'rgba(0,0,0,.2)')+';color:'+(active?'#d4a84b':'rgba(212,168,75,.35)')+';cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+label+'</button>';
-    h+='<button onclick="_deleteRoute('+i+')" style="padding:0 4px;border-radius:0 3px 3px 0;border:1px solid rgba(212,168,75,'+(active?'.4':'.15')+');background:'+(active?'rgba(212,168,75,.1)':'rgba(0,0,0,.2)')+';color:rgba(212,168,75,.35);cursor:pointer;font-size:9px;" title="Verwijder">&#10005;</button>';
+    if(_routes.length>1){h+='<button onclick="_deleteRoute('+i+')" style="padding:0 4px;border-radius:0 3px 3px 0;border:1px solid rgba(212,168,75,'+(active?'.4':'.15')+');background:'+(active?'rgba(212,168,75,.1)':'rgba(0,0,0,.2)')+';color:rgba(212,168,75,.35);cursor:pointer;font-size:9px;" title="Verwijder">&#10005;</button>';}
+    else{h+='<div style="width:4px;"></div>';}
     h+='</div>';
   });
   if(_routes.length<3){h+='<button onclick="_addAlternativeRoute()" style="padding:3px 7px;font-size:12px;border-radius:3px;border:1px solid rgba(212,168,75,.2);background:rgba(0,0,0,.2);color:rgba(212,168,75,.6);cursor:pointer;margin-left:2px;flex-shrink:0;" title="Alternatief pad toevoegen">+</button>';}
