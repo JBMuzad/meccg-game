@@ -775,6 +775,7 @@ function switchTab(tab){
 }
 
 var _showDreamSites=false;
+var _siteQuery='';
 
 function renderSites(f){
   _siteFilter=f;
@@ -798,9 +799,21 @@ function renderSites(f){
   }
 
   if(f!=='ALL') sites=sites.filter(function(s){return s.t===f;});
+
+  // Zoekfilter
+  var q=_siteQuery.toLowerCase().trim();
+  if(q) sites=sites.filter(function(s){
+    return s.n.toLowerCase().indexOf(q)>=0||(s.reg||'').toLowerCase().indexOf(q)>=0;
+  });
+
   _siteList=sites;
 
-  var h='<div class="ssite-filt">';
+  var h='<div style="padding:6px 8px 4px;">'
+    +'<input id="siteSearchInput" type="text" placeholder="&#128269; Zoek site of regio…" value="'+_siteQuery.replace(/"/g,'&quot;')+'"'
+    +' oninput="_siteQuery=this.value;renderSites(_siteFilter)"'
+    +' style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:#e8dcc8;font-size:12px;padding:5px 8px;outline:none;font-family:inherit;">'
+    +'</div>';
+  h+='<div class="ssite-filt">';
   [{k:'ALL',l:'Alles'},{k:'haven',l:'Haven'},{k:'free',l:'Free-hold'},
    {k:'ruins',l:'Ruins'},{k:'border',l:'Border'},{k:'shadow',l:'Shadow'},{k:'dark',l:'Dark'}
   ].forEach(function(ft){
