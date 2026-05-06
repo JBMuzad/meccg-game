@@ -880,19 +880,33 @@ function toggleDreamSites(){
   renderSites(_siteFilter);
 }
 
+function _dreamSiteObj(ds, alignment){
+  // Bouw een site-object voor openSiteOverlay, met _cardData voor klik-door naar kaartdetail
+  _buildRdByName();
+  var rid=_rdByName[(ds.region||'').toLowerCase()]||null;
+  return {
+    n:ds.name, t:ds.type, rid:rid, reg:ds.region,
+    a:alignment||ds.alignments[0]||'',
+    img:'', cdn:getDCImgUrl(ds.set,ds.name)||'',
+    set:ds.set, nh:ds.haven||'', dream:true,
+    _cardData:{
+      id:ds.id, name:ds.name,
+      type:ds.type, alignment:ds.alignments.join(' / '),
+      set:ds.set+' (Dream)', dreamcard:true,
+      imgUrl:getDCImgUrl(ds.set,ds.name)||'',
+      text:ds.text, quote:'',
+      attrs:{Type:'Site',Subtype:SL[ds.type]||ds.type,
+             Alignment:ds.alignments.join(' / '),Region:ds.region,
+             Path:ds.path||undefined,Haven:ds.haven||undefined}
+    }
+  };
+}
+
 function selectSite(i){
   var s=_siteList[i];
   if(!s)return;
   if(s.dream&&s._ds){
-    openCardOverlay({
-      id:s._ds.id, name:s._ds.name,
-      type:s._ds.type, alignment:s._ds.alignments.join(' / '),
-      set:s._ds.set+' (Dream)', dreamcard:true,
-      imgUrl:getDCImgUrl(s._ds.set,s._ds.name)||'', text:s._ds.text, quote:'',
-      attrs:{Type:'Site',Subtype:SL[s._ds.type]||s._ds.type,
-             Alignment:s._ds.alignments.join(' / '),Region:s._ds.region,
-             Path:s._ds.path||undefined,Haven:s._ds.haven||undefined}
-    });
+    openSiteOverlay(_dreamSiteObj(s._ds, s.a));
   } else {
     openSiteOverlay(s);
   }
@@ -976,27 +990,56 @@ function openSiteOverlay(s){
   document.getElementById('soVersions').innerHTML='';
   document.getElementById('soImgWrap').style.display=hasSite?'flex':'none';
 
+  // Klikbaar maken: afbeelding opent kaartdetail
+  var _soImgWrap=document.getElementById('soImgWrap');
+  _soImgWrap.onclick=null;
+  _soImgWrap.style.cursor='default';
+
   if(hasSite){
-    var versions=SITES_DB.filter(function(x){return x.n===s.n;}).map(function(x){
-      return {n:x.n,a:x.a,t:x.t,img:x.img,_loc:x.loc,_cdn:x.cdn};
-    });
-    if(!versions.length) versions=[{n:s.n,a:s.a,t:s.t,img:s.img,_loc:s.loc,_cdn:s.cdn}];
-    var vdiv=document.getElementById('soVersions');
-    var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10'};
-    versions.forEach(function(v,vi){
-      var btn=document.createElement('button');
-      btn.className='sovbtn'+(vi===0?' active':'');
-      btn.textContent=v.a||(v.set||'').toUpperCase();
-      var ac=ACOLOR[v.a];
-      if(ac){btn.style.borderColor=ac;if(vi===0)btn.style.background=ac+'55';}
-      btn.onclick=(function(vv,b,ac){return function(){
-        document.querySelectorAll('.sovbtn').forEach(function(x){x.classList.remove('active');x.style.background='';});
-        b.classList.add('active');if(ac)b.style.background=ac+'55';
-        loadSiteImg(vv);
-      };})(v,btn,ac);
-      vdiv.appendChild(btn);
-    });
-    loadSiteImg(versions[0]);
+    if(s.dream&&s._cardData){
+      // Dreamcard site: toon afbeelding direct, geen versie-knoppen
+      document.getElementById('soVersions').innerHTML=
+        '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
+      var dImg={_cdn:s._cardData.imgUrl,_loc:''};
+      loadSiteImg(dImg);
+      _soImgWrap.style.cursor='pointer';
+      _soImgWrap.onclick=(function(cd){return function(){closeCardOverlay&&closeCardOverlay();openCardOverlay(cd);};})(s._cardData);
+    } else {
+      var versions=SITES_DB.filter(function(x){return x.n===s.n;}).map(function(x){
+        return {n:x.n,a:x.a,t:x.t,img:x.img,_loc:x.loc,_cdn:x.cdn};
+      });
+      if(!versions.length) versions=[{n:s.n,a:s.a,t:s.t,img:s.img,_loc:s.loc,_cdn:s.cdn}];
+      var vdiv=document.getElementById('soVersions');
+      var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10'};
+      var _setImgClick=function(v){
+        _soImgWrap.style.cursor='pointer';
+        _soImgWrap.onclick=function(){
+          // Zoek kaart in _allCards, anders bouw minimaal object
+          var cd=_allCards.filter(function(c){
+            return c.name.toLowerCase()===s.n.toLowerCase()&&(!v.a||c.alignment===v.a);
+          })[0]||{id:s.n,name:s.n,type:SL[s.t]||s.t,alignment:v.a||'',set:v.set||'',
+                  dreamcard:false,imgUrl:v._cdn||v._loc||'',text:'',quote:'',
+                  attrs:{Type:'Site',Subtype:SL[s.t]||s.t}};
+          openCardOverlay(cd);
+        };
+      };
+      versions.forEach(function(v,vi){
+        var btn=document.createElement('button');
+        btn.className='sovbtn'+(vi===0?' active':'');
+        btn.textContent=v.a||(v.set||'').toUpperCase();
+        var ac=ACOLOR[v.a];
+        if(ac){btn.style.borderColor=ac;if(vi===0)btn.style.background=ac+'55';}
+        btn.onclick=(function(vv,b,ac){return function(){
+          document.querySelectorAll('.sovbtn').forEach(function(x){x.classList.remove('active');x.style.background='';});
+          b.classList.add('active');if(ac)b.style.background=ac+'55';
+          loadSiteImg(vv);
+          _setImgClick(vv);
+        };})(v,btn,ac);
+        vdiv.appendChild(btn);
+      });
+      loadSiteImg(versions[0]);
+      _setImgClick(versions[0]);
+    }
   }
 
   // Speelbare resources
@@ -1080,6 +1123,17 @@ function openSiteOverlay(s){
             vdiv2.appendChild(b);
           });
           loadSiteImg(vs[0]);
+          // Klik op afbeelding → kaartdetail
+          var _w=document.getElementById('soImgWrap');
+          _w.style.cursor='pointer';
+          _w.onclick=function(){
+            var cd=_allCards.filter(function(c){
+              return c.name.toLowerCase()===site.n.toLowerCase();
+            })[0]||{id:site.n,name:site.n,type:SL[site.t]||site.t,alignment:'',
+                    set:'',dreamcard:false,imgUrl:'',text:'',quote:'',
+                    attrs:{Type:'Site',Subtype:SL[site.t]||site.t}};
+            openCardOverlay(cd);
+          };
         };})(os);
         otherDiv.appendChild(row);
       });
@@ -1216,19 +1270,19 @@ function _renderDreamSitesInOverlay(regionName){
     var nm='<div><div class="soOtherName">'+ds.name+badge+'</div><div class="soOtherType">'+(SL[ds.type]||ds.type)+(ds.alignments.length?' · '+ds.alignments.join('/'):'')+'</div></div>';
     row.innerHTML=dot+nm;
     row.onclick=(function(site){return function(){
-      openCardOverlay({
-        id:site.id, name:site.name,
-        type:site.type, alignment:site.alignments.join(' / '),
-        set:site.set+' (Dream)', dreamcard:true,
-        imgUrl:getDCImgUrl(site.set,site.name)||'', text:site.text, quote:'',
-        attrs:{
-          Type:'Site', Subtype:SL[site.type]||site.type,
-          Alignment:site.alignments.join(' / '),
-          Region:site.region,
-          Path:site.path||undefined,
-          Haven:site.haven||undefined
-        }
-      });
+      document.querySelectorAll('.soOtherRow').forEach(function(r){r.classList.remove('active');});
+      row.classList.add('active');
+      // Update overlay met dreamcard site (zelfde flow als reguliere sites)
+      var sObj=_dreamSiteObj(site, site.alignments[0]);
+      document.getElementById('soSiteName').textContent=site.name;
+      document.getElementById('soSiteType').textContent=SL[site.type]||site.type;
+      document.getElementById('soVersions').innerHTML=
+        '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
+      document.getElementById('soImgWrap').style.display='flex';
+      loadSiteImg({_cdn:sObj._cardData.imgUrl,_loc:''});
+      var wrap=document.getElementById('soImgWrap');
+      wrap.style.cursor='pointer';
+      wrap.onclick=(function(cd){return function(){openCardOverlay(cd);};})(sObj._cardData);
     };})(ds);
     otherDiv.appendChild(row);
   });
