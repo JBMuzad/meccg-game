@@ -302,6 +302,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       </div>
     </div>
     <div id="soRight">
+      <div id="soRouteBack" style="display:none;"></div>
       <div id="soSiteName"></div>
       <div id="soSiteType"></div>
       <div id="soVersions"></div>
@@ -363,6 +364,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <img id="cdImg" src="" alt="" onerror="this.style.opacity='.3'">
     </div>
     <div id="cardDetailCol">
+      <div id="cdRouteBack" style="display:none;"></div>
       <div>
         <div class="cd-title" id="cdTitle"></div>
         <div id="cdBadges"></div>
@@ -1183,6 +1185,17 @@ function openSiteOverlay(s){
     }
   }
 
+  var _sorb=document.getElementById('soRouteBack');
+  if(_sorb){
+    if(_routeReturn){
+      _sorb.style.display='';
+      _sorb.innerHTML='<button onclick="returnToRoute()" style="width:100%;padding:5px 8px;background:rgba(212,168,75,.08);border:1px solid rgba(212,168,75,.22);border-radius:3px;color:rgba(212,168,75,.75);font-size:10px;cursor:pointer;text-align:left;">&#9664; Terug naar route</button>';
+    } else {
+      _sorb.style.display='none';
+      _sorb.innerHTML='';
+    }
+  }
+
   document.getElementById('siteOverlay').classList.add('open');
 
   // Pan kaart naar regio
@@ -1211,6 +1224,7 @@ function loadSiteImg(v){
 }
 
 function closeSiteOverlay(){
+  _routeReturn=null;
   document.getElementById('siteOverlay').classList.remove('open');
   document.getElementById('soImg').style.display='none';
 }
@@ -1622,10 +1636,21 @@ function openCardOverlay(c){
   document.getElementById('cdNotesStatus').textContent='';
 
   _fillCardEditForm(c.id);
+  var _cdrb=document.getElementById('cdRouteBack');
+  if(_cdrb){
+    if(_routeReturn){
+      _cdrb.style.display='';
+      _cdrb.innerHTML='<button onclick="returnToRoute()" style="width:100%;padding:5px 8px;background:rgba(212,168,75,.08);border:1px solid rgba(212,168,75,.22);border-radius:3px;color:rgba(212,168,75,.75);font-size:10px;cursor:pointer;text-align:left;">&#9664; Terug naar route</button>';
+    } else {
+      _cdrb.style.display='none';
+      _cdrb.innerHTML='';
+    }
+  }
   document.getElementById('cardOverlay').classList.add('open');
 }
 
 function closeCardOverlay(){
+  _routeReturn=null;
   document.getElementById('cardOverlay').classList.remove('open');
   _curCardId=null;
 }
@@ -1651,6 +1676,7 @@ var TYPE_NAME_RT={'F':'Free-domain','W':'Wilderness','B':'Border-land','S':'Shad
 var MOVE_COLORS=['#d4a84b','#4a8fd0','#6a9a4a','#8a3a8a','#b8842a','#2a7a8a','#c04040','#408060'];
 
 var _routeStart=null, _routeEnd=null;
+var _routeReturn=null;
 
 // BFS kortste pad tussen twee regio's
 function bfsPath(startRid, endRid){
@@ -1782,7 +1808,7 @@ function buildRouteScenarioHtml(path,rdS,rdE){
       var bg=isFirst?'rgba(212,168,75,.15)':isLast?col+'33':'rgba(255,255,255,.04)';
       var border=isFirst?'rgba(212,168,75,.4)':isLast?col:'rgba(255,255,255,.1)';
       var textCol=isFirst?'#d4a84b':isLast?col:'rgba(240,224,184,.6)';
-      h+='<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+bg+';border:1px solid '+border+';color:'+textCol+';">'+(rd2?rd2.name:r)+'</span>';
+      h+='<span class="rt-clk-reg" data-rid="'+r+'" style="cursor:pointer;font-size:9px;padding:2px 6px;border-radius:3px;background:'+bg+';border:1px solid '+border+';color:'+textCol+';text-decoration:underline dotted;" title="Klik voor regio-info">'+(rd2?rd2.name:r)+'</span>';
       if(ri<seg.length-1)h+='<span style="color:rgba(255,255,255,.2);font-size:9px;">&#8250;</span>';
     });
     h+='</div>';
@@ -1792,7 +1818,7 @@ function buildRouteScenarioHtml(path,rdS,rdE){
       h+='<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Sites in '+(lastRd?lastRd.name:'?')+'</div>';
       h+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;">';
       destSites.forEach(function(s){
-        h+='<span class="rt-site-tag" style="background:rgba(0,0,0,.3);border:1px solid '+(SC[s.t]||'#888')+';color:'+(SC[s.t]||'#888')+'">'+s.n+'</span>';
+        h+='<span class="rt-site-tag rt-clk-site" data-site-n="'+s.n+'" data-site-rid="'+lastRid+'" style="cursor:pointer;background:rgba(0,0,0,.3);border:1px solid '+(SC[s.t]||'#888')+';color:'+(SC[s.t]||'#888')+';" title="Klik voor site-info">'+s.n+'</span>';
       });
       h+='</div>';
     } else {
@@ -1801,7 +1827,12 @@ function buildRouteScenarioHtml(path,rdS,rdE){
 
     // Hazards
     if(uniqHaz.length){
-      h+='<div style="font-size:9px;color:rgba(220,80,80,.6);">&#9888; '+uniqHaz.join(', ')+'</div>';
+      h+='<div style="font-size:9px;color:rgba(220,80,80,.6);">&#9888; ';
+      uniqHaz.forEach(function(haz,hi){
+        h+='<span class="rt-clk-haz" data-haz="'+haz+'" style="cursor:pointer;text-decoration:underline dotted;" title="Zoek hazard-kaart">'+haz+'</span>';
+        if(hi<uniqHaz.length-1)h+=', ';
+      });
+      h+='</div>';
     }
     h+='</div></div>';
   });
@@ -1956,6 +1987,7 @@ function showRouteOnMap(path){
 
   // Full scenario in overlay right panel
   document.getElementById('rtInfo').innerHTML=buildRouteScenarioHtml(path,rdS,rdE);
+  _addRouteInfoListeners();
   document.getElementById('routeOverlay').classList.add('open');
 }
 
@@ -1968,6 +2000,68 @@ document.addEventListener('keydown',function(e){
     if(ro&&ro.classList.contains('open')){closeRouteOverlay();}
   }
 });
+
+function returnToRoute(){
+  var r=_routeReturn; _routeReturn=null;
+  document.getElementById('siteOverlay').classList.remove('open');
+  document.getElementById('cardOverlay').classList.remove('open');
+  if(!r)return;
+  _routeStart=r.start; _routeEnd=r.end;
+  var path=(_routeStart&&_routeEnd)?bfsPath(_routeStart,_routeEnd):null;
+  if(path){
+    showRouteOnMap(path);
+    var rdS=RD[_routeStart],rdE=RD[_routeEnd];
+    var moves=pathToMoves(path);
+    document.getElementById('rtHeader').innerHTML=
+      '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">'+
+      '<div style="font-size:15px;color:#d4a84b;font-weight:700">'+(rdS?rdS.name:'?')+' &#8594; '+(rdE?rdE.name:'?')+'</div>'+
+      '<div style="font-size:10px;color:rgba(212,168,75,.45);">'+moves.length+' beweging'+(moves.length>1?'en':'')+' &middot; '+(path.length-1)+' stappen</div>'+
+      '</div>';
+    document.getElementById('rtInfo').innerHTML=buildRouteScenarioHtml(path,rdS,rdE);
+    _addRouteInfoListeners();
+  }
+  document.getElementById('routeOverlay').classList.add('open');
+}
+
+function _addRouteInfoListeners(){
+  var info=document.getElementById('rtInfo');
+  info.querySelectorAll('.rt-clk-reg').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var rid=this.dataset.rid;
+      if(!rid||!RD[rid])return;
+      _routeReturn={start:_routeStart,end:_routeEnd};
+      closeRouteOverlay();
+      var firstSite=RD[rid].s&&RD[rid].s.length?RD[rid].s[0]:null;
+      openRegioOverlay(rid,firstSite);
+    });
+  });
+  info.querySelectorAll('.rt-clk-site').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var sn=this.dataset.siteN;
+      var sRid=this.dataset.siteRid;
+      var sObj=SITES_DB.filter(function(s){return s.n===sn&&s.a==='Hero';})[0]
+             ||SITES_DB.filter(function(s){return s.n===sn;})[0];
+      if(!sObj)return;
+      _routeReturn={start:_routeStart,end:_routeEnd};
+      closeRouteOverlay();
+      openSiteOverlay(Object.assign({},sObj,{rid:sRid,_loc:sObj.loc,_cdn:sObj.cdn}));
+    });
+  });
+  info.querySelectorAll('.rt-clk-haz').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var haz=this.dataset.haz;
+      if(!haz)return;
+      _routeReturn={start:_routeStart,end:_routeEnd};
+      closeRouteOverlay();
+      switchTab('cards');
+      var inp=document.getElementById('cardSearch');
+      if(inp){inp.value=haz;searchCards(haz);}
+    });
+  });
+}
 
 
 // ── Supabase schrijven ────────────────────────────────────────────────────────
