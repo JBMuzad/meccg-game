@@ -2054,7 +2054,8 @@ function showRouteOnMap(path){
   document.getElementById('rtMapMeta').textContent=(rdS?rdS.name:'?')+' → '+(rdE?rdE.name:'?')+' · '+moves.length+' beweging'+(moves.length>1?'en':'')+' · '+(path.length-1)+' stappen';
 
   document.getElementById('rtHeader').innerHTML=
-    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">'+
+    _renderRouteTabs()+
+    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-top:6px;">'+
     '<div style="font-size:15px;color:#d4a84b;font-weight:700">'+(rdS?rdS.name:'?')+' &#8594; '+(rdE?rdE.name:'?')+'</div>'+
     '<div style="font-size:10px;color:rgba(212,168,75,.45);">'+moves.length+' beweging'+(moves.length>1?'en':'')+' &middot; '+(path.length-1)+' stappen</div>'+
     '</div>';
@@ -2083,18 +2084,10 @@ function returnToRoute(){
   _routeStart=r.start; _routeEnd=r.end;
   var path=_routes[_activeRouteIdx]||(_routeStart&&_routeEnd?bfsPath(_routeStart,_routeEnd):null);
   if(path){
-    showRouteOnMap(path);
-    var rdS=RD[_routeStart],rdE=RD[_routeEnd];
-    var moves=pathToMoves(path);
-    document.getElementById('rtHeader').innerHTML=
-      '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">'+
-      '<div style="font-size:15px;color:#d4a84b;font-weight:700">'+(rdS?rdS.name:'?')+' &#8594; '+(rdE?rdE.name:'?')+'</div>'+
-      '<div style="font-size:10px;color:rgba(212,168,75,.45);">'+moves.length+' beweging'+(moves.length>1?'en':'')+' &middot; '+(path.length-1)+' stappen</div>'+
-      '</div>';
-    document.getElementById('rtInfo').innerHTML=buildRouteScenarioHtml(path,rdS,rdE);
-    _addRouteInfoListeners();
+    showRouteOnMap(path); // zet rtHeader (met tabs), rtInfo, opent overlay
+  } else {
+    document.getElementById('routeOverlay').classList.add('open');
   }
-  document.getElementById('routeOverlay').classList.add('open');
 }
 
 function _addRouteInfoListeners(){
