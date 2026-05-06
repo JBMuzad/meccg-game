@@ -407,7 +407,20 @@ function _sbFetch(table,params,cb){
 
 function loadSupabaseData(cb){
   var pending=5,_nameToRid={};
-  function done(){if(--pending===0)cb();}
+
+  // Koppeling sites->regio's pas na alle fetches: vermijdt race condition
+  // waarbij sites-fetch eerder klaar is dan regions-fetch (_nameToRid nog leeg).
+  function done(){
+    if(--pending===0){
+      var officialSets={'tw':1,'le':1,'as':1,'ba':1,'td':1,'dm':1,'wh':1};
+      SITES_DB.forEach(function(s){
+        if(!officialSets[s.set]||s.a!=='Hero')return;
+        var rid=_nameToRid[(s.reg||'').toLowerCase()];
+        if(rid&&RD[rid])RD[rid].s.push({n:s.n,t:s.t,img:s.img,cdn:s.cdn});
+      });
+      cb();
+    }
+  }
 
   // 1. Regions + polys
   _sbFetch('regions','select=*&limit=200',function(rows){
@@ -427,17 +440,10 @@ function loadSupabaseData(cb){
     done();
   });
 
-  // 3. Sites
+  // 3. Sites (alleen SITES_DB vullen; koppeling aan RD.s in done())
   _sbFetch('sites','select=*&limit=1000',function(rows){
     SITES_DB=rows.map(function(s){
       return {n:s.name,a:s.alignment,t:s.type,img:s.img,loc:s.loc,cdn:s.cdn,set:s.set_code,reg:s.region,nh:s.near_haven||''};
-    });
-    // Vul RD.s (primaire sites per regio) vanuit officiële sets, Hero-versie
-    var officialSets={'tw':1,'le':1,'as':1,'ba':1,'td':1,'dm':1,'wh':1};
-    SITES_DB.forEach(function(s){
-      if(!officialSets[s.set]||s.a!=='Hero')return;
-      var rid=_nameToRid[(s.reg||'').toLowerCase()];
-      if(rid&&RD[rid])RD[rid].s.push({n:s.n,t:s.t,img:s.img,cdn:s.cdn});
     });
     done();
   });
