@@ -410,6 +410,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 <script>
 
 var SITE_SYMBOLS={"haven": "\u2694", "free": "\u25a1", "ruins": "\u25b3", "shadow": "\u25c6", "border": "\u25cb", "dark": "\u25cf"};
+var _siteTypeCache={}; // normName -> SL-key, gevuld vanuit cards-dc.json
 var SITE_COLORS={"haven": "#c8a020", "free": "#4080c0", "ruins": "#a06030", "shadow": "#8030a0", "border": "#60a060", "dark": "#c04040"};
 
 var NS='http://www.w3.org/2000/svg';
@@ -1269,16 +1270,7 @@ function loadDreamSites(cb){
 
 function _normName(n){ return (n||'').toLowerCase().replace(/[\u2018\u2019\u201a\u201b\u2032\u0060]/g,"'"); }
 function _resolveSiteType(name, alignment, fallback){
-  if(!_cardsLoaded||!_allCards.length) return fallback;
-  var nl=_normName(name);
-  var match=_allCards.filter(function(c){
-    return _normName(c.name)===nl&&c.type.toLowerCase()==='site'&&(!alignment||c.alignment===alignment);
-  })[0]||_allCards.filter(function(c){
-    return _normName(c.name)===nl&&c.type.toLowerCase()==='site';
-  })[0];
-  if(match&&match.attrs&&match.attrs['Site Type']) return _normSiteType(match.attrs['Site Type']);
-  if(match&&match.attrs&&match.attrs.Subtype) return _normSiteType(match.attrs.Subtype);
-  return fallback;
+  return _siteTypeCache[_normName(name)]||fallback;
 }
 
 function _updateSoPlayable(siteName, siteType){
@@ -1402,6 +1394,23 @@ function _buildCardList(){
         if(name&&c.image)imgLookup[name.toLowerCase()]=base+c.image;
       });
     });
+
+    // Bouw site type cache vanuit cards-dc.json (authoritative)
+    cardnumData.forEach(function(c){
+      if((c.Primary||'').toLowerCase()==='site'&&c.NameEN&&c.Site){
+        var k=_normName(c.NameEN);
+        if(!_siteTypeCache[k]) _siteTypeCache[k]=_normSiteType(c.Site);
+      }
+    });
+    // Update site overlay type als het open is
+    if(document.getElementById('siteOverlay').classList.contains('open')){
+      var _snm=document.getElementById('soSiteName').textContent;
+      if(_snm){
+        var _st2=_siteTypeCache[_normName(_snm)]||_normSiteType(document.getElementById('soSiteType').textContent);
+        document.getElementById('soSiteType').textContent=SL[_st2]||_st2;
+        _updateSoPlayable(_snm,_st2);
+      }
+    }
 
     // Verwerk cardnum kaarten
     _allCards=[];
