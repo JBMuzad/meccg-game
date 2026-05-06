@@ -283,6 +283,23 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <div id="soImgLoad">Laden&#8230;</div>
         <img id="soImg"/>
       </div>
+      <button id="soAnalyseBtn" onclick="openCardAnalysis()" style="display:none;margin-top:10px;padding:5px 12px;background:rgba(100,160,220,.15);border:1px solid rgba(100,160,220,.3);border-radius:4px;color:#7ab0e0;font-size:11px;cursor:pointer;">&#128270; Analyseer kaart</button>
+    </div>
+
+    <!-- Kaartanalyse test-venster -->
+    <div id="cardAnalysisOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;">
+      <div style="background:#1a1710;border:1px solid rgba(212,168,75,.3);border-radius:8px;width:520px;max-height:80vh;overflow-y:auto;padding:20px;position:relative;">
+        <button onclick="closeCardAnalysis()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#d4a84b;font-size:20px;cursor:pointer;">&#10005;</button>
+        <div style="font-size:14px;color:#d4a84b;font-weight:700;margin-bottom:14px;">&#128270; Kaartanalyse via Claude Vision</div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px;color:rgba(255,255,255,.4);display:block;margin-bottom:4px;">Anthropic API Key</label>
+          <input id="aiApiKey" type="password" placeholder="sk-ant-..." autocomplete="off"
+            style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:#e8d8a0;font-size:12px;outline:none;"/>
+        </div>
+        <button onclick="runCardAnalysis()" style="padding:7px 18px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.35);border-radius:4px;color:#d4a84b;font-size:12px;cursor:pointer;margin-bottom:14px;">&#9654; Analyseer</button>
+        <div id="aiStatus" style="font-size:11px;color:rgba(100,160,220,.7);margin-bottom:8px;"></div>
+        <div id="aiResult" style="font-size:12px;color:#e8d8c0;line-height:1.6;white-space:pre-wrap;"></div>
+      </div>
     </div>
     <div id="soRight">
       <div id="soSiteName"></div>
@@ -1172,9 +1189,11 @@ function openSiteOverlay(s){
 function loadSiteImg(v){
   var img=document.getElementById('soImg');
   var load=document.getElementById('soImgLoad');
+  var btn=document.getElementById('soAnalyseBtn');
   img.style.display='none';load.style.display='block';load.textContent='Laden…';
-  img.onload=function(){img.style.display='block';load.style.display='none';};
-  img.onerror=function(){load.textContent='Niet beschikbaar';img.style.display='none';};
+  if(btn)btn.style.display='none';
+  img.onload=function(){img.style.display='block';load.style.display='none';if(btn)btn.style.display='block';};
+  img.onerror=function(){load.textContent='Niet beschikbaar';img.style.display='none';if(btn)btn.style.display='none';};
   getImageEl(v,img);
 }
 
@@ -2205,6 +2224,74 @@ function renderResources(){
 }
 
 // .res-loc stijl
+
+// ── Kaartanalyse via Claude Vision ───────────────────────────────────────────
+var _analysisImgUrl='';
+
+function openCardAnalysis(){
+  var img=document.getElementById('soImg');
+  _analysisImgUrl=img.src||'';
+  if(!_analysisImgUrl){return;}
+  var saved=sessionStorage.getItem('meccg_ai_key')||'';
+  document.getElementById('aiApiKey').value=saved;
+  document.getElementById('aiStatus').textContent='';
+  document.getElementById('aiResult').textContent='';
+  var ov=document.getElementById('cardAnalysisOverlay');
+  ov.style.display='flex';
+}
+
+function closeCardAnalysis(){
+  document.getElementById('cardAnalysisOverlay').style.display='none';
+}
+
+async function runCardAnalysis(){
+  var key=document.getElementById('aiApiKey').value.trim();
+  if(!key){document.getElementById('aiStatus').textContent='Vul een API key in.';return;}
+  if(!_analysisImgUrl){document.getElementById('aiStatus').textContent='Geen afbeelding gevonden.';return;}
+  sessionStorage.setItem('meccg_ai_key',key);
+  var status=document.getElementById('aiStatus');
+  var result=document.getElementById('aiResult');
+  status.textContent='Analyseren…';
+  result.textContent='';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true',
+        'content-type':'application/json'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:1024,
+        messages:[{
+          role:'user',
+          content:[
+            {type:'image',source:{type:'url',url:_analysisImgUrl}},
+            {type:'text',text:'Dit is een MECCG (Middle Earth CCG) sitekaart. Extraheer de volgende velden en geef ze terug als JSON:\n- name: naam van de site\n- type: site type (Haven / Free-hold / Border-hold / Ruins & Lairs / Shadow-hold / Dark-hold)\n- nearest_haven: dichtstbijzijnde haven\n- path: pad/terrein symbolen (bijv. W B S D)\n- automatic_attacks: automatische aanvallen (omschrijving)\n- special: speciale tekst / abilities\n- mps: marshalling points\n- alignment: Hero / Minion / beide'}
+          ]
+        }]
+      })
+    });
+    var data=await resp.json();
+    if(!resp.ok){status.textContent='Fout: '+(data.error&&data.error.message||resp.status);return;}
+    var text=(data.content&&data.content[0]&&data.content[0].text)||'';
+    status.textContent='Klaar.';
+    // Probeer JSON te parsen en netjes weer te geven
+    var jsonMatch=text.match(/\{[\s\S]*\}/);
+    if(jsonMatch){
+      try{
+        var parsed=JSON.parse(jsonMatch[0]);
+        result.textContent=JSON.stringify(parsed,null,2);
+      }catch(e){result.textContent=text;}
+    } else {
+      result.textContent=text;
+    }
+  }catch(e){
+    status.textContent='Netwerkfout: '+e.message;
+  }
+}
 
 </script>
 </body>
