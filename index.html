@@ -179,6 +179,8 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
   padding:5px 14px;border-radius:4px;cursor:pointer;margin-top:2px;}
 .ep-save:hover{background:rgba(212,168,75,.22);}
 .cd-attr-ov{border-color:rgba(212,168,75,.4)!important;color:#d4a84b!important;}
+.res-loc{margin-top:2px;}
+.res-loc:hover span:last-child{color:#d4a84b!important;}
 .ep-status{font-size:9px;margin-left:8px;color:rgba(212,168,75,.5);
   opacity:1;transition:opacity 1s;}
 </style>
@@ -220,6 +222,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <button class="sbtab" id="tabSites" onclick="switchTab('sites')">&#127981; Sites</button>
         <button class="sbtab" id="tabRoutes" onclick="switchTab('routes')">&#128336; Routes</button>
         <button class="sbtab" id="tabCards" onclick="switchTab('cards')">&#127183; Cards</button>
+        <button class="sbtab" id="tabRes" onclick="switchTab('res')">&#9670; Resources</button>
     </div>
     <div id="sbody" style="display:flex;flex-direction:column;overflow:hidden;">
       <div style="padding:10px 10px 6px;flex-shrink:0;">
@@ -244,6 +247,15 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
           style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;">
       </div>
       <div id="cardResults" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
+    </div>
+    <div class="sbb" id="sbres" style="display:none;flex-direction:column;padding:0;">
+      <div style="padding:6px 8px 4px;flex-shrink:0;">
+        <input id="resSearch" type="text" placeholder="&#128269; Zoek resource&#8230;" autocomplete="off"
+          oninput="_resQuery=this.value;renderResources()"
+          style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;">
+      </div>
+      <div id="resFilts" style="flex-shrink:0;"></div>
+      <div id="resList" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
     </div>
     <div class="sb-footer" onclick="clearCache()">&#128465; Cache wissen</div>
   </div>
@@ -765,10 +777,12 @@ function switchTab(tab){
   document.getElementById('tabSites').classList.toggle('on',tab==='sites');
   document.getElementById('tabRoutes').classList.toggle('on',tab==='routes');
   document.getElementById('tabCards').classList.toggle('on',tab==='cards');
+  document.getElementById('tabRes').classList.toggle('on',tab==='res');
   document.getElementById('sbody').style.display=tab==='regio'?'flex':'none';
   document.getElementById('sbsites').style.display=tab==='sites'?'flex':'none';
   document.getElementById('sbroutes').style.display=tab==='routes'?'':'none';
   document.getElementById('sbcards').style.display=tab==='cards'?'flex':'none';
+  document.getElementById('sbres').style.display=tab==='res'?'flex':'none';
   if(tab==='sites') renderSites(_siteFilter);
   if(tab!=='regio'){clearRegioHighlight();document.getElementById('regioSearch').value='';}
   if(tab==='routes'){
@@ -780,6 +794,7 @@ function switchTab(tab){
     if(!q) document.getElementById('cardResults').innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam om te zoeken.</div>';
     else searchCards(q);
   }
+  if(tab==='res') renderResources();
 }
 
 var _showDreamSites=false;
@@ -1854,6 +1869,132 @@ function saveCardEdit(){
     setTimeout(function(){st.style.opacity='0';setTimeout(function(){st.textContent='';st.style.opacity='1';},600);},2000);
   });
 }
+
+
+// ── Resources tab ─────────────────────────────────────────────────────────────
+
+// Resource type groepen (Primary-veld uit cardnum)
+var RES_GROUPS = [
+  {id:'char',   label:'Karakter',   match:function(t){return /wizard|character|agent/i.test(t);}},
+  {id:'ally',   label:'Bondgenoot', match:function(t){return /^ally$/i.test(t);}},
+  {id:'item',   label:'Item',       match:function(t){return /item|ring/i.test(t);}},
+  {id:'faction',label:'Factie',     match:function(t){return /^faction$/i.test(t);}},
+  {id:'event',  label:'Event',      match:function(t){return /event/i.test(t);}}
+];
+
+// Item → speellocatie (MECCG-regels)
+var ITEM_SITES = {
+  'minor item':  'Elke site met aanvallen',
+  'major item':  'Free-hold · Ruins & Lairs · Shadow/Dark-hold',
+  'greater item':'Ruins & Lairs',
+  'gold ring':   'Ruins & Lairs · Free/Shadow/Dark-hold',
+  'special item':'Zie kaarttekst',
+  'ring':        'Ruins & Lairs · Free/Shadow/Dark-hold'
+};
+
+var _resFilters = [];   // actieve groep-ids (leeg = alles)
+var _resQuery   = '';
+
+function _resGroupOf(card){
+  var t = (card.type||'').toLowerCase();
+  for(var i=0;i<RES_GROUPS.length;i++){
+    if(RES_GROUPS[i].match(t)) return RES_GROUPS[i].id;
+  }
+  return null;
+}
+
+function _isResource(card){
+  return _resGroupOf(card) !== null;
+}
+
+function _resPlayLocation(card){
+  var t=(card.type||'').toLowerCase();
+  // Item
+  for(var k in ITEM_SITES){
+    if(t.indexOf(k)>=0) return {label:ITEM_SITES[k], site:null};
+  }
+  // Home site (Karakter, Bondgenoot, Factie)
+  var home=(card.attrs&&card.attrs['Home Site'])||'';
+  if(home){
+    // Zoek site in SITES_DB
+    var sl=home.toLowerCase();
+    var found=SITES_DB.filter(function(s){return s.n.toLowerCase()===sl;});
+    var rid=null;
+    if(found.length){
+      _buildRdByName();
+      rid=_rdByName[(found[0].reg||'').toLowerCase()]||null;
+    }
+    return {label:home, site:found.length?found[0]:null, rid:rid};
+  }
+  return null;
+}
+
+function toggleResFilter(id){
+  var idx=_resFilters.indexOf(id);
+  if(idx>=0) _resFilters.splice(idx,1);
+  else _resFilters.push(id);
+  renderResources();
+}
+
+function renderResources(){
+  if(!_cardsLoaded){_buildCardList();return;}
+
+  // Filter-knoppen
+  var fh='<div class="ssite-filt">';
+  RES_GROUPS.forEach(function(g){
+    var on=_resFilters.indexOf(g.id)>=0;
+    fh+='<button class="sfbtn'+(on?' on':'')+'" onclick="toggleResFilter(\''+g.id+'\')">'+g.label+'</button>';
+  });
+  fh+='</div>';
+  document.getElementById('resFilts').innerHTML=fh;
+
+  // Kaartlijst filteren
+  var q=_resQuery.toLowerCase().trim();
+  var cards=_allCards.filter(function(c){
+    if(!_isResource(c)) return false;
+    if(_resFilters.length&&_resFilters.indexOf(_resGroupOf(c))<0) return false;
+    if(q&&c.name.toLowerCase().indexOf(q)<0) return false;
+    return true;
+  });
+
+  if(!cards.length){
+    document.getElementById('resList').innerHTML='<div class="placeholder">Geen resources gevonden.</div>';
+    return;
+  }
+
+  var lh='';
+  cards.slice(0,120).forEach(function(c){
+    var loc=_resPlayLocation(c);
+    var locHtml='';
+    if(loc){
+      if(loc.site||loc.rid){
+        // Klikbare site/regio
+        var sObj=loc.site;
+        var rObj=loc.rid?{n:sObj?sObj.n:loc.label,a:sObj?sObj.a:'',t:sObj?sObj.t:'',img:sObj?sObj.img:'',loc:sObj?sObj.loc:'',cdn:sObj?sObj.cdn:'',set:sObj?sObj.set:'',reg:sObj?sObj.reg:'',nh:sObj?sObj.nh:'',rid:loc.rid}:null;
+        var rIdx=rObj?_siteList.indexOf(rObj):-1;
+        locHtml='<div class="res-loc" onclick="openSiteOverlay('+JSON.stringify(rObj||{n:loc.label,rid:null})+')" style="cursor:pointer;">'
+          +'<span style="color:rgba(212,168,75,.45);font-size:9px;">&#9654; </span>'
+          +'<span style="color:rgba(212,168,75,.7);font-size:10px;">'+loc.label+'</span></div>';
+      } else {
+        locHtml='<div class="res-loc"><span style="color:rgba(255,255,255,.25);font-size:9px;">'+loc.label+'</span></div>';
+      }
+    }
+    var alignColor={'Hero':'#4080c0','Minion':'#c04040','Balrog':'#804040','Fallen-wizard':'#806040','Elf-lord':'#408060'}[c.alignment]||'#666';
+    lh+='<div class="ssite-row" onclick="openCardOverlay('+JSON.stringify(c).replace(/</g,'\\u003c')+') " style="flex-wrap:wrap;align-items:flex-start;padding:6px 8px;">'
+      +'<div class="sdot" style="background:'+alignColor+';margin-top:3px;flex-shrink:0;"></div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div class="sname" style="white-space:normal;">'+c.name
+          +(c.dreamcard?' <span style="font-size:8px;color:#7ab0e0;">dream</span>':'')
+        +'</div>'
+        +'<div class="ssite-reg">'+(c.type||'')+(c.alignment?' · '+c.alignment:'')+'</div>'
+        +locHtml
+      +'</div></div>';
+  });
+  if(cards.length>120) lh+='<div style="color:rgba(255,255,255,.25);font-size:10px;text-align:center;padding:6px;">'+cards.length+' resultaten — verfijn je zoekopdracht</div>';
+  document.getElementById('resList').innerHTML=lh;
+}
+
+// .res-loc stijl
 
 </script>
 </body>
