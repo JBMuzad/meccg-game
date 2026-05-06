@@ -1677,6 +1677,57 @@ var MOVE_COLORS=['#d4a84b','#4a8fd0','#6a9a4a','#8a3a8a','#b8842a','#2a7a8a','#c
 
 var _routeStart=null, _routeEnd=null;
 var _routeReturn=null;
+var _routes=[{start:null,end:null}];
+var _activeRouteIdx=0;
+
+function _saveActiveRoute(){
+  _routes[_activeRouteIdx]={start:_routeStart,end:_routeEnd};
+}
+function _renderRouteTabs(){
+  var h='<div style="display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid rgba(212,168,75,.1);flex-shrink:0;">';
+  _routes.forEach(function(r,i){
+    var active=i===_activeRouteIdx;
+    var rdS=r.start&&RD[r.start]?RD[r.start]:null;
+    var rdE=r.end&&RD[r.end]?RD[r.end]:null;
+    var label=rdS&&rdE?(rdS.name.split(' ')[0]+'\u2192'+rdE.name.split(' ')[0]):'Route '+(i+1);
+    h+='<div style="display:flex;flex:1;min-width:0;">';
+    h+='<button onclick="_switchRoute('+i+')" style="flex:1;min-width:0;padding:3px 5px;font-size:9px;border-radius:3px 0 0 3px;border:1px solid rgba(212,168,75,'+(active?'.4':'.15')+');border-right:none;background:'+(active?'rgba(212,168,75,.15)':'rgba(0,0,0,.2)')+';color:'+(active?'#d4a84b':'rgba(212,168,75,.35)')+';cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+label+'">'+label+'</button>';
+    if(_routes.length>1){h+='<button onclick="_deleteRoute('+i+')" style="padding:0 4px;border-radius:0 3px 3px 0;border:1px solid rgba(212,168,75,'+(active?'.4':'.15')+');background:'+(active?'rgba(212,168,75,.1)':'rgba(0,0,0,.2)')+';color:rgba(212,168,75,.35);cursor:pointer;font-size:9px;" title="Verwijder">&#10005;</button>';}
+    h+='</div>';
+  });
+  if(_routes.length<3){h+='<button onclick="_addAlternativeRoute()" style="padding:3px 7px;font-size:12px;border-radius:3px;border:1px solid rgba(212,168,75,.2);background:rgba(0,0,0,.2);color:rgba(212,168,75,.6);cursor:pointer;margin-left:2px;flex-shrink:0;" title="Alternatieve route toevoegen">+</button>';}
+  h+='</div>';
+  return h;
+}
+function _switchRoute(idx){
+  _saveActiveRoute();
+  _activeRouteIdx=idx;
+  _routeStart=_routes[idx].start;
+  _routeEnd=_routes[idx].end;
+  var path=(_routeStart&&_routeEnd)?bfsPath(_routeStart,_routeEnd):null;
+  updateRouteSidebar(path);
+  if(path){showRouteOnMap(path);}
+  else{document.getElementById('rtSvg').innerHTML='';document.getElementById('rtMapMeta').textContent='';document.getElementById('routeOverlay').classList.remove('open');}
+}
+function _addAlternativeRoute(){
+  if(_routes.length>=3)return;
+  _saveActiveRoute();
+  _routes.push({start:null,end:null});
+  _activeRouteIdx=_routes.length-1;
+  _routeStart=null;_routeEnd=null;
+  updateRouteSidebar();
+  document.getElementById('rtSvg').innerHTML='';document.getElementById('rtMapMeta').textContent='';document.getElementById('routeOverlay').classList.remove('open');
+}
+function _deleteRoute(idx){
+  if(_routes.length<=1){_routes[0]={start:null,end:null};_activeRouteIdx=0;_routeStart=null;_routeEnd=null;updateRouteSidebar();document.getElementById('rtSvg').innerHTML='';document.getElementById('routeOverlay').classList.remove('open');return;}
+  _routes.splice(idx,1);
+  if(_activeRouteIdx>=_routes.length)_activeRouteIdx=_routes.length-1;
+  _routeStart=_routes[_activeRouteIdx].start;_routeEnd=_routes[_activeRouteIdx].end;
+  var path=(_routeStart&&_routeEnd)?bfsPath(_routeStart,_routeEnd):null;
+  updateRouteSidebar(path);
+  if(path)showRouteOnMap(path);
+  else{document.getElementById('rtSvg').innerHTML='';document.getElementById('rtMapMeta').textContent='';document.getElementById('routeOverlay').classList.remove('open');}
+}
 
 // BFS kortste pad tussen twee regio's
 function bfsPath(startRid, endRid){
@@ -1837,23 +1888,25 @@ function buildRouteScenarioHtml(path,rdS,rdE){
     h+='</div></div>';
   });
 
-  h+='<button onclick="_routeStart=null;_routeEnd=null;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Nieuwe route</button>';
+  h+='<button onclick="_routes[_activeRouteIdx]={start:null,end:null};_routeStart=null;_routeEnd=null;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset route</button>';
   return h;
 }
 
 function updateRouteSidebar(path){
+  _saveActiveRoute();
+  var tabs=_renderRouteTabs();
   var rdS=_routeStart?RD[_routeStart]:null;
   var rdE=_routeEnd?RD[_routeEnd]:null;
   var sb=document.getElementById('sbroutes');
 
   if(!_routeStart){
-    sb.innerHTML='<div class="rt-placeholder">&#128336; Klik op een regio op de kaart<br>om de startpositie te kiezen.</div>';
+    sb.innerHTML=tabs+'<div class="rt-placeholder">&#128336; Klik op een regio op de kaart<br>om de startpositie te kiezen.</div>';
     return;
   }
   if(!_routeEnd){
     var allRegions=Object.keys(RD).filter(function(r){return r!==_routeStart;}).map(function(r){return RD[r];}).sort(function(a,b){return a.name.localeCompare(b.name);});
     var opts=allRegions.map(function(r){return '<option value="'+Object.keys(RD).find(function(k){return RD[k]===r;})+'">'+r.name+'</option>';}).join('');
-    sb.innerHTML=
+    sb.innerHTML=tabs+
       '<div style="padding:6px 0 10px;border-bottom:1px solid rgba(212,168,75,.1);margin-bottom:10px;">'+
       '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">Start</div>'+
       '<div style="font-size:15px;color:#d4a84b;font-weight:700">'+rdS.name+'</div>'+
@@ -1866,18 +1919,18 @@ function updateRouteSidebar(path){
       ' style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;margin-bottom:6px;">'+
       '<div id="rtEndList" style="overflow-y:auto;max-height:300px;"></div>'+
       '</div>'+
-      '<button onclick="_routeStart=null;_routeEnd=null;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
+      '<button onclick="_routes[_activeRouteIdx]={start:null,end:null};_routeStart=null;_routeEnd=null;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
     renderRouteEndList('');
     return;
   }
 
   if(!path){
-    sb.innerHTML='<div class="rt-placeholder">Geen pad gevonden tussen deze regio\'s.</div>'+
-      '<button onclick="_routeStart=null;_routeEnd=null;updateRouteSidebar();" style="margin-top:10px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
+    sb.innerHTML=tabs+'<div class="rt-placeholder">Geen pad gevonden tussen deze regio\'s.</div>'+
+      '<button onclick="_routes[_activeRouteIdx]={start:null,end:null};_routeStart=null;_routeEnd=null;updateRouteSidebar();" style="margin-top:10px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
     return;
   }
 
-  sb.innerHTML=buildRouteScenarioHtml(path,rdS,rdE);
+  sb.innerHTML=tabs+buildRouteScenarioHtml(path,rdS,rdE);
 }
 
 function showRouteOnMap(path){
