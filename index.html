@@ -411,10 +411,6 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
   </div>
 </div>
 
-<!-- Image lightbox -->
-<div id="imgLightbox" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:500;align-items:center;justify-content:center;cursor:zoom-out;">
-  <img id="lbImg" src="" alt="" style="max-width:95vw;max-height:95vh;border-radius:4px;object-fit:contain;box-shadow:0 8px 48px rgba(0,0,0,.8);">
-</div>
 
 <script>
 
@@ -1219,8 +1215,7 @@ function closeSiteOverlay(){
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    var lb=document.getElementById('imgLightbox');if(lb&&lb.style.display==='flex'){lb.style.display='none';return;}
-    if(document.getElementById('cardOverlay').classList.contains('open')){closeCardOverlay();return;}
+if(document.getElementById('cardOverlay').classList.contains('open')){closeCardOverlay();return;}
     var ov=document.getElementById('siteOverlay');if(ov.classList.contains('open')){closeSiteOverlay();return;}
     document.getElementById('modal').classList.remove('open');
   }
@@ -1534,11 +1529,24 @@ function openCardOverlay(c){
   var _cdImg=document.getElementById('cdImg');
   _cdImg.src=ov.img_url||c.imgUrl;
   _cdImg.style.opacity='1';
-  _cdImg.style.cursor='zoom-in';
+  _cdImg.style.cursor='pointer';
+  _cdImg.title='Klik om af te drukken op kaartgrootte';
   _cdImg.onclick=function(){
-    if(!this.src||this.getAttribute('src')==='')return;
-    document.getElementById('lbImg').src=this.src;
-    document.getElementById('imgLightbox').style.display='flex';
+    var src=this.src;
+    if(!src||src==='')return;
+    var w=window.open('','_blank','width=400,height=600');
+    w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'+
+      '*{margin:0;padding:0;box-sizing:border-box;}'+
+      'body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff;}'+
+      'img{width:63mm;height:88mm;object-fit:fill;display:block;}'+
+      '@media print{'+
+        'body{margin:0;background:#fff;}'+
+        'img{width:63mm;height:88mm;object-fit:fill;}'+
+      '}'+
+    '</style></head><body>'+
+    '<img src="'+src+'" onload="window.print();window.close();">'+
+    '</body></html>');
+    w.document.close();
   };
   document.getElementById('cdTitle').textContent=c.name;
 
