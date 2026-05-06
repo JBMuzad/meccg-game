@@ -1271,6 +1271,7 @@ function _buildCardList(){
     var q=document.getElementById('cardSearch').value;
     if(q&&q.length>=2)searchCards(q);
     else el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam om te zoeken.</div>';
+    if(_curTab==='res') renderResources();
   }).catch(function(){
     el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Kon databank niet laden.</div>';
     _cardsLoaded=false;
@@ -1950,6 +1951,14 @@ function renderResources(){
 
   // Kaartlijst filteren
   var q=_resQuery.toLowerCase().trim();
+  var hasFilter=_resFilters.length>0||q.length>0;
+
+  if(!hasFilter){
+    document.getElementById('resList').innerHTML=
+      '<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Kies een categorie of typ een naam.</div>';
+    return;
+  }
+
   var cards=_allCards.filter(function(c){
     if(!_isResource(c)) return false;
     if(_resFilters.length&&_resFilters.indexOf(_resGroupOf(c))<0) return false;
@@ -1962,17 +1971,17 @@ function renderResources(){
     return;
   }
 
-  var lh='';
-  cards.slice(0,120).forEach(function(c){
+  // Sorteer op naam
+  cards.sort(function(a,b){return a.name.localeCompare(b.name);});
+
+  function _makeResRow(c){
     var loc=_resPlayLocation(c);
     var locHtml='';
     if(loc){
       if(loc.site||loc.rid){
-        // Klikbare site/regio
         var sObj=loc.site;
-        var rObj=loc.rid?{n:sObj?sObj.n:loc.label,a:sObj?sObj.a:'',t:sObj?sObj.t:'',img:sObj?sObj.img:'',loc:sObj?sObj.loc:'',cdn:sObj?sObj.cdn:'',set:sObj?sObj.set:'',reg:sObj?sObj.reg:'',nh:sObj?sObj.nh:'',rid:loc.rid}:null;
-        var rIdx=rObj?_siteList.indexOf(rObj):-1;
-        locHtml='<div class="res-loc" onclick="openSiteOverlay('+JSON.stringify(rObj||{n:loc.label,rid:null})+')" style="cursor:pointer;">'
+        var rObj={n:sObj?sObj.n:loc.label,a:sObj?sObj.a:'',t:sObj?sObj.t:'',img:sObj?sObj.img:'',loc:sObj?sObj.loc:'',cdn:sObj?sObj.cdn:'',set:sObj?sObj.set:'',reg:sObj?sObj.reg:'',nh:sObj?sObj.nh:'',rid:loc.rid};
+        locHtml='<div class="res-loc" onclick="event.stopPropagation();openSiteOverlay('+JSON.stringify(rObj)+')" style="cursor:pointer;">'
           +'<span style="color:rgba(212,168,75,.45);font-size:9px;">&#9654; </span>'
           +'<span style="color:rgba(212,168,75,.7);font-size:10px;">'+loc.label+'</span></div>';
       } else {
@@ -1980,7 +1989,7 @@ function renderResources(){
       }
     }
     var alignColor={'Hero':'#4080c0','Minion':'#c04040','Balrog':'#804040','Fallen-wizard':'#806040','Elf-lord':'#408060'}[c.alignment]||'#666';
-    lh+='<div class="ssite-row" onclick="openCardOverlay('+JSON.stringify(c).replace(/</g,'\\u003c')+') " style="flex-wrap:wrap;align-items:flex-start;padding:6px 8px;">'
+    return '<div class="ssite-row" onclick="openCardOverlay('+JSON.stringify(c).replace(/</g,'\\u003c')+')" style="flex-wrap:wrap;align-items:flex-start;padding:6px 8px;">'
       +'<div class="sdot" style="background:'+alignColor+';margin-top:3px;flex-shrink:0;"></div>'
       +'<div style="flex:1;min-width:0;">'
         +'<div class="sname" style="white-space:normal;">'+c.name
@@ -1989,8 +1998,10 @@ function renderResources(){
         +'<div class="ssite-reg">'+(c.type||'')+(c.alignment?' · '+c.alignment:'')+'</div>'
         +locHtml
       +'</div></div>';
-  });
-  if(cards.length>120) lh+='<div style="color:rgba(255,255,255,.25);font-size:10px;text-align:center;padding:6px;">'+cards.length+' resultaten — verfijn je zoekopdracht</div>';
+  }
+
+  var lh='<div style="color:rgba(255,255,255,.2);font-size:9px;padding:4px 8px 2px;">'+cards.length+' resources</div>';
+  cards.forEach(function(c){lh+=_makeResRow(c);});
   document.getElementById('resList').innerHTML=lh;
 }
 
