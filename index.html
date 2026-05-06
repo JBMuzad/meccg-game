@@ -1017,12 +1017,15 @@ function openSiteOverlay(s){
       var _setImgClick=function(v){
         _soImgWrap.style.cursor='pointer';
         _soImgWrap.onclick=function(){
-          // Zoek kaart in _allCards, anders bouw minimaal object
-          var cd=_allCards.filter(function(c){
+          var found=_allCards.filter(function(c){
             return c.name.toLowerCase()===s.n.toLowerCase()&&(!v.a||c.alignment===v.a);
-          })[0]||{id:s.n,name:s.n,type:SL[s.t]||s.t,alignment:v.a||'',set:v.set||'',
-                  dreamcard:false,imgUrl:v._cdn||v._loc||'',text:'',quote:'',
-                  attrs:{Type:'Site',Subtype:SL[s.t]||s.t}};
+          })[0];
+          var imgUrl=v._cdn||v._loc||'';
+          var cd=found
+            ? Object.assign({},found,{imgUrl:imgUrl||found.imgUrl})
+            : {id:s.n,name:s.n,type:SL[s.t]||s.t,alignment:v.a||'',set:v.set||'',
+               dreamcard:false,imgUrl:imgUrl,text:'',quote:'',
+               attrs:{Type:'Site',Subtype:SL[s.t]||s.t,Alignment:v.a||'',Region:s.reg||''}};
           openCardOverlay(cd);
         };
       };
@@ -1095,14 +1098,21 @@ function openSiteOverlay(s){
           // Klik op afbeelding → kaartdetail
           var _w=document.getElementById('soImgWrap');
           _w.style.cursor='pointer';
-          _w.onclick=function(){
-            var cd=_allCards.filter(function(c){
-              return c.name.toLowerCase()===site.n.toLowerCase();
-            })[0]||{id:site.n,name:site.n,type:SL[site.t]||site.t,alignment:'',
-                    set:'',dreamcard:false,imgUrl:'',text:'',quote:'',
-                    attrs:{Type:'Site',Subtype:SL[site.t]||site.t}};
-            openCardOverlay(cd);
-          };
+          (function(curVs){
+            _w.onclick=function(){
+              var v=curVs[0]||{};
+              var imgUrl=v._cdn||v._loc||'';
+              var found=_allCards.filter(function(c){
+                return c.name.toLowerCase()===site.n.toLowerCase()&&(!v.a||c.alignment===v.a);
+              })[0];
+              var cd=found
+                ? Object.assign({},found,{imgUrl:imgUrl||found.imgUrl})
+                : {id:site.n,name:site.n,type:SL[site.t]||site.t,alignment:v.a||'',
+                   set:'',dreamcard:false,imgUrl:imgUrl,text:'',quote:'',
+                   attrs:{Type:'Site',Subtype:SL[site.t]||site.t,Alignment:v.a||'',Region:rd?rd.name:''}};
+              openCardOverlay(cd);
+            };
+          })(vs);
           // Speelbaar bijwerken voor deze site
           _updateSoPlayable(site.n, site.t);
         };})(os);
@@ -1362,6 +1372,9 @@ function _buildCardList(){
       if(c.Direct)attrs['Direct Inf.']=c.Direct;
       if(c.MPs)attrs.MPs=c.MPs;
       if(c.Home)attrs['Home Site']=(c.Home||'').trim();
+      if(c.Nearest)attrs['Nearest Haven']=c.Nearest;
+      if(c.Path)attrs.Path=c.Path;
+      if(c.Playable)attrs.Playable=c.Playable;
       if(c.Rarity)attrs.Rarity=c.Rarity;
       if(c.Artist)attrs.Artist=c.Artist;
       _allCards.push({
