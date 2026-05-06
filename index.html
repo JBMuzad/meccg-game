@@ -1224,12 +1224,12 @@ function loadDreamSites(cb){
 
 function _updateSoPlayable(siteName, siteType){
   var SITE_PLAY={
-    'haven': ['Karakter','Bondgenoot','Minor Item'],
-    'free':  ['Factie','Major Item','Special Item'],
-    'ruins': ['Greater Item','Major Item','Gold Ring'],
-    'shadow':['Factie','Major Item','Gold Ring'],
-    'dark':  ['Factie','Major Item','Gold Ring'],
-    'border':['Factie','Minor Item']
+    'haven': ['Karakter','Bondgenoot'],
+    'free':  ['Factie','Major Item','Gold Ring','Special Item'],
+    'border':['Factie','Minor Item'],
+    'ruins': ['Minor Item','Major Item','Greater Item','Gold Ring'],
+    'shadow':['Factie','Minor Item','Major Item','Gold Ring'],
+    'dark':  ['Factie','Minor Item','Major Item','Gold Ring']
   };
   var playTypes=SITE_PLAY[siteType]||[];
   var ph='<div class="soHazLabel" style="margin-top:6px;">&#9670; Speelbaar</div>';
