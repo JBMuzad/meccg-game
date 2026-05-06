@@ -411,6 +411,11 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
   </div>
 </div>
 
+<!-- Image lightbox -->
+<div id="imgLightbox" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:500;align-items:center;justify-content:center;cursor:zoom-out;">
+  <img id="lbImg" src="" alt="" style="max-width:95vw;max-height:95vh;border-radius:4px;object-fit:contain;box-shadow:0 8px 48px rgba(0,0,0,.8);">
+</div>
+
 <script>
 
 var SITE_SYMBOLS={"haven": "\u2694", "free": "\u25a1", "ruins": "\u25b3", "shadow": "\u25c6", "border": "\u25cb", "dark": "\u25cf"};
@@ -490,7 +495,7 @@ function loadSupabaseData(cb){
   }
   _sbFetch('sites','select=*&limit=1000',function(rows){
     SITES_DB=rows.map(function(s){
-      return {n:s.name,a:s.alignment,t:_normSiteType(s.type),img:s.img,loc:s.loc,cdn:s.cdn,set:s.set_code,reg:s.region,nh:s.near_haven||''};
+      return {n:s.name,a:s.alignment,t:_normSiteType(s.type),img:s.img,loc:s.loc,cdn:s.cdn,set:s.set_code,reg:s.region,nh:s.near_haven||'',path:s.path||'',playable:s.playable||''};
     });
     done();
   });
@@ -1067,7 +1072,7 @@ function openSiteOverlay(s){
             ? Object.assign({},found,{imgUrl:imgUrl||found.imgUrl})
             : {id:s.n,name:s.n,type:SL[s.t]||s.t,alignment:v.a||'',set:v.set||'',
                dreamcard:false,imgUrl:imgUrl,text:'',quote:'',
-               attrs:{Type:'Site',Subtype:SL[s.t]||s.t,Alignment:v.a||'',Region:s.reg||''}};
+               attrs:_buildSiteAttrs(s,_siteT,v.a||'')};
           openCardOverlay(cd);
         };
       };
@@ -1152,7 +1157,7 @@ function openSiteOverlay(s){
                 ? Object.assign({},found,{imgUrl:imgUrl||found.imgUrl})
                 : {id:site.n,name:site.n,type:SL[site.t]||site.t,alignment:v.a||'',
                    set:'',dreamcard:false,imgUrl:imgUrl,text:'',quote:'',
-                   attrs:{Type:'Site',Subtype:SL[site.t]||site.t,Alignment:v.a||'',Region:rd?rd.name:''}};
+                   attrs:_buildSiteAttrs(site,_resolveSiteType(site.n,site.a,site.t),v.a||'')};
               openCardOverlay(cd);
             };
           })(vs);
@@ -1214,6 +1219,7 @@ function closeSiteOverlay(){
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
+    var lb=document.getElementById('imgLightbox');if(lb&&lb.style.display==='flex'){lb.style.display='none';return;}
     if(document.getElementById('cardOverlay').classList.contains('open')){closeCardOverlay();return;}
     var ov=document.getElementById('siteOverlay');if(ov.classList.contains('open')){closeSiteOverlay();return;}
     document.getElementById('modal').classList.remove('open');
@@ -1278,6 +1284,17 @@ function loadDreamSites(cb){
 }
 
 function _normName(n){ return (n||'').toLowerCase().replace(/[\u2018\u2019\u201a\u201b\u2032\u0060]/g,"'"); }
+function _buildSiteAttrs(s,siteType,alignment){
+  var a={};
+  a['Type']='Site';
+  if(siteType) a['Site Type']=SL[siteType]||siteType;
+  if(alignment) a['Alignment']=alignment;
+  if(s.reg||s.region) a['Region']=s.reg||s.region||'';
+  if(s.nh) a['Nearest Haven']=s.nh;
+  if(s.path) a['Path']=(s.path||'').toUpperCase();
+  if(s.playable) a['Speelbaar']=s.playable;
+  return a;
+}
 function _resolveSiteType(name, alignment, fallback){
   return _siteTypeCache[_normName(name)]||fallback;
 }
@@ -1514,8 +1531,15 @@ function openCardOverlay(c){
   var ovAttrs=ov.attrs||{};
 
   // Afbeelding (override heeft prioriteit)
-  document.getElementById('cdImg').src=ov.img_url||c.imgUrl;
-  document.getElementById('cdImg').style.opacity='1';
+  var _cdImg=document.getElementById('cdImg');
+  _cdImg.src=ov.img_url||c.imgUrl;
+  _cdImg.style.opacity='1';
+  _cdImg.style.cursor='zoom-in';
+  _cdImg.onclick=function(){
+    if(!this.src||this.getAttribute('src')==='')return;
+    document.getElementById('lbImg').src=this.src;
+    document.getElementById('imgLightbox').style.display='flex';
+  };
   document.getElementById('cdTitle').textContent=c.name;
 
   // Badges
