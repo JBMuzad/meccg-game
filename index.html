@@ -2240,16 +2240,19 @@ function _addRouteInfoListeners(){
 // ── Supabase schrijven ────────────────────────────────────────────────────────
 function _sbWrite(method,table,filter,data,cb){
   var url=SB_URL+'/rest/v1/'+table+(filter?'?'+filter:'');
-  fetch(url,{
+  var opts={
     method:method,
     headers:{
       'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,
       'Content-Type':'application/json',
       'Prefer':method==='POST'?'resolution=merge-duplicates,return=representation':'return=representation'
-    },
-    body:JSON.stringify(data)
-  }).then(function(r){return r.json();}).then(function(r){if(cb)cb(null,r);})
-    .catch(function(e){if(cb)cb(e);});
+    }
+  };
+  if(method!=='DELETE'&&data!=null) opts.body=JSON.stringify(data);
+  fetch(url,opts).then(function(r){
+    if(r.status===204){if(cb)cb(null,null);return;}
+    return r.json().then(function(j){if(cb)cb(null,j);});
+  }).catch(function(e){if(cb)cb(e);});
 }
 function sbPatch(table,filter,data,cb){_sbWrite('PATCH',table,filter,data,cb);}
 function sbUpsert(table,data,cb){_sbWrite('POST',table,null,data,cb);}
@@ -2418,12 +2421,82 @@ function saveCardEdit(){
 var _decksData=[], _decksLoaded=false;
 var _OWN_DECKS_KEY='meccg_own_decks';
 
-// --- Eigen decks (localStorage) ---
+// --- Gebruikers-ID: anonieme browser UUID, persistent in localStorage ---
+function _getUserId(){
+  var k='meccg_uid';
+  var uid=localStorage.getItem(k);
+  if(!uid){
+    uid='u_'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+    localStorage.setItem(k,uid);
+  }
+  return uid;
+}
+
+// --- localStorage helpers (snelle cache) ---
 function _loadOwnDecks(){
   try{return JSON.parse(localStorage.getItem(_OWN_DECKS_KEY)||'[]');}catch(e){return [];}
 }
 function _saveOwnDecks(decks){
   localStorage.setItem(_OWN_DECKS_KEY,JSON.stringify(decks));
+}
+
+// --- Supabase sync helpers ---
+function _deckToSbRow(deck){
+  // Sla kaartdata op in jsonb 'cards' kolom
+  return {
+    id: deck.id,
+    user_id: _getUserId(),
+    deck_name: deck.deck_name,
+    alignment: deck.alignment||'Hero',
+    cards: {
+      starting_company: deck.starting_company||[],
+      characters: deck.characters||[],
+      resources: deck.resources||[],
+      hazards: deck.hazards||[],
+      sites: deck.sites||[],
+      sideboard: deck.sideboard||[]
+    },
+    updated_at: new Date().toISOString()
+  };
+}
+function _sbRowToDeck(row){
+  var c=row.cards||{};
+  return {
+    id: row.id,
+    deck_name: row.deck_name,
+    alignment: row.alignment,
+    custom: true,
+    starting_company: c.starting_company||[],
+    characters: c.characters||[],
+    resources: c.resources||[],
+    hazards: c.hazards||[],
+    sites: c.sites||[],
+    sideboard: c.sideboard||[]
+  };
+}
+
+function _upsertDeckToSb(deck){
+  sbUpsert('user_decks',_deckToSbRow(deck),null);
+}
+function _deleteDeckFromSb(id){
+  _sbWrite('DELETE','user_decks','id=eq.'+encodeURIComponent(id)+'&user_id=eq.'+encodeURIComponent(_getUserId()),null,null);
+}
+
+// Haal eigen decks op uit Supabase en merge in localStorage
+function _fetchOwnDecksFromSb(cb){
+  var uid=_getUserId();
+  _sbFetch('user_decks','select=*&user_id=eq.'+encodeURIComponent(uid)+'&order=updated_at.asc',function(rows){
+    if(!rows||!Array.isArray(rows)){if(cb)cb();return;}
+    // Merge: SB is leading voor bestaande IDs, localStorage voor nieuwe (nog niet gesyncte)
+    var local=_loadOwnDecks();
+    var sbIds=rows.map(function(r){return r.id;});
+    var localOnly=local.filter(function(d){return sbIds.indexOf(d.id)===-1;});
+    var merged=rows.map(_sbRowToDeck).concat(localOnly);
+    // Sync lokale onbekende decks naar SB
+    localOnly.forEach(function(d){_upsertDeckToSb(d);});
+    _saveOwnDecks(merged);
+    if(cb)cb();
+  });
 }
 
 function toggleNewDeckForm(){
@@ -2438,9 +2511,11 @@ function createOwnDeck(){
   var align=document.getElementById('newDeckAlign').value;
   var decks=_loadOwnDecks();
   var id='own_'+Date.now();
-  decks.push({id:id,deck_name:name,alignment:align,custom:true,
-    starting_company:[],characters:[],resources:[],hazards:[],sites:[],sideboard:[]});
+  var deck={id:id,deck_name:name,alignment:align,custom:true,
+    starting_company:[],characters:[],resources:[],hazards:[],sites:[],sideboard:[]};
+  decks.push(deck);
   _saveOwnDecks(decks);
+  _upsertDeckToSb(deck);
   document.getElementById('newDeckName').value='';
   document.getElementById('newDeckForm').style.display='none';
   _refreshDeckDropdowns(id);
@@ -2450,6 +2525,7 @@ function deleteOwnDeck(id){
   if(!confirm('Deck verwijderen?'))return;
   var decks=_loadOwnDecks().filter(function(d){return d.id!==id;});
   _saveOwnDecks(decks);
+  _deleteDeckFromSb(id);
   _refreshDeckDropdowns('');
   document.getElementById('deckDetail').innerHTML='<div class="placeholder">Deck verwijderd.</div>';
 }
@@ -2462,6 +2538,7 @@ function addCardToDeck(deckId,section,cardName){
   var existing=deck[section].filter(function(c){return c.name.toLowerCase()===cardName.toLowerCase();})[0];
   if(existing){existing.qty++;}else{deck[section].push({qty:1,name:cardName});}
   _saveOwnDecks(decks);
+  _upsertDeckToSb(deck);
   return true;
 }
 
@@ -2471,6 +2548,7 @@ function removeCardFromDeck(deckId,section,cardName){
   if(!deck||!deck[section])return;
   deck[section]=deck[section].filter(function(c){return c.name.toLowerCase()!==cardName.toLowerCase();});
   _saveOwnDecks(decks);
+  _upsertDeckToSb(deck);
   renderDeckDetail(deckId);
 }
 
@@ -2541,6 +2619,7 @@ function _refreshCardOverlayDeckSel(){
 function renderDecks(){
   if(!_decksLoaded){
     _decksLoaded=true;
+    // Laad challenge decks + eigen decks uit Supabase parallel
     fetch('data/decks_challenge.json').then(function(r){return r.json();}).then(function(data){
       _decksData=data;
       var sel=document.getElementById('deckSelect');
@@ -2551,14 +2630,14 @@ function renderDecks(){
         o.value=d.id; o.textContent=d.deck_name;
         grp.appendChild(o);
       });
-      // Voeg in vóór eventuele eigen optgroup
       var ownGrp=sel.querySelector('optgroup[data-own]');
       sel.insertBefore(grp,ownGrp||null);
       document.getElementById('deckDetail').innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';
-      _refreshDeckDropdowns();
+      // Haal eigen decks op uit Supabase (merge met localStorage)
+      _fetchOwnDecksFromSb(function(){ _refreshDeckDropdowns(); });
     }).catch(function(){
       document.getElementById('deckDetail').innerHTML='<div class="placeholder">Decks konden niet geladen worden.</div>';
-      _refreshDeckDropdowns();
+      _fetchOwnDecksFromSb(function(){ _refreshDeckDropdowns(); });
     });
     return;
   }
