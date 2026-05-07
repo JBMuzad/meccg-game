@@ -271,10 +271,23 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="resList" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
     </div>
     <div class="sbb" id="sbdecks" style="display:none;flex-direction:column;padding:0;">
-      <div style="padding:8px 10px 6px;flex-shrink:0;">
-        <select id="deckSelect" class="deck-select" onchange="renderDeckDetail(this.value)">
+      <div style="padding:8px 10px 4px;flex-shrink:0;display:flex;gap:5px;align-items:center;">
+        <select id="deckSelect" class="deck-select" style="flex:1;" onchange="renderDeckDetail(this.value)">
           <option value="">&#8212; Selecteer een deck &#8212;</option>
         </select>
+        <button onclick="toggleNewDeckForm()" title="Nieuw deck aanmaken" style="padding:5px 9px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.35);color:#d4a84b;border-radius:4px;cursor:pointer;font-size:14px;flex-shrink:0;">+</button>
+      </div>
+      <div id="newDeckForm" style="display:none;padding:0 10px 8px;flex-shrink:0;border-bottom:1px solid rgba(212,168,75,.12);">
+        <input id="newDeckName" type="text" placeholder="Naam van het deck…" autocomplete="off"
+          style="width:100%;box-sizing:border-box;padding:6px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:4px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;margin-bottom:5px;">
+        <div style="display:flex;gap:5px;">
+          <select id="newDeckAlign" class="deck-select" style="flex:1;font-size:11px;padding:5px 8px;">
+            <option value="Hero">Hero</option>
+            <option value="Minion">Minion</option>
+            <option value="Fallen-wizard">Fallen-wizard</option>
+          </select>
+          <button onclick="createOwnDeck()" style="padding:5px 12px;background:rgba(212,168,75,.2);border:1px solid rgba(212,168,75,.4);color:#d4a84b;border-radius:4px;cursor:pointer;font-size:11px;">Aanmaken</button>
+        </div>
       </div>
       <div id="deckDetail" style="overflow-y:auto;flex:1;padding:0 6px 6px;">
         <div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>
@@ -411,6 +424,24 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <div class="cd-section-label">Extra informatie</div>
         <a id="cdWikiLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener">&#128269; Zoek op MECCG Wiki</a>
         <a id="cdCouncilLink" class="cd-wiki-link" href="#" target="_blank" rel="noopener" style="margin-left:6px;">&#127183; cardnum.net</a>
+      </div>
+      <div class="cd-section" id="cdDeckSection">
+        <div class="cd-section-label">&#9651; Toevoegen aan deck</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;">
+          <select id="cdDeckSel" class="deck-select" style="flex:1;min-width:100px;font-size:11px;padding:5px 8px;">
+            <option value="">&#8212; Kies deck &#8212;</option>
+          </select>
+          <select id="cdSectionSel" class="deck-select" style="width:auto;font-size:11px;padding:5px 8px;">
+            <option value="resources">Resources</option>
+            <option value="hazards">Hazards</option>
+            <option value="characters">Personages</option>
+            <option value="starting_company">Starting Company</option>
+            <option value="sites">Sites</option>
+            <option value="sideboard">Sideboard</option>
+          </select>
+          <button onclick="addCurrentCardToDeck()" style="padding:5px 10px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.35);color:#d4a84b;border-radius:4px;cursor:pointer;font-size:12px;">+</button>
+        </div>
+        <div id="cdDeckFeedback" style="font-size:10px;color:rgba(212,168,75,.5);min-height:14px;"></div>
       </div>
       <div class="cd-section">
         <div class="cd-section-label">Persoonlijke notities</div>
@@ -2385,60 +2416,202 @@ function saveCardEdit(){
 // Secondary = specifiek subtype (Faction, Minor Item, Permanent-event, Ally, …)
 // ── Decks ────────────────────────────────────────────────────────────────────
 var _decksData=[], _decksLoaded=false;
+var _OWN_DECKS_KEY='meccg_own_decks';
 
+// --- Eigen decks (localStorage) ---
+function _loadOwnDecks(){
+  try{return JSON.parse(localStorage.getItem(_OWN_DECKS_KEY)||'[]');}catch(e){return [];}
+}
+function _saveOwnDecks(decks){
+  localStorage.setItem(_OWN_DECKS_KEY,JSON.stringify(decks));
+}
+
+function toggleNewDeckForm(){
+  var f=document.getElementById('newDeckForm');
+  f.style.display=f.style.display==='none'?'block':'none';
+  if(f.style.display==='block') document.getElementById('newDeckName').focus();
+}
+
+function createOwnDeck(){
+  var name=document.getElementById('newDeckName').value.trim();
+  if(!name)return;
+  var align=document.getElementById('newDeckAlign').value;
+  var decks=_loadOwnDecks();
+  var id='own_'+Date.now();
+  decks.push({id:id,deck_name:name,alignment:align,custom:true,
+    starting_company:[],characters:[],resources:[],hazards:[],sites:[],sideboard:[]});
+  _saveOwnDecks(decks);
+  document.getElementById('newDeckName').value='';
+  document.getElementById('newDeckForm').style.display='none';
+  _refreshDeckDropdowns(id);
+}
+
+function deleteOwnDeck(id){
+  if(!confirm('Deck verwijderen?'))return;
+  var decks=_loadOwnDecks().filter(function(d){return d.id!==id;});
+  _saveOwnDecks(decks);
+  _refreshDeckDropdowns('');
+  document.getElementById('deckDetail').innerHTML='<div class="placeholder">Deck verwijderd.</div>';
+}
+
+function addCardToDeck(deckId,section,cardName){
+  var decks=_loadOwnDecks();
+  var deck=decks.filter(function(d){return d.id===deckId;})[0];
+  if(!deck)return false;
+  if(!deck[section])deck[section]=[];
+  var existing=deck[section].filter(function(c){return c.name.toLowerCase()===cardName.toLowerCase();})[0];
+  if(existing){existing.qty++;}else{deck[section].push({qty:1,name:cardName});}
+  _saveOwnDecks(decks);
+  return true;
+}
+
+function removeCardFromDeck(deckId,section,cardName){
+  var decks=_loadOwnDecks();
+  var deck=decks.filter(function(d){return d.id===deckId;})[0];
+  if(!deck||!deck[section])return;
+  deck[section]=deck[section].filter(function(c){return c.name.toLowerCase()!==cardName.toLowerCase();});
+  _saveOwnDecks(decks);
+  renderDeckDetail(deckId);
+}
+
+function addCurrentCardToDeck(){
+  var deckId=document.getElementById('cdDeckSel').value;
+  var section=document.getElementById('cdSectionSel').value;
+  var fb=document.getElementById('cdDeckFeedback');
+  if(!deckId){fb.textContent='Kies eerst een deck.';fb.style.color='rgba(200,100,100,.8)';return;}
+  if(!_curCard){return;}
+  var name=_curCard.name;
+  var ok=addCardToDeck(deckId,section,name);
+  if(ok){
+    var decks=_loadOwnDecks();
+    var deck=decks.filter(function(d){return d.id===deckId;})[0];
+    var dname=deck?deck.deck_name:'deck';
+    fb.textContent='✓ Toegevoegd aan '+dname;
+    fb.style.color='rgba(100,200,100,.8)';
+    setTimeout(function(){fb.textContent='';},2500);
+    // Herlaad detail als dit deck nu open staat in tab
+    var sel=document.getElementById('deckSelect');
+    if(sel&&sel.value===deckId) renderDeckDetail(deckId);
+  }
+}
+
+function _refreshDeckDropdowns(selectId){
+  var ownDecks=_loadOwnDecks();
+  // Hoofd deck-selector (tab)
+  var sel=document.getElementById('deckSelect');
+  // Verwijder bestaande eigen optgroep
+  var existing=sel.querySelector('optgroup[data-own]');
+  if(existing)sel.removeChild(existing);
+  if(ownDecks.length){
+    var grp=document.createElement('optgroup');
+    grp.label='Eigen decks';
+    grp.setAttribute('data-own','1');
+    ownDecks.forEach(function(d){
+      var o=document.createElement('option');
+      o.value=d.id; o.textContent=d.deck_name;
+      grp.appendChild(o);
+    });
+    sel.appendChild(grp);
+  }
+  if(selectId!==undefined) sel.value=selectId;
+  // Kaartoverlay deck-selector bijwerken
+  _refreshCardOverlayDeckSel();
+}
+
+function _refreshCardOverlayDeckSel(){
+  var sel=document.getElementById('cdDeckSel');
+  if(!sel)return;
+  // Wis eigen opties
+  while(sel.options.length>1) sel.remove(1);
+  var ownDecks=_loadOwnDecks();
+  if(!ownDecks.length){
+    var o=document.createElement('option');
+    o.value=''; o.textContent='Geen eigen decks (maak eerst aan)'; o.disabled=true;
+    sel.appendChild(o);
+  } else {
+    ownDecks.forEach(function(d){
+      var o=document.createElement('option');
+      o.value=d.id; o.textContent=d.deck_name;
+      sel.appendChild(o);
+    });
+  }
+}
+
+// --- Decks tab render ---
 function renderDecks(){
   if(!_decksLoaded){
     _decksLoaded=true;
     fetch('data/decks_challenge.json').then(function(r){return r.json();}).then(function(data){
       _decksData=data;
       var sel=document.getElementById('deckSelect');
+      var grp=document.createElement('optgroup');
+      grp.label='Challenge Decks';
       data.forEach(function(d){
-        var opt=document.createElement('option');
-        opt.value=d.id;
-        opt.textContent=d.deck_name;
-        sel.appendChild(opt);
+        var o=document.createElement('option');
+        o.value=d.id; o.textContent=d.deck_name;
+        grp.appendChild(o);
       });
+      // Voeg in vóór eventuele eigen optgroup
+      var ownGrp=sel.querySelector('optgroup[data-own]');
+      sel.insertBefore(grp,ownGrp||null);
       document.getElementById('deckDetail').innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';
+      _refreshDeckDropdowns();
     }).catch(function(){
       document.getElementById('deckDetail').innerHTML='<div class="placeholder">Decks konden niet geladen worden.</div>';
+      _refreshDeckDropdowns();
     });
     return;
   }
-  // Herender als data al beschikbaar is
+  _refreshDeckDropdowns();
   var cur=document.getElementById('deckSelect').value;
   if(cur) renderDeckDetail(cur);
 }
 
-function renderDeckDetail(deckId){
-  var deck=_decksData.filter(function(d){return d.id===deckId;})[0];
-  var div=document.getElementById('deckDetail');
-  if(!deck){div.innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';return;}
+var _DECK_SECTIONS=[
+  {key:'starting_company',label:'Starting Company'},
+  {key:'characters',label:'Personages'},
+  {key:'resources',label:'Resources'},
+  {key:'hazards',label:'Hazards'},
+  {key:'sites',label:'Sites'},
+  {key:'sideboard',label:'Sideboard'}
+];
 
-  var align=deck.alignment==='Hero'?'<span style="color:#4a7aaa">Hero</span>':'<span style="color:#aa4a4a">Minion</span>';
+function renderDeckDetail(deckId){
+  document.getElementById('deckSelect').value=deckId;
+  var div=document.getElementById('deckDetail');
+  if(!deckId){div.innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';return;}
+
+  // Zoek in challenge decks én eigen decks
+  var deck=_decksData.filter(function(d){return d.id===deckId;})[0]
+    ||_loadOwnDecks().filter(function(d){return d.id===deckId;})[0];
+  if(!deck){div.innerHTML='<div class="placeholder">Deck niet gevonden.</div>';return;}
+
+  var isOwn=!!deck.custom;
+  var aColor=deck.alignment==='Hero'?'#4a7aaa':deck.alignment==='Minion'?'#aa4a4a':'#8a5a8a';
   var leader=deck.wizard||deck.ringwraith||'';
   var h='<div class="deck-header">';
-  h+='<div class="deck-title">'+deck.deck_name+'</div>';
-  h+='<div class="deck-sub">'+align+(leader?' &middot; '+leader:'')+'</div>';
-  if(deck.description)h+='<div class="deck-desc">'+deck.description+'</div>';
+  h+='<div style="display:flex;align-items:flex-start;gap:6px;">';
+  h+='<div style="flex:1"><div class="deck-title">'+deck.deck_name+'</div>';
+  h+='<div class="deck-sub"><span style="color:'+aColor+'">'+deck.alignment+'</span>'+(leader?' &middot; '+leader:'')+'</div></div>';
+  if(isOwn) h+='<button onclick="deleteOwnDeck(\''+deckId+'\')" title="Deck verwijderen" style="background:rgba(180,60,60,.15);border:1px solid rgba(180,60,60,.35);color:rgba(200,100,100,.7);border-radius:3px;padding:3px 7px;cursor:pointer;font-size:10px;flex-shrink:0;">&#128465;</button>';
+  h+='</div>';
+  if(deck.description) h+='<div class="deck-desc">'+deck.description+'</div>';
   h+='</div>';
 
-  var SECTIONS=[
-    {key:'starting_company',label:'Starting Company'},
-    {key:'characters',label:'Personages'},
-    {key:'resources',label:'Resources'},
-    {key:'hazards',label:'Hazards'},
-    {key:'sites',label:'Sites'},
-    {key:'sideboard',label:'Sideboard'}
-  ];
-  SECTIONS.forEach(function(sec){
+  _DECK_SECTIONS.forEach(function(sec){
     var cards=deck[sec.key];
-    if(!cards||!cards.length)return;
+    if(!cards||!cards.length){
+      if(isOwn) h+='<div class="deck-section">'+sec.label+' <span style="color:rgba(212,168,75,.2)">(0)</span></div>';
+      return;
+    }
     var total=cards.reduce(function(s,c){return s+c.qty;},0);
     h+='<div class="deck-section">'+sec.label+' <span style="color:rgba(212,168,75,.25)">('+total+')</span></div>';
     cards.forEach(function(c){
       var isSite=sec.key==='sites';
-      var nm=c.name.replace(/'/g,"&#39;");
-      h+='<div class="deck-card-row" onclick="'+(isSite?'_deckOpenSite':'_deckOpenCard')+'(\''+nm+'\')"><span class="deck-qty">'+c.qty+'&times;</span><span class="deck-card-name">'+c.name+'</span></div>';
+      var nm=c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      h+='<div class="deck-card-row" onclick="'+(isSite?'_deckOpenSite':'_deckOpenCard')+'(\''+nm+'\')"><span class="deck-qty">'+c.qty+'&times;</span><span class="deck-card-name" style="flex:1">'+c.name+'</span>';
+      if(isOwn) h+='<span onclick="event.stopPropagation();removeCardFromDeck(\''+deckId+'\',\''+sec.key+'\',\''+nm+'\')" style="color:rgba(200,100,100,.45);font-size:11px;padding:0 4px;cursor:pointer;" title="Verwijderen">&times;</span>';
+      h+='</div>';
     });
   });
 
@@ -2455,14 +2628,8 @@ function _deckOpenCard(name){
 function _deckOpenSite(name){
   _buildRdByName();
   var s=SITES_DB.filter(function(x){return x.n.toLowerCase()===name.toLowerCase();})[0];
-  if(s){
-    var rid=_rdByName[(s.reg||'').toLowerCase()]||null;
-    openSiteOverlay(Object.assign({},s,{rid:rid}));
-  } else {
-    switchTab('sites');
-    document.getElementById('siteSearchInput').value=name;
-    _siteQuery=name;renderSites('ALL');
-  }
+  if(s){var rid=_rdByName[(s.reg||'').toLowerCase()]||null;openSiteOverlay(Object.assign({},s,{rid:rid}));}
+  else{switchTab('sites');document.getElementById('siteSearchInput').value=name;_siteQuery=name;renderSites('ALL');}
 }
 
 var RES_GROUPS = [
