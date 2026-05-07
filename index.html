@@ -936,8 +936,10 @@ function _dreamSiteObj(ds, alignment){
   // Bouw een site-object voor openSiteOverlay, met _cardData voor klik-door naar kaartdetail
   _buildRdByName();
   var rid=_rdByName[(ds.region||'').toLowerCase()]||null;
-  // Zoek SITES_DB voor cdn-URL en lokale afbeelding (meest betrouwbaar)
-  var dbEntry=SITES_DB.filter(function(s){return s.n.toLowerCase()===ds.name.toLowerCase();})[0]||null;
+  // Zoek SITES_DB voor cdn-URL en lokale afbeelding — eerst op naam+alignment, dan alleen naam
+  var al=alignment||ds.alignments[0]||'';
+  var dbEntry=SITES_DB.filter(function(s){return s.n.toLowerCase()===ds.name.toLowerCase()&&s.a===al;})[0]
+    ||SITES_DB.filter(function(s){return s.n.toLowerCase()===ds.name.toLowerCase();})[0]||null;
   var dbCdn=dbEntry&&dbEntry.cdn||'';
   var dbLoc=dbEntry&&dbEntry.loc||dbEntry&&dbEntry.img||'';
   // Fallback: vastorper/dc via getDCImgUrl
