@@ -314,6 +314,10 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="soRegMeta"><span id="soRegName"></span></div>
     </div>
     <div id="soMiddle">
+      <div id="soViewToggle" style="display:none;gap:4px;margin-bottom:6px;justify-content:center;">
+        <button id="soToggleSite" class="sovbtn active" onclick="_soToggleView('site')" style="font-size:10px;padding:3px 10px;">&#127970; Site kaart</button>
+        <button id="soToggleUd" class="sovbtn" onclick="_soToggleView('udmap')" style="font-size:10px;padding:3px 10px;">&#128506; Under-deeps kaart</button>
+      </div>
       <div id="soImgWrap">
         <div id="soImgLoad">Laden&#8230;</div>
         <img id="soImg"/>
@@ -1038,7 +1042,6 @@ function openRegioOverlay(rid, firstSite){
 }
 
 function openSiteOverlay(s){
-  console.log('[openSiteOverlay] n=',s.n,'dream=',s.dream,'_cdn=',s._cdn,'cdn=',s.cdn);
   var rid=s.rid;
   var rd=rid?RD[rid]:null;
 
@@ -1108,6 +1111,15 @@ function openSiteOverlay(s){
   document.getElementById('soSiteType').textContent=hasSite?(SL[_siteT]||_siteT):'';
   document.getElementById('soVersions').innerHTML='';
   document.getElementById('soImgWrap').style.display=hasSite?'flex':'none';
+
+  // Under-deeps toggle tonen/verbergen + resetten naar site-kaart view
+  var _udToggle=document.getElementById('soViewToggle');
+  var _showUdToggle=hasSite&&_isUnderDeepsSite(s.n);
+  _udToggle.style.display=_showUdToggle?'flex':'none';
+  if(_showUdToggle){
+    document.getElementById('soToggleSite').classList.add('active');
+    document.getElementById('soToggleUd').classList.remove('active');
+  }
 
   // Klikbaar maken: afbeelding opent kaartdetail
   var _soImgWrap=document.getElementById('soImgWrap');
@@ -1283,7 +1295,57 @@ function openSiteOverlay(s){
   }
 }
 
+// Onder-deeps detectie
+var _UNDER_DEEPS_NAMES=[
+  'the iron-deeps','the cobalt-deeps','the wind-deeps','the rusted-deeps',
+  'the drowning-deeps','the sulfur-deeps','the gem-deeps','the pukel-deeps',
+  'the pûkel-deeps','the under-grottos','the under-leas','the under-vaults',
+  'the under-caves','the under-gates','the under-galleries','the under-courts',
+  'the under-forges','ancient maze','ancient deep-hold','deep mines',
+  'the pits of angband','remains of thangorodrim','kheledkhizdin',
+  'ruins of belegost','ruins of nogrod','grop-k','vaults of ut',
+  'falek-dim','angurath','limestone-caverns','funur','under-deeps of'
+];
+function _isUnderDeepsSite(name){
+  if(!name)return false;
+  var n=name.toLowerCase();
+  if(n.indexOf('-deeps')!==-1||n.indexOf('under-')!==-1)return true;
+  return _UNDER_DEEPS_NAMES.some(function(k){return n.indexOf(k)!==-1;});
+}
+
+var _soCurrentVersion=null;  // bijhouden welke versie (v-object) geladen is
+
+function _soToggleView(view){
+  var isMap=view==='udmap';
+  var ts=document.getElementById('soToggleSite');
+  var tu=document.getElementById('soToggleUd');
+  if(ts)ts.classList.toggle('active',!isMap);
+  if(tu)tu.classList.toggle('active',isMap);
+  if(isMap){
+    var img=document.getElementById('soImg');
+    var load=document.getElementById('soImgLoad');
+    var btn=document.getElementById('soAnalyseBtn');
+    img.onerror=null;
+    img.style.display='none';load.style.display='block';load.textContent='Laden…';
+    if(btn)btn.style.display='none';
+    img.onload=function(){img.style.display='block';load.style.display='none';};
+    img.onerror=function(){load.textContent='Niet beschikbaar';img.style.display='none';};
+    img.src='under-deep-site-map.jpg';
+    // Kaart niet klikbaar maken in map-view
+    var w=document.getElementById('soImgWrap');
+    w.style.cursor='default';w.onclick=null;
+  } else {
+    if(_soCurrentVersion)loadSiteImg(_soCurrentVersion);
+  }
+}
+
 function loadSiteImg(v){
+  _soCurrentVersion=v;
+  // Reset toggle naar site-kaart view als we een nieuwe afbeelding laden
+  var ts=document.getElementById('soToggleSite');
+  var tu=document.getElementById('soToggleUd');
+  if(ts)ts.classList.add('active');
+  if(tu)tu.classList.remove('active');
   var img=document.getElementById('soImg');
   var load=document.getElementById('soImgLoad');
   var btn=document.getElementById('soAnalyseBtn');
@@ -1291,12 +1353,9 @@ function loadSiteImg(v){
   img.style.display='none';load.style.display='block';load.textContent='Laden…';
   if(btn)btn.style.display='none';
   img.onload=function(){img.style.display='block';load.style.display='none';if(btn)btn.style.display='block';};
-  var _dbgUrls=[v._cdn,v.cdn,v._loc?'meccg-images/'+v._loc:'',v.img?'meccg-images/'+v.img:''].filter(Boolean);
-  console.log('[loadSiteImg] urls=',_dbgUrls);
   getImageEl(v,img,function(){
     load.textContent='Niet beschikbaar';
     img.style.display='none';if(btn)btn.style.display='none';
-    console.warn('[loadSiteImg] alle URLs gefaald:',_dbgUrls);
   });
 }
 
@@ -1447,9 +1506,7 @@ function _renderDreamSitesInOverlay(regionName){
     row.onclick=(function(site){
       var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10','Wizard':'#4a6a10'};
       function _loadAlignment(al){
-        console.log('[_loadAlignment] site=',site.name,'al=',al);
         var _dso=_dreamSiteObj(site,al);
-        console.log('[_dreamSiteObj] result=',JSON.stringify({n:_dso.n,_cdn:_dso._cdn,cdn:_dso.cdn,dream:_dso.dream}));
         openSiteOverlay(_dso);
         // Herstel actieve rij markering (openSiteOverlay reset soOtherSites)
         // en injecteer versieknoppen als er meerdere alignments zijn
