@@ -59,6 +59,17 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .ssite-reg{font-size:9px;color:rgba(240,224,184,.35);font-style:italic;}
 .sb-footer{border-top:1px solid rgba(212,168,75,.15);padding:8px 12px;font-size:9px;color:rgba(212,168,75,.35);cursor:pointer;}
 .sb-footer:hover{color:#d4a84b;}
+.deck-select{width:100%;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;cursor:pointer;}
+.deck-select option{background:#12100c;color:#e8d8a0;}
+.deck-header{padding:8px 10px 6px;border-bottom:1px solid rgba(212,168,75,.12);margin-bottom:4px;}
+.deck-title{font-size:13px;color:#d4a84b;font-weight:700;margin-bottom:2px;}
+.deck-sub{font-size:10px;color:rgba(212,168,75,.5);}
+.deck-desc{font-size:10px;color:rgba(240,224,184,.45);line-height:1.5;margin-top:5px;font-style:italic;}
+.deck-section{font-size:9px;color:rgba(212,168,75,.5);text-transform:uppercase;letter-spacing:.1em;margin:8px 0 2px;padding:0 6px;}
+.deck-card-row{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:3px;cursor:pointer;}
+.deck-card-row:hover{background:rgba(212,168,75,.1);}
+.deck-qty{font-size:10px;color:rgba(212,168,75,.4);min-width:18px;text-align:right;flex-shrink:0;}
+.deck-card-name{font-size:11px;flex:1;}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;align-items:center;justify-content:center;}
 .modal.open{display:flex;}
 .mbox{position:relative;display:flex;gap:12px;align-items:flex-start;max-width:90vw;}
@@ -224,6 +235,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <button class="sbtab" id="tabRoutes" onclick="switchTab('routes')">&#128336; Routes</button>
         <button class="sbtab" id="tabCards" onclick="switchTab('cards')">&#127183; Cards</button>
         <button class="sbtab" id="tabRes" onclick="switchTab('res')">&#9670; Resources</button>
+        <button class="sbtab" id="tabDecks" onclick="switchTab('decks')">&#127183; Decks</button>
     </div>
     <div id="sbody" style="display:flex;flex-direction:column;overflow:hidden;">
       <div style="padding:10px 10px 6px;flex-shrink:0;">
@@ -257,6 +269,16 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       </div>
       <div id="resFilts" style="flex-shrink:0;"></div>
       <div id="resList" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
+    </div>
+    <div class="sbb" id="sbdecks" style="display:none;flex-direction:column;padding:0;">
+      <div style="padding:8px 10px 6px;flex-shrink:0;">
+        <select id="deckSelect" class="deck-select" onchange="renderDeckDetail(this.value)">
+          <option value="">&#8212; Selecteer een deck &#8212;</option>
+        </select>
+      </div>
+      <div id="deckDetail" style="overflow-y:auto;flex:1;padding:0 6px 6px;">
+        <div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>
+      </div>
     </div>
     <div class="sb-footer" onclick="clearCache()">&#128465; Cache wissen</div>
   </div>
@@ -841,11 +863,14 @@ function switchTab(tab){
   document.getElementById('tabRoutes').classList.toggle('on',tab==='routes');
   document.getElementById('tabCards').classList.toggle('on',tab==='cards');
   document.getElementById('tabRes').classList.toggle('on',tab==='res');
+  document.getElementById('tabDecks').classList.toggle('on',tab==='decks');
   document.getElementById('sbody').style.display=tab==='regio'?'flex':'none';
   document.getElementById('sbsites').style.display=tab==='sites'?'flex':'none';
   document.getElementById('sbroutes').style.display=tab==='routes'?'':'none';
   document.getElementById('sbcards').style.display=tab==='cards'?'flex':'none';
   document.getElementById('sbres').style.display=tab==='res'?'flex':'none';
+  document.getElementById('sbdecks').style.display=tab==='decks'?'flex':'none';
+  if(tab==='decks')renderDecks();
   if(tab==='sites') renderSites(_siteFilter);
   if(tab!=='regio'){clearRegioHighlight();document.getElementById('regioSearch').value='';}
   if(tab==='routes'){
@@ -2358,6 +2383,88 @@ function saveCardEdit(){
 // Resource type groepen
 // Primary = "Resource" / "Character" / "Hazard" / "Site" / "Region"
 // Secondary = specifiek subtype (Faction, Minor Item, Permanent-event, Ally, …)
+// ── Decks ────────────────────────────────────────────────────────────────────
+var _decksData=[], _decksLoaded=false;
+
+function renderDecks(){
+  if(!_decksLoaded){
+    _decksLoaded=true;
+    fetch('data/decks_challenge.json').then(function(r){return r.json();}).then(function(data){
+      _decksData=data;
+      var sel=document.getElementById('deckSelect');
+      data.forEach(function(d){
+        var opt=document.createElement('option');
+        opt.value=d.id;
+        opt.textContent=d.deck_name;
+        sel.appendChild(opt);
+      });
+      document.getElementById('deckDetail').innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';
+    }).catch(function(){
+      document.getElementById('deckDetail').innerHTML='<div class="placeholder">Decks konden niet geladen worden.</div>';
+    });
+    return;
+  }
+  // Herender als data al beschikbaar is
+  var cur=document.getElementById('deckSelect').value;
+  if(cur) renderDeckDetail(cur);
+}
+
+function renderDeckDetail(deckId){
+  var deck=_decksData.filter(function(d){return d.id===deckId;})[0];
+  var div=document.getElementById('deckDetail');
+  if(!deck){div.innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';return;}
+
+  var align=deck.alignment==='Hero'?'<span style="color:#4a7aaa">Hero</span>':'<span style="color:#aa4a4a">Minion</span>';
+  var leader=deck.wizard||deck.ringwraith||'';
+  var h='<div class="deck-header">';
+  h+='<div class="deck-title">'+deck.deck_name+'</div>';
+  h+='<div class="deck-sub">'+align+(leader?' &middot; '+leader:'')+'</div>';
+  if(deck.description)h+='<div class="deck-desc">'+deck.description+'</div>';
+  h+='</div>';
+
+  var SECTIONS=[
+    {key:'starting_company',label:'Starting Company'},
+    {key:'characters',label:'Personages'},
+    {key:'resources',label:'Resources'},
+    {key:'hazards',label:'Hazards'},
+    {key:'sites',label:'Sites'},
+    {key:'sideboard',label:'Sideboard'}
+  ];
+  SECTIONS.forEach(function(sec){
+    var cards=deck[sec.key];
+    if(!cards||!cards.length)return;
+    var total=cards.reduce(function(s,c){return s+c.qty;},0);
+    h+='<div class="deck-section">'+sec.label+' <span style="color:rgba(212,168,75,.25)">('+total+')</span></div>';
+    cards.forEach(function(c){
+      var isSite=sec.key==='sites';
+      var nm=c.name.replace(/'/g,"&#39;");
+      h+='<div class="deck-card-row" onclick="'+(isSite?'_deckOpenSite':'_deckOpenCard')+'(\''+nm+'\')"><span class="deck-qty">'+c.qty+'&times;</span><span class="deck-card-name">'+c.name+'</span></div>';
+    });
+  });
+
+  div.innerHTML=h;
+}
+
+function _deckOpenCard(name){
+  if(!_cardsLoaded){_buildCardList();setTimeout(function(){_deckOpenCard(name);},600);return;}
+  var found=_allCards.filter(function(c){return c.name.toLowerCase()===name.toLowerCase();})[0];
+  if(found){openCardOverlay(found);}
+  else{switchTab('cards');document.getElementById('cardSearch').value=name;searchCards(name);}
+}
+
+function _deckOpenSite(name){
+  _buildRdByName();
+  var s=SITES_DB.filter(function(x){return x.n.toLowerCase()===name.toLowerCase();})[0];
+  if(s){
+    var rid=_rdByName[(s.reg||'').toLowerCase()]||null;
+    openSiteOverlay(Object.assign({},s,{rid:rid}));
+  } else {
+    switchTab('sites');
+    document.getElementById('siteSearchInput').value=name;
+    _siteQuery=name;renderSites('ALL');
+  }
+}
+
 var RES_GROUPS = [
   {id:'char',    label:'Karakter',   match:function(p,s){return p==='character'||/character|agent|avatar|leader/i.test(s);}},
   {id:'ally',    label:'Bondgenoot', match:function(p,s){return /^ally$/i.test(s);}},
