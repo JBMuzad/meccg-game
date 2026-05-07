@@ -1370,19 +1370,43 @@ function _renderDreamSitesInOverlay(regionName){
     row.onclick=(function(site){return function(){
       document.querySelectorAll('.soOtherRow').forEach(function(r){r.classList.remove('active');});
       row.classList.add('active');
-      // Update overlay met dreamcard site (zelfde flow als reguliere sites)
-      var sObj=_dreamSiteObj(site, site.alignments[0]);
       document.getElementById('soSiteName').textContent=site.name;
       document.getElementById('soSiteType').textContent=SL[site.type]||site.type;
-      document.getElementById('soVersions').innerHTML=
-        '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
       document.getElementById('soImgWrap').style.display='flex';
-      loadSiteImg({_cdn:sObj._cardData.imgUrl,_loc:''});
-      var wrap=document.getElementById('soImgWrap');
-      wrap.style.cursor='pointer';
-      wrap.onclick=(function(cd){return function(){openCardOverlay(cd);};})(sObj._cardData);
-      // Speelbaar bijwerken voor deze dreamcard site
       _updateSoPlayable(site.name, site.type);
+
+      var vdiv=document.getElementById('soVersions');
+      vdiv.innerHTML='';
+      var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10','Wizard':'#4a6a10'};
+      var imgUrl=getDCImgUrl(site.set,site.name)||'';
+      var wrap=document.getElementById('soImgWrap');
+
+      function _activateDreamAlignment(al,btn){
+        document.querySelectorAll('#soVersions .sovbtn').forEach(function(b){b.classList.remove('active');b.style.background='';});
+        if(btn){btn.classList.add('active');var ac=ACOLOR[al];if(ac)btn.style.background=ac+'55';}
+        loadSiteImg({_cdn:imgUrl,_loc:''});
+        var sObj=_dreamSiteObj(site,al);
+        wrap.style.cursor='pointer';
+        wrap.onclick=(function(cd){return function(){openCardOverlay(cd);};})(sObj._cardData);
+      }
+
+      if(site.alignments.length<=1){
+        // Eén alignment: toon alleen dream-badge
+        vdiv.innerHTML='<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
+        _activateDreamAlignment(site.alignments[0]||'',null);
+      } else {
+        // Meerdere alignments: toon versieknoppen
+        site.alignments.forEach(function(al,ai){
+          var btn=document.createElement('button');
+          btn.className='sovbtn'+(ai===0?' active':'');
+          btn.textContent=al;
+          var ac=ACOLOR[al];
+          if(ac){btn.style.borderColor=ac;if(ai===0)btn.style.background=ac+'55';}
+          btn.onclick=(function(a,b){return function(){_activateDreamAlignment(a,b);};})(al,btn);
+          vdiv.appendChild(btn);
+        });
+        _activateDreamAlignment(site.alignments[0],vdiv.querySelector('.sovbtn'));
+      }
     };})(ds);
     otherDiv.appendChild(row);
   });
