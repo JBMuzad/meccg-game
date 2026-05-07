@@ -555,14 +555,13 @@ function getDB(cb){
 }
 
 function tryUrls(el,urls,i,onFail){
-  if(i>=urls.length){el.src='';if(onFail)onFail();return;}
+  if(i>=urls.length){el.onerror=null;el.src='';if(onFail)onFail();return;}
   el.onerror=function(){tryUrls(el,urls,i+1,onFail);};
-  // Als exact dezelfde src al geladen is, vuurt onload niet opnieuw →
-  // reset eerst zodat de browser de laadcyclus opnieuw doorloopt.
-  if(el.src===urls[i]){el.src='';}
   el.src=urls[i];
-  // Als de afbeelding al gecacht en compleet is, trigger onload handmatig.
-  if(el.complete&&el.naturalWidth>0){var ev=new Event('load');el.dispatchEvent(ev);}
+  // Gecachte afbeelding: onload vuurt niet opnieuw als src al compleet is.
+  if(el.complete&&el.naturalWidth>0&&el.src===urls[i]){
+    var ev=new Event('load');el.dispatchEvent(ev);
+  }
 }
 
 function getImage(s,cb){
@@ -1221,6 +1220,7 @@ function loadSiteImg(v){
   var img=document.getElementById('soImg');
   var load=document.getElementById('soImgLoad');
   var btn=document.getElementById('soAnalyseBtn');
+  img.onerror=null; // verwijder eventuele stale handler van vorige lading
   img.style.display='none';load.style.display='block';load.textContent='Laden…';
   if(btn)btn.style.display='none';
   img.onload=function(){img.style.display='block';load.style.display='none';if(btn)btn.style.display='block';};
@@ -1572,7 +1572,7 @@ function openCardOverlay(c){
 
   // Afbeelding (override heeft prioriteit)
   var _cdImg=document.getElementById('cdImg');
-  _cdImg.src=ov.img_url||c.imgUrl;
+  _cdImg.src=ov.img_url||c.imgUrl||'';
   _cdImg.style.opacity='1';
   _cdImg.style.cursor='pointer';
   _cdImg.title='Klik om af te drukken op kaartgrootte';
