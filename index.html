@@ -936,20 +936,17 @@ function _dreamSiteObj(ds, alignment){
   // Bouw een site-object voor openSiteOverlay, met _cardData voor klik-door naar kaartdetail
   _buildRdByName();
   var rid=_rdByName[(ds.region||'').toLowerCase()]||null;
-  // Zoek council-of-elrond URL in _allCards (primair); vastorper/dc als fallback
-  var councilUrl='';
-  if(_cardsLoaded&&_allCards.length){
-    var cFound=_allCards.filter(function(c){return c.dreamcard&&c.name.toLowerCase()===ds.name.toLowerCase();})[0];
-    if(cFound&&cFound.imgUrl)councilUrl=cFound.imgUrl;
-  }
+  // Zoek SITES_DB voor cdn-URL en lokale afbeelding (meest betrouwbaar)
+  var dbEntry=SITES_DB.filter(function(s){return s.n.toLowerCase()===ds.name.toLowerCase();})[0]||null;
+  var dbCdn=dbEntry&&dbEntry.cdn||'';
+  var dbLoc=dbEntry&&dbEntry.loc||dbEntry&&dbEntry.img||'';
+  // Fallback: vastorper/dc via getDCImgUrl
   var dcUrl=getDCImgUrl(ds.set,ds.name)||'';
-  // _cdn (primair) = council-of-elrond indien beschikbaar, anders vastorper/dc
-  // cdn (secundair) = vastorper/dc als extra fallback
-  var primaryUrl=councilUrl||dcUrl;
+  var primaryUrl=dbCdn||dcUrl;
   return {
     n:ds.name, t:ds.type, rid:rid, reg:ds.region,
     a:alignment||ds.alignments[0]||'',
-    img:'', _cdn:primaryUrl, cdn:dcUrl,
+    img:dbLoc, _cdn:primaryUrl, cdn:dcUrl,
     set:ds.set, nh:ds.haven||'', dream:true,
     _cardData:{
       id:ds.id, name:ds.name,
@@ -1064,8 +1061,8 @@ function openSiteOverlay(s){
       // Dreamcard site: toon afbeelding direct, geen versie-knoppen
       document.getElementById('soVersions').innerHTML=
         '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
-      // Gebruik alle bekende URL-bronnen: council-of-elrond (_cdn) + vastorper/dc (cdn)
-      var dImg={_cdn:s._cdn||s._cardData.imgUrl,cdn:s.cdn||''};
+      // Gebruik alle bekende URL-bronnen: SITES_DB (_cdn) + vastorper/dc (cdn) + lokale img
+      var dImg={_cdn:s._cdn||s._cardData.imgUrl,cdn:s.cdn||'',img:s.img||''};
       loadSiteImg(dImg);
       _soImgWrap.style.cursor='pointer';
       _soImgWrap.onclick=(function(cd){return function(){closeCardOverlay&&closeCardOverlay();openCardOverlay(cd);};})(s._cardData);
