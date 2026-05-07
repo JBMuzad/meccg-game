@@ -1371,47 +1371,50 @@ function _renderDreamSitesInOverlay(regionName){
     var badge='<span style="font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(100,160,220,.15);color:#7ab0e0;margin-left:4px;">dream</span>';
     var nm='<div><div class="soOtherName">'+ds.name+badge+'</div><div class="soOtherType">'+(SL[ds.type]||ds.type)+(ds.alignments.length?' · '+ds.alignments.join('/'):'')+'</div></div>';
     row.innerHTML=dot+nm;
-    row.onclick=(function(site){return function(){
-      document.querySelectorAll('.soOtherRow').forEach(function(r){r.classList.remove('active');});
-      row.classList.add('active');
-      document.getElementById('soSiteName').textContent=site.name;
-      document.getElementById('soSiteType').textContent=SL[site.type]||site.type;
-      document.getElementById('soImgWrap').style.display='flex';
-      _updateSoPlayable(site.name, site.type);
-
-      var vdiv=document.getElementById('soVersions');
-      vdiv.innerHTML='';
+    row.onclick=(function(site){
       var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10','Wizard':'#4a6a10'};
-      var imgUrl=getDCImgUrl(site.set,site.name)||'';
-      var wrap=document.getElementById('soImgWrap');
-
-      function _activateDreamAlignment(al,btn){
-        document.querySelectorAll('#soVersions .sovbtn').forEach(function(b){b.classList.remove('active');b.style.background='';});
-        if(btn){btn.classList.add('active');var ac=ACOLOR[al];if(ac)btn.style.background=ac+'55';}
-        loadSiteImg({_cdn:imgUrl,_loc:''});
-        var sObj=_dreamSiteObj(site,al);
-        wrap.style.cursor='pointer';
-        wrap.onclick=(function(cd){return function(){openCardOverlay(cd);};})(sObj._cardData);
+      function _loadAlignment(al){
+        // Gebruik exact hetzelfde pad als de Sites tab: openSiteOverlay
+        openSiteOverlay(_dreamSiteObj(site,al));
+        // Herstel actieve rij markering (openSiteOverlay reset soOtherSites)
+        // en injecteer versieknoppen als er meerdere alignments zijn
+        if(site.alignments.length>1){
+          var vdiv=document.getElementById('soVersions');
+          vdiv.innerHTML='';
+          site.alignments.forEach(function(a,ai){
+            var btn=document.createElement('button');
+            btn.className='sovbtn'+(a===al?' active':'');
+            btn.textContent=a;
+            var ac=ACOLOR[a];
+            if(ac){btn.style.borderColor=ac;if(a===al)btn.style.background=ac+'55';}
+            btn.onclick=(function(alignment,b){return function(){
+              document.querySelectorAll('#soVersions .sovbtn').forEach(function(x){x.classList.remove('active');x.style.background='';});
+              b.classList.add('active');if(ACOLOR[alignment])b.style.background=ACOLOR[alignment]+'55';
+              openSiteOverlay(_dreamSiteObj(site,alignment));
+              if(site.alignments.length>1){
+                var vd=document.getElementById('soVersions');
+                vd.innerHTML='';
+                site.alignments.forEach(function(a2,ai2){
+                  var b2=document.createElement('button');
+                  b2.className='sovbtn'+(a2===alignment?' active':'');
+                  b2.textContent=a2;
+                  var ac2=ACOLOR[a2];
+                  if(ac2){b2.style.borderColor=ac2;if(a2===alignment)b2.style.background=ac2+'55';}
+                  b2.onclick=b2._oc||(b2._oc=(function(al2){return function(){_loadAlignment(al2);};})(a2));
+                  vd.appendChild(b2);
+                });
+              }
+            };})(a,btn);
+            vdiv.appendChild(btn);
+          });
+        }
       }
-
-      if(site.alignments.length<=1){
-        // Eén alignment: toon alleen dream-badge
-        vdiv.innerHTML='<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
-        _activateDreamAlignment(site.alignments[0]||'',null);
-      } else {
-        // Meerdere alignments: toon versieknoppen
-        site.alignments.forEach(function(al,ai){
-          var btn=document.createElement('button');
-          btn.className='sovbtn'+(ai===0?' active':'');
-          btn.textContent=al;
-          var ac=ACOLOR[al];
-          if(ac){btn.style.borderColor=ac;if(ai===0)btn.style.background=ac+'55';}
-          btn.onclick=(function(a,b){return function(){_activateDreamAlignment(a,b);};})(al,btn);
-          vdiv.appendChild(btn);
-        });
-        _activateDreamAlignment(site.alignments[0],vdiv.querySelector('.sovbtn'));
-      }
-    };})(ds);
+      return function(){
+        document.querySelectorAll('.soOtherRow').forEach(function(r){r.classList.remove('active');});
+        row.classList.add('active');
+        _loadAlignment(site.alignments[0]||'');
+      };
+    })(ds);
     otherDiv.appendChild(row);
   });
 }
