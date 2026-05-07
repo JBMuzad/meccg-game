@@ -524,7 +524,7 @@ function _normSiteType(t){
 }
 
 function loadSupabaseData(cb){
-  var pending=5,_nameToRid={};
+  var pending=5;_nameToRid={};
 
   // Koppeling sites->regio's pas na alle fetches: vermijdt race condition
   // waarbij sites-fetch eerder klaar is dan regions-fetch (_nameToRid nog leeg).
@@ -580,7 +580,7 @@ function loadSupabaseData(cb){
   });
 }
 
-var SITE_MARKERS=[],SITES_DB=[],RD={},POLYS={},ADJACENCY={};
+var SITE_MARKERS=[],SITES_DB=[],RD={},POLYS={},ADJACENCY={},_nameToRid={};
 
 
 
