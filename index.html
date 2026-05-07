@@ -1371,9 +1371,12 @@ function _buildUdMarkers(){
     function _udOpen(e){
       e.stopPropagation();
       if(dbSite){
+        // rid opzoeken via regio-naam (SITES_DB slaat geen rid op, alleen reg-naam)
+        var _reg=dbSite.reg||'';
+        var _rid=_nameToRid[_reg.toLowerCase()]||null;
         var sObj={n:dbSite.n,t:dbSite.t,a:dbSite.a,
                   img:dbSite.img,loc:dbSite.loc,cdn:dbSite.cdn,
-                  rid:dbSite.rid,reg:dbSite.reg||''};
+                  rid:_rid,reg:_reg};
         openSiteOverlay(sObj);
       } else {
         switchTab('cards');
