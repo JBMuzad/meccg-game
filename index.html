@@ -597,7 +597,7 @@ var _dataReady=false,_imgReady=false;
 function _tryInit(){if(_dataReady&&_imgReady){document.getElementById('loading').style.display='none';buildRegions();buildSiteMarkers();iv();}}
 mapImg.onload=function(){imgW=this.naturalWidth;imgH=this.naturalHeight;this.width=imgW;this.height=imgH;sv.setAttribute('width',imgW);sv.setAttribute('height',imgH);sv.setAttribute('viewBox','0 0 '+imgW+' '+imgH);_imgReady=true;_tryInit();};
 loadSupabaseData(function(){_dataReady=true;_rdByName={};_tryInit();});
-_buildCardList(); // laad kaartdata op achtergrond zodat site types altijd beschikbaar zijn
+setTimeout(function(){_buildCardList();},0); // laad kaartdata op achtergrond zodat site types altijd beschikbaar zijn
 mapImg.src='https://btupnjyvsltowbynqhxz.supabase.co/storage/v1/object/public/meccg/meccg-map.jpg';
 mw.addEventListener('mousedown',function(e){pan=true;lx=e.clientX;ly=e.clientY;});
 document.addEventListener('mousemove',function(e){if(!pan)return;tx+=e.clientX-lx;ty+=e.clientY-ly;lx=e.clientX;ly=e.clientY;apT();});
@@ -936,16 +936,26 @@ function _dreamSiteObj(ds, alignment){
   // Bouw een site-object voor openSiteOverlay, met _cardData voor klik-door naar kaartdetail
   _buildRdByName();
   var rid=_rdByName[(ds.region||'').toLowerCase()]||null;
+  // Zoek council-of-elrond URL in _allCards (primair); vastorper/dc als fallback
+  var councilUrl='';
+  if(_cardsLoaded&&_allCards.length){
+    var cFound=_allCards.filter(function(c){return c.dreamcard&&c.name.toLowerCase()===ds.name.toLowerCase();})[0];
+    if(cFound&&cFound.imgUrl)councilUrl=cFound.imgUrl;
+  }
+  var dcUrl=getDCImgUrl(ds.set,ds.name)||'';
+  // _cdn (primair) = council-of-elrond indien beschikbaar, anders vastorper/dc
+  // cdn (secundair) = vastorper/dc als extra fallback
+  var primaryUrl=councilUrl||dcUrl;
   return {
     n:ds.name, t:ds.type, rid:rid, reg:ds.region,
     a:alignment||ds.alignments[0]||'',
-    img:'', cdn:getDCImgUrl(ds.set,ds.name)||'',
+    img:'', _cdn:primaryUrl, cdn:dcUrl,
     set:ds.set, nh:ds.haven||'', dream:true,
     _cardData:{
       id:ds.id, name:ds.name,
       type:ds.type, alignment:ds.alignments.join(' / '),
       set:ds.set+' (Dream)', dreamcard:true,
-      imgUrl:getDCImgUrl(ds.set,ds.name)||'',
+      imgUrl:primaryUrl,
       text:ds.text, quote:'',
       attrs:{Type:'Site',Subtype:SL[ds.type]||ds.type,
              Alignment:ds.alignments.join(' / '),Region:ds.region,
@@ -973,6 +983,7 @@ function openRegioOverlay(rid, firstSite){
 }
 
 function openSiteOverlay(s){
+  console.log('[openSiteOverlay] n=',s.n,'dream=',s.dream,'_cdn=',s._cdn,'cdn=',s.cdn);
   var rid=s.rid;
   var rd=rid?RD[rid]:null;
 
@@ -1053,7 +1064,8 @@ function openSiteOverlay(s){
       // Dreamcard site: toon afbeelding direct, geen versie-knoppen
       document.getElementById('soVersions').innerHTML=
         '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(100,160,220,.15);color:#7ab0e0;">dream</span>';
-      var dImg={_cdn:s._cardData.imgUrl,_loc:''};
+      // Gebruik alle bekende URL-bronnen: council-of-elrond (_cdn) + vastorper/dc (cdn)
+      var dImg={_cdn:s._cdn||s._cardData.imgUrl,cdn:s.cdn||''};
       loadSiteImg(dImg);
       _soImgWrap.style.cursor='pointer';
       _soImgWrap.onclick=(function(cd){return function(){closeCardOverlay&&closeCardOverlay();openCardOverlay(cd);};})(s._cardData);
@@ -1220,11 +1232,17 @@ function loadSiteImg(v){
   var img=document.getElementById('soImg');
   var load=document.getElementById('soImgLoad');
   var btn=document.getElementById('soAnalyseBtn');
-  img.onerror=null; // verwijder eventuele stale handler van vorige lading
+  img.onerror=null;
   img.style.display='none';load.style.display='block';load.textContent='Laden…';
   if(btn)btn.style.display='none';
   img.onload=function(){img.style.display='block';load.style.display='none';if(btn)btn.style.display='block';};
-  getImageEl(v,img,function(){load.textContent='Niet beschikbaar';img.style.display='none';if(btn)btn.style.display='none';});
+  var _dbgUrls=[v._cdn,v.cdn,v._loc?'meccg-images/'+v._loc:'',v.img?'meccg-images/'+v.img:''].filter(Boolean);
+  console.log('[loadSiteImg] urls=',_dbgUrls);
+  getImageEl(v,img,function(){
+    load.textContent='Niet beschikbaar';
+    img.style.display='none';if(btn)btn.style.display='none';
+    console.warn('[loadSiteImg] alle URLs gefaald:',_dbgUrls);
+  });
 }
 
 function closeSiteOverlay(){
@@ -1374,8 +1392,10 @@ function _renderDreamSitesInOverlay(regionName){
     row.onclick=(function(site){
       var ACOLOR={'Hero':'#2a5a9a','Minion':'#7a1515','Balrog':'#4a0808','Fallen-wizard':'#6a4a10','Wizard':'#4a6a10'};
       function _loadAlignment(al){
-        // Gebruik exact hetzelfde pad als de Sites tab: openSiteOverlay
-        openSiteOverlay(_dreamSiteObj(site,al));
+        console.log('[_loadAlignment] site=',site.name,'al=',al);
+        var _dso=_dreamSiteObj(site,al);
+        console.log('[_dreamSiteObj] result=',JSON.stringify({n:_dso.n,_cdn:_dso._cdn,cdn:_dso.cdn,dream:_dso.dream}));
+        openSiteOverlay(_dso);
         // Herstel actieve rij markering (openSiteOverlay reset soOtherSites)
         // en injecteer versieknoppen als er meerdere alignments zijn
         if(site.alignments.length>1){
