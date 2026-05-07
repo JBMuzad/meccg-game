@@ -554,9 +554,9 @@ function getDB(cb){
   }).catch(function(){_db={byImg:{},byName:{}};_cbs.forEach(function(f){f(_db);});_cbs=[];document.getElementById('cacheStatus').textContent='offline';});
 }
 
-function tryUrls(el,urls,i){
-  if(i>=urls.length){el.src='';return;}
-  el.onerror=function(){tryUrls(el,urls,i+1);};
+function tryUrls(el,urls,i,onFail){
+  if(i>=urls.length){el.src='';if(onFail)onFail();return;}
+  el.onerror=function(){tryUrls(el,urls,i+1,onFail);};
   el.src=urls[i];
 }
 
@@ -571,13 +571,13 @@ function getImage(s,cb){
   s._ui=0;
 }
 
-function getImageEl(s,el){
+function getImageEl(s,el,onFail){
   var urls=[];
   if(s._cdn) urls.push(s._cdn);
   if(s.cdn)  urls.push(s.cdn);
   if(s._loc) urls.push('meccg-images/'+s._loc);
   if(s.img)  urls.push('meccg-images/'+s.img);
-  tryUrls(el,urls,0);
+  tryUrls(el,urls,0,onFail);
 }
 
 // Kaartmap
@@ -1219,8 +1219,7 @@ function loadSiteImg(v){
   img.style.display='none';load.style.display='block';load.textContent='Laden…';
   if(btn)btn.style.display='none';
   img.onload=function(){img.style.display='block';load.style.display='none';if(btn)btn.style.display='block';};
-  img.onerror=function(){load.textContent='Niet beschikbaar';img.style.display='none';if(btn)btn.style.display='none';};
-  getImageEl(v,img);
+  getImageEl(v,img,function(){load.textContent='Niet beschikbaar';img.style.display='none';if(btn)btn.style.display='none';});
 }
 
 function closeSiteOverlay(){
