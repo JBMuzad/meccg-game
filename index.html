@@ -109,7 +109,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 
 /* Under-deeps kaart markers */
 .udm{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;z-index:10;}
-.udm-dot{width:32px;height:32px;background:rgba(212,168,75,0);border:2px solid rgba(212,168,75,0);border-radius:50%;transition:background .15s,border-color .15s;}
+.udm-dot{width:48px;height:48px;background:rgba(212,168,75,0);border:2px solid rgba(212,168,75,0);border-radius:50%;transition:background .15s,border-color .15s;}
 .udm:hover .udm-dot{background:rgba(212,168,75,.25);border-color:rgba(212,168,75,.7);}
 .udm-label{position:absolute;left:50%;transform:translateX(-50%);top:18px;background:rgba(10,8,5,.88);border:1px solid rgba(212,168,75,.4);color:#e8d8a0;font-size:10px;padding:3px 7px;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none;font-family:Georgia,serif;}
 .udm:hover .udm-label{opacity:1;}
@@ -1352,10 +1352,14 @@ var _UD_SITES=[
 function _buildUdMarkers(){
   var mk=document.getElementById('udMarkers');
   mk.innerHTML='';
+  // Verwijder diakritische tekens voor vergelijking (ë→e, û→u, î→i, ...)
+  function _normAcc(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
   _UD_SITES.forEach(function(ud){
-    // Zoek overeenkomende site in SITES_DB (case-insensitive, meerdere varianten)
+    // Zoek overeenkomende site in SITES_DB — accent-insensitief + case-insensitief
+    var udNorm=_normAcc(ud.n);
     var dbSite=SITES_DB.filter(function(s){
-      return s.n.toLowerCase()===ud.n.toLowerCase();
+      return _normAcc(s.n)===udNorm;
     })[0]||null;
 
     var div=document.createElement('div');
