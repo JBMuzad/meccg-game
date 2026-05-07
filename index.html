@@ -107,6 +107,14 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 #soHazards{margin-bottom:6px;}
 .soHazLabel{font-size:10px;color:rgba(212,168,75,.45);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;}
 
+/* Under-deeps kaart markers */
+.udm{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;z-index:10;}
+.udm-dot{width:12px;height:12px;background:#8b3a3a;border:2px solid #d4a84b;border-radius:50%;transition:transform .15s,background .15s;}
+.udm:hover .udm-dot{transform:scale(1.5);background:#d4a84b;}
+.udm-label{position:absolute;left:50%;transform:translateX(-50%);top:14px;background:rgba(10,8,5,.85);border:1px solid rgba(212,168,75,.35);color:#e8d8a0;font-size:9px;padding:2px 5px;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none;}
+.udm:hover .udm-label{opacity:1;}
+.b.mapmode{font-weight:700;}
+
 /* Routes tab */
 .rt-placeholder{color:rgba(240,224,184,.3);font-size:12px;font-style:italic;padding:20px 0;text-align:center;line-height:1.8;}
 .rt-section-title{font-size:10px;color:rgba(212,168,75,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
@@ -201,13 +209,16 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 <div class="bar">
   <h1>&#9876; MECCG &#8212; Midden-aarde</h1>
   <div class="sep"></div>
-  <button class="b on" onclick="setFilter('ALL',this)">Alles</button>
-  <button class="b" onclick="setFilter('W',this)">Wilderness</button>
-  <button class="b" onclick="setFilter('B',this)">Border</button>
-  <button class="b" onclick="setFilter('S',this)">Shadow</button>
-  <button class="b" onclick="setFilter('F',this)">Free</button>
-  <button class="b" onclick="setFilter('C',this)">Coastal</button>
-  <div class="sep"></div>
+  <button class="b mapmode on" id="btnModeNormal" onclick="switchMapMode('normal')">&#127757; Midden-aarde</button>
+  <button class="b mapmode" id="btnModeUd" onclick="switchMapMode('underdeeps')">&#9660; Under-deeps</button>
+  <div class="sep" id="barTerrainSep"></div>
+  <button class="b on" id="barTerrainAll" onclick="setFilter('ALL',this)">Alles</button>
+  <button class="b" id="barTerrainW" onclick="setFilter('W',this)">Wilderness</button>
+  <button class="b" id="barTerrainB" onclick="setFilter('B',this)">Border</button>
+  <button class="b" id="barTerrainS" onclick="setFilter('S',this)">Shadow</button>
+  <button class="b" id="barTerrainF" onclick="setFilter('F',this)">Free</button>
+  <button class="b" id="barTerrainC" onclick="setFilter('C',this)">Coastal</button>
+  <div class="sep" id="barSitesSep"></div>
   <button class="b on" id="btnSites" onclick="toggleSiteMarkers(this)">&#128205; Sites</button>
   <div class="sep"></div>
   <span id="cacheStatus" style="font-size:9px;color:rgba(212,168,75,.45);font-style:italic">laden...</span>
@@ -217,6 +228,9 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
     <div class="mi" id="mi">
       <img id="mapimg" draggable="false"/>
       <svg id="sv"><g id="rl"></g></svg>
+      <div id="udLayer" style="display:none;position:absolute;top:0;left:0;pointer-events:none;">
+        <div id="udMarkers" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+      </div>
     </div>
     <div id="loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(212,168,75,.6);font-size:13px">Kaart laden&#8230;</div>
     <div class="zi">
@@ -314,10 +328,6 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="soRegMeta"><span id="soRegName"></span></div>
     </div>
     <div id="soMiddle">
-      <div id="soViewToggle" style="display:none;gap:4px;margin-bottom:6px;justify-content:center;">
-        <button id="soToggleSite" class="sovbtn active" onclick="_soToggleView('site')" style="font-size:10px;padding:3px 10px;">&#127970; Site kaart</button>
-        <button id="soToggleUd" class="sovbtn" onclick="_soToggleView('udmap')" style="font-size:10px;padding:3px 10px;">&#128506; Under-deeps kaart</button>
-      </div>
       <div id="soImgWrap">
         <div id="soImgLoad">Laden&#8230;</div>
         <img id="soImg"/>
@@ -1112,15 +1122,6 @@ function openSiteOverlay(s){
   document.getElementById('soVersions').innerHTML='';
   document.getElementById('soImgWrap').style.display=hasSite?'flex':'none';
 
-  // Under-deeps toggle tonen/verbergen + resetten naar site-kaart view
-  var _udToggle=document.getElementById('soViewToggle');
-  var _showUdToggle=hasSite&&_isUnderDeepsSite(s.n);
-  _udToggle.style.display=_showUdToggle?'flex':'none';
-  if(_showUdToggle){
-    document.getElementById('soToggleSite').classList.add('active');
-    document.getElementById('soToggleUd').classList.remove('active');
-  }
-
   // Klikbaar maken: afbeelding opent kaartdetail
   var _soImgWrap=document.getElementById('soImgWrap');
   _soImgWrap.onclick=null;
@@ -1295,57 +1296,7 @@ function openSiteOverlay(s){
   }
 }
 
-// Onder-deeps detectie
-var _UNDER_DEEPS_NAMES=[
-  'the iron-deeps','the cobalt-deeps','the wind-deeps','the rusted-deeps',
-  'the drowning-deeps','the sulfur-deeps','the gem-deeps','the pukel-deeps',
-  'the pûkel-deeps','the under-grottos','the under-leas','the under-vaults',
-  'the under-caves','the under-gates','the under-galleries','the under-courts',
-  'the under-forges','ancient maze','ancient deep-hold','deep mines',
-  'the pits of angband','remains of thangorodrim','kheledkhizdin',
-  'ruins of belegost','ruins of nogrod','grop-k','vaults of ut',
-  'falek-dim','angurath','limestone-caverns','funur','under-deeps of'
-];
-function _isUnderDeepsSite(name){
-  if(!name)return false;
-  var n=name.toLowerCase();
-  if(n.indexOf('-deeps')!==-1||n.indexOf('under-')!==-1)return true;
-  return _UNDER_DEEPS_NAMES.some(function(k){return n.indexOf(k)!==-1;});
-}
-
-var _soCurrentVersion=null;  // bijhouden welke versie (v-object) geladen is
-
-function _soToggleView(view){
-  var isMap=view==='udmap';
-  var ts=document.getElementById('soToggleSite');
-  var tu=document.getElementById('soToggleUd');
-  if(ts)ts.classList.toggle('active',!isMap);
-  if(tu)tu.classList.toggle('active',isMap);
-  if(isMap){
-    var img=document.getElementById('soImg');
-    var load=document.getElementById('soImgLoad');
-    var btn=document.getElementById('soAnalyseBtn');
-    img.onerror=null;
-    img.style.display='none';load.style.display='block';load.textContent='Laden…';
-    if(btn)btn.style.display='none';
-    img.onload=function(){img.style.display='block';load.style.display='none';};
-    img.onerror=function(){load.textContent='Niet beschikbaar';img.style.display='none';};
-    img.src='under-deep-site-map.jpg';
-    // Kaart niet klikbaar maken in map-view
-    var w=document.getElementById('soImgWrap');
-    w.style.cursor='default';w.onclick=null;
-  } else {
-    if(_soCurrentVersion)loadSiteImg(_soCurrentVersion);
-  }
-}
-
 function loadSiteImg(v){
-  _soCurrentVersion=v;
-  // Reset toggle naar site-kaart view als we een nieuwe afbeelding laden
-  var ts=document.getElementById('soToggleSite');
-  var tu=document.getElementById('soToggleUd');
-  if(ts)ts.classList.add('active');
-  if(tu)tu.classList.remove('active');
   var img=document.getElementById('soImg');
   var load=document.getElementById('soImgLoad');
   var btn=document.getElementById('soAnalyseBtn');
@@ -1357,6 +1308,133 @@ function loadSiteImg(v){
     load.textContent='Niet beschikbaar';
     img.style.display='none';if(btn)btn.style.display='none';
   });
+}
+
+// ── Under-deeps kaartmodus ────────────────────────────────────────────────────
+var _mapMode='normal';
+var _normalMapSrc='https://btupnjyvsltowbynqhxz.supabase.co/storage/v1/object/public/meccg/meccg-map.jpg';
+var _udMapSrc='under-deep-site-map.jpg';
+// Posities als % van de afbeeldingsgrootte (x=links, y=boven)
+// Gebaseerd op under-deep-site-map.jpg (3580x2560 px)
+var _UD_SITES=[
+  {n:'Ancient Maze',              x:47.0, y: 3.5},
+  {n:'The Under-forges',          x:27.5, y:11.5},
+  {n:'The Pits of Angband',       x: 3.5, y:20.5},
+  {n:'Remains of Thangorodrim',   x: 3.0, y:28.5},
+  {n:'Ancient Deep-hold',         x:89.0, y: 4.5},
+  {n:'Deep Mines',                x:84.0, y:10.5},
+  {n:'Grop-Külkodar',             x:85.5, y:22.0},
+  {n:'The Vaults of Utumno',      x:96.5, y:30.0},
+  {n:'Ruins of Kheledkhizdin',    x:89.5, y:36.5},
+  {n:'The Cobalt-deeps',          x:60.5, y:27.5},
+  {n:'The Under-leas',            x:46.0, y:33.5},
+  {n:'The Iron-deeps',            x:31.0, y:38.5},
+  {n:'The Wind-deeps',            x:65.0, y:37.5},
+  {n:'The Rusted-deeps',          x:82.5, y:42.0},
+  {n:'Ruins of Belegost',         x:12.0, y:36.0},
+  {n:'The Drowning-deeps',        x:16.5, y:43.5},
+  {n:'The Under-vaults',          x:38.5, y:47.0},
+  {n:'Ruins of Nogrod',           x:11.5, y:50.5},
+  {n:'The Under-grottos',         x:55.5, y:50.5},
+  {n:'The Sulfur-deeps',          x:56.0, y:57.5},
+  {n:'Mines of Falek-dim',        x:80.0, y:58.5},
+  {n:'The Under-caves',           x:22.0, y:65.5},
+  {n:'The Under-gates',           x:46.0, y:67.0},
+  {n:'The Gem-deeps',             x:43.5, y:77.5},
+  {n:'The Under-galleries',       x:57.0, y:77.0},
+  {n:'The Under-courts',          x:76.0, y:73.0},
+  {n:'The Pukel-deeps',           x:45.0, y:87.0},
+  {n:'Mines of Angurath',         x:83.5, y:80.0},
+  {n:'The Under-deeps of Funur',  x:46.0, y:95.0},
+  {n:'The Limestone-caverns',     x:83.0, y:94.5}
+];
+
+function _buildUdMarkers(){
+  var mk=document.getElementById('udMarkers');
+  mk.innerHTML='';
+  _UD_SITES.forEach(function(ud){
+    // Zoek overeenkomende site in SITES_DB (case-insensitive, meerdere varianten)
+    var dbSite=SITES_DB.filter(function(s){
+      return s.n.toLowerCase()===ud.n.toLowerCase();
+    })[0]||null;
+
+    var div=document.createElement('div');
+    div.className='udm';
+    div.style.left=ud.x+'%';
+    div.style.top=ud.y+'%';
+    div.innerHTML='<div class="udm-dot"></div><div class="udm-label">'+ud.n+'</div>';
+
+    div.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(dbSite){
+        // Bouw site-object en open overlay
+        var sObj={n:dbSite.n,t:dbSite.t,a:dbSite.a,
+                  img:dbSite.img,loc:dbSite.loc,cdn:dbSite.cdn,
+                  rid:dbSite.rid,reg:dbSite.reg||''};
+        openSiteOverlay(sObj);
+      } else {
+        // Site niet in DB: open kaart-zoekopdracht als fallback
+        switchTab('cards');
+        document.getElementById('cardSearch').value=ud.n;
+        searchCards(ud.n);
+      }
+    });
+    mk.appendChild(div);
+  });
+}
+
+function switchMapMode(mode){
+  if(mode===_mapMode)return;
+  _mapMode=mode;
+
+  var btnN=document.getElementById('btnModeNormal');
+  var btnU=document.getElementById('btnModeUd');
+  btnN.classList.toggle('on', mode==='normal');
+  btnU.classList.toggle('on', mode==='underdeeps');
+
+  // Terrein-filter + sites-knop tonen/verbergen
+  ['barTerrainSep','barTerrainAll','barTerrainW','barTerrainB',
+   'barTerrainS','barTerrainF','barTerrainC','barSitesSep','btnSites'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.style.display=mode==='normal'?'':'none';
+  });
+
+  var udLayer=document.getElementById('udLayer');
+  var normalSvg=document.getElementById('sv');
+
+  if(mode==='underdeeps'){
+    // Laad UD-kaart als achtergrond en pas dimensies aan
+    mapImg.onload=function(){
+      imgW=this.naturalWidth;imgH=this.naturalHeight;
+      this.width=imgW;this.height=imgH;
+      normalSvg.setAttribute('width',imgW);normalSvg.setAttribute('height',imgH);
+      normalSvg.setAttribute('viewBox','0 0 '+imgW+' '+imgH);
+      udLayer.style.width=imgW+'px';
+      udLayer.style.height=imgH+'px';
+      udLayer.style.display='block';
+      _buildUdMarkers();
+      iv();
+    };
+    // Verberg regio-SVG inhoud, toon UD-laag
+    document.getElementById('rl').style.display='none';
+    var siteMarkerEl=document.getElementById('site-markers');
+    if(siteMarkerEl)siteMarkerEl.style.display='none';
+    mapImg.src=_udMapSrc;
+  } else {
+    // Herstel normale kaart
+    udLayer.style.display='none';
+    document.getElementById('rl').style.display='';
+    var siteMarkerEl2=document.getElementById('site-markers');
+    if(siteMarkerEl2)siteMarkerEl2.style.display='';
+    mapImg.onload=function(){
+      imgW=this.naturalWidth;imgH=this.naturalHeight;
+      this.width=imgW;this.height=imgH;
+      normalSvg.setAttribute('width',imgW);normalSvg.setAttribute('height',imgH);
+      normalSvg.setAttribute('viewBox','0 0 '+imgW+' '+imgH);
+      iv();
+    };
+    mapImg.src=_normalMapSrc;
+  }
 }
 
 function closeSiteOverlay(){
