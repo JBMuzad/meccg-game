@@ -557,7 +557,12 @@ function getDB(cb){
 function tryUrls(el,urls,i,onFail){
   if(i>=urls.length){el.src='';if(onFail)onFail();return;}
   el.onerror=function(){tryUrls(el,urls,i+1,onFail);};
+  // Als exact dezelfde src al geladen is, vuurt onload niet opnieuw →
+  // reset eerst zodat de browser de laadcyclus opnieuw doorloopt.
+  if(el.src===urls[i]){el.src='';}
   el.src=urls[i];
+  // Als de afbeelding al gecacht en compleet is, trigger onload handmatig.
+  if(el.complete&&el.naturalWidth>0){var ev=new Event('load');el.dispatchEvent(ev);}
 }
 
 function getImage(s,cb){
