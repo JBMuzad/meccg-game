@@ -1364,21 +1364,24 @@ function _buildUdMarkers(){
     div.style.top=ud.y+'%';
     div.innerHTML='<div class="udm-dot"></div><div class="udm-label">'+ud.n+'</div>';
 
-    div.addEventListener('click',function(e){
+    function _udOpen(e){
       e.stopPropagation();
       if(dbSite){
-        // Bouw site-object en open overlay
         var sObj={n:dbSite.n,t:dbSite.t,a:dbSite.a,
                   img:dbSite.img,loc:dbSite.loc,cdn:dbSite.cdn,
                   rid:dbSite.rid,reg:dbSite.reg||''};
         openSiteOverlay(sObj);
       } else {
-        // Site niet in DB: open kaart-zoekopdracht als fallback
         switchTab('cards');
         document.getElementById('cardSearch').value=ud.n;
         searchCards(ud.n);
       }
-    });
+    }
+    div.addEventListener('click', _udOpen);
+    div.addEventListener('touchend', function(e){
+      e.stopPropagation();
+      if(!_tapMoved) _udOpen(e);
+    }, {passive:false});
     mk.appendChild(div);
   });
 }
