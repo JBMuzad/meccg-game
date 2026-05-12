@@ -1536,23 +1536,37 @@ function _resolveSiteType(name, alignment, fallback){
 }
 
 function _updateSoPlayable(siteName, siteType){
-  var SITE_PLAY={
-    'haven':       ['Karakter','Bondgenoot'],
-    'free':        ['Factie','Major Item','Gold Ring','Special Item'],
-    'border':      ['Factie','Minor Item'],
-    'ruins':       ['Minor Item','Major Item','Greater Item','Gold Ring'],
-    'shadow':      ['Factie','Minor Item','Major Item','Gold Ring'],
-    'dark':        ['Factie','Minor Item','Major Item','Gold Ring'],
-    'darkhaven':   ['Karakter','Bondgenoot'],
-    'lordhaven':   ['Karakter','Bondgenoot'],
-    'wizardhaven': ['Karakter','Bondgenoot'],
-    'elf-hold':    ['Factie','Major Item','Gold Ring','Special Item']
-  };
-  var playTypes=SITE_PLAY[siteType]||[];
   var ph='<div class="soHazLabel" style="margin-top:6px;">&#9670; Speelbaar</div>';
-  playTypes.forEach(function(pt){
-    ph+='<span class="htag" style="background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.2);color:rgba(212,168,75,.75);">'+pt+'</span>';
-  });
+
+  // Gebruik exacte kaartdata indien beschikbaar in SITES_DB
+  var sNameL=(siteName||'').toLowerCase();
+  var dbEntry=SITES_DB.filter(function(s){return s.n.toLowerCase()===sNameL;})[0];
+  var playable=dbEntry&&dbEntry.playable?dbEntry.playable:'';
+
+  if(playable){
+    // Splits op komma, toon elk item als tag
+    playable.split(/[,;]/).forEach(function(item){
+      var t=item.trim();
+      if(t) ph+='<span class="htag" style="background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.2);color:rgba(212,168,75,.75);">'+t+'</span>';
+    });
+  } else {
+    // Fallback: generieke mapping op sitetype
+    var SITE_PLAY={
+      'haven':       ['Characters','Allies'],
+      'free':        ['Factions','Major Items','Gold Rings','Special Items'],
+      'border':      ['Factions','Minor Items'],
+      'ruins':       ['Minor Items','Major Items','Greater Items','Gold Rings'],
+      'shadow':      ['Factions','Minor Items','Major Items','Gold Rings'],
+      'dark':        ['Factions','Minor Items','Major Items','Gold Rings'],
+      'darkhaven':   ['Characters','Allies'],
+      'lordhaven':   ['Characters','Allies'],
+      'wizardhaven': ['Characters','Allies'],
+      'elf-hold':    ['Factions','Major Items','Gold Rings','Special Items']
+    };
+    (SITE_PLAY[siteType]||[]).forEach(function(pt){
+      ph+='<span class="htag" style="background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.2);color:rgba(212,168,75,.75);">'+pt+'</span>';
+    });
+  }
   var _soHomeCards=[];
   if(_cardsLoaded){
     var sNameL=(siteName||'').toLowerCase();
