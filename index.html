@@ -495,6 +495,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 
 var SITE_SYMBOLS={"haven": "\u2694", "free": "\u25a1", "ruins": "\u25b3", "shadow": "\u25c6", "border": "\u25cb", "dark": "\u25cf"};
 var _siteTypeCache={}; // normName -> SL-key, gevuld vanuit cards-dc.json
+var _sitePlayableCache={}; // normName -> playable string (lowercase), gevuld vanuit cards-dc.json
 var SITE_COLORS={"haven": "#c8a020", "free": "#4080c0", "ruins": "#a06030", "shadow": "#8030a0", "border": "#60a060", "dark": "#c04040"};
 
 var NS='http://www.w3.org/2000/svg';
@@ -1713,11 +1714,16 @@ function _buildCardList(){
       });
     });
 
-    // Bouw site type cache vanuit cards-dc.json (authoritative)
+    // Bouw site type cache + playable cache vanuit cards-dc.json (authoritative)
     cardnumData.forEach(function(c){
-      if((c.Primary||'').toLowerCase()==='site'&&c.NameEN&&c.Site){
+      if((c.Primary||'').toLowerCase()==='site'&&c.NameEN){
         var k=_normName(c.NameEN);
-        if(!_siteTypeCache[k]) _siteTypeCache[k]=_normSiteType(c.Site);
+        if(c.Site&&!_siteTypeCache[k]) _siteTypeCache[k]=_normSiteType(c.Site);
+        // Voorkeur: Hero alignment (heeft doorgaans rijkere speelbare items)
+        if(c.Playable){
+          if(!_sitePlayableCache[k]||(c.Alignment||'').toLowerCase()==='hero')
+            _sitePlayableCache[k]=(c.Playable||'').toLowerCase();
+        }
       }
     });
     // Update site overlay type als het open is
@@ -1958,30 +1964,38 @@ var _activeRouteIdx=0;
 var _routeResFilter=null; // actief resource-filter ('minor','items','allies','factions')
 var _rtResGlowGroup=null; // SVG groep met rode gloed polygonen
 
+// Dezelfde SITE_PLAY mapping als _updateSoPlayable — eén bron van waarheid
+var _SITE_PLAY={
+  'haven':       ['allies'],
+  'free':        ['factions','major','gold','special'],
+  'border':      ['factions','minor'],
+  'ruins':       ['minor','major','greater','gold'],
+  'shadow':      ['factions','minor','major','gold'],
+  'dark':        ['factions','minor','major','gold'],
+  'darkhaven':   ['allies'],
+  'lordhaven':   ['allies'],
+  'wizardhaven': ['allies'],
+  'elf-hold':    ['factions','major','gold','special']
+};
+
 function _getResFilterRids(type){
   var matchRids=[];
   SITES_DB.forEach(function(s){
-    var p=(s.playable||'').toLowerCase();
-    var t=s.t; // sitetype-code als fallback
     var match=false;
+    var p=(s.playable||'').toLowerCase();
     if(p){
-      // Gebruik exacte kaartdata
-      if(type==='minor')   match=p.indexOf('minor item')!==-1;
-      if(type==='major')   match=p.indexOf('major item')!==-1;
-      if(type==='greater') match=p.indexOf('greater item')!==-1;
-      if(type==='gold')    match=p.indexOf('gold ring')!==-1;
-      if(type==='special') match=p.indexOf('special item')!==-1;
+      // Gebruik exacte tekst uit Supabase playable-veld (zelfde als site overlay)
+      if(type==='minor')   match=p.indexOf('minor item')!==-1||p.indexOf('minor')!==-1;
+      if(type==='major')   match=p.indexOf('major item')!==-1||p.indexOf('major')!==-1;
+      if(type==='greater') match=p.indexOf('greater item')!==-1||p.indexOf('greater')!==-1;
+      if(type==='gold')    match=p.indexOf('gold ring')!==-1||p.indexOf('gold')!==-1;
+      if(type==='special') match=p.indexOf('special item')!==-1||p.indexOf('special')!==-1;
       if(type==='allies')  match=p.indexOf('alli')!==-1;
       if(type==='factions')match=p.indexOf('faction')!==-1;
     } else {
-      // Fallback op sitetype als playable-veld leeg is
-      if(type==='minor')   match=t==='border'||t==='ruins'||t==='shadow'||t==='dark';
-      if(type==='major')   match=t==='ruins'||t==='shadow'||t==='dark'||t==='free'||t==='elf-hold';
-      if(type==='greater') match=t==='ruins';
-      if(type==='gold')    match=t==='ruins'||t==='shadow'||t==='dark'||t==='free'||t==='elf-hold';
-      if(type==='special') match=t==='free'||t==='elf-hold';
-      if(type==='allies')  match=t==='haven'||t==='darkhaven'||t==='lordhaven'||t==='wizardhaven';
-      if(type==='factions')match=t==='border'||t==='shadow'||t==='dark'||t==='free'||t==='elf-hold';
+      // Fallback: zelfde SITE_PLAY mapping als in de site overlay
+      var types=_SITE_PLAY[s.t]||[];
+      match=types.indexOf(type)!==-1;
     }
     if(match){
       var rid=_nameToRid[(s.reg||'').toLowerCase()];
@@ -2035,12 +2049,17 @@ function _clearRouteResGlow(){
 
 function _applyRouteResFilter(type){
   _routeResFilter=(_routeResFilter===type)?null:type; // toggle
+  if(!_cardsLoaded){
+    // Zorg dat cardnum data geladen wordt; herteken na laden
+    _buildCardList();
+    setTimeout(function(){ _drawRouteResGlow(); _updateRouteFilterBtns(); }, 1500);
+  }
   _drawRouteResGlow();
   _updateRouteFilterBtns();
 }
 
 function _updateRouteFilterBtns(){
-  ['minor','items','allies','factions'].forEach(function(t){
+  ['minor','major','greater','gold','special','allies','factions'].forEach(function(t){
     var btn=document.getElementById('rtrf-'+t);
     if(btn) btn.classList.toggle('active',_routeResFilter===t);
   });
