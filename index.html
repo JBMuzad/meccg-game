@@ -117,6 +117,9 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 
 /* Routes tab */
 .rt-placeholder{color:rgba(240,224,184,.3);font-size:12px;font-style:italic;padding:20px 0;text-align:center;line-height:1.8;}
+.rtrf-btn{padding:5px 10px;border-radius:4px;border:1px solid rgba(212,168,75,.2);background:rgba(255,255,255,.04);color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;font-family:Georgia,serif;transition:background .15s,border-color .15s,color .15s;}
+.rtrf-btn:hover{background:rgba(212,168,75,.1);}
+.rtrf-btn.active{background:rgba(200,50,50,.25);border-color:rgba(220,80,80,.6);color:rgba(255,130,130,.9);}
 .rt-section-title{font-size:10px;color:rgba(212,168,75,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
 .rt-dest-item{padding:7px 8px;border-radius:5px;border:1px solid rgba(212,168,75,.12);margin-bottom:6px;cursor:pointer;background:rgba(255,255,255,.02);}
 .rt-dest-item:hover{background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.3);}
@@ -903,6 +906,7 @@ var _curTab='regio', _siteFilter='ALL', _siteList=[], _routeMode=false;
 function switchTab(tab){
   _curTab=tab;
   _routeMode=(tab==='routes');
+  if(!_routeMode)_clearRouteResGlow();
   document.getElementById('tabRegio').classList.toggle('on',tab==='regio');
   document.getElementById('tabSites').classList.toggle('on',tab==='sites');
   document.getElementById('tabRoutes').classList.toggle('on',tab==='routes');
@@ -1944,6 +1948,71 @@ var _routeStart=null, _routeEnd=null;
 var _routeReturn=null;
 var _routes=[]; // array van pad-arrays (elk pad = array van regio-IDs)
 var _activeRouteIdx=0;
+var _routeResFilter=null; // actief resource-filter ('minor','items','allies','factions')
+var _rtResGlowGroup=null; // SVG groep met rode gloed polygonen
+
+function _getResFilterRids(type){
+  var matchRids=[];
+  SITES_DB.forEach(function(s){
+    var p=(s.playable||'').toLowerCase();
+    var match=false;
+    if(type==='minor')   match=p.indexOf('minor item')!==-1;
+    if(type==='items')   match=p.indexOf('major item')!==-1||p.indexOf('greater item')!==-1||p.indexOf('gold ring')!==-1||p.indexOf('special item')!==-1;
+    if(type==='allies')  match=p.indexOf('all')!==-1; // allies / ally
+    if(type==='factions')match=p.indexOf('faction')!==-1;
+    if(match){
+      var rid=_nameToRid[(s.reg||'').toLowerCase()];
+      if(rid&&matchRids.indexOf(rid)===-1)matchRids.push(rid);
+    }
+  });
+  return matchRids;
+}
+
+function _drawRouteResGlow(){
+  // Verwijder vorige gloedlaag
+  if(_rtResGlowGroup)_rtResGlowGroup.innerHTML='';
+  if(!_routeResFilter){return;}
+  // Maak groep aan als nodig (eenmalig aan #sv toevoegen)
+  var svEl=document.getElementById('sv');
+  if(!_rtResGlowGroup){
+    _rtResGlowGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
+    _rtResGlowGroup.setAttribute('id','rtResGlow');
+    svEl.appendChild(_rtResGlowGroup);
+  } else if(!svEl.contains(_rtResGlowGroup)){
+    svEl.appendChild(_rtResGlowGroup);
+  }
+  var rids=_getResFilterRids(_routeResFilter);
+  rids.forEach(function(rid){
+    if(!POLYS[rid])return;
+    // Gloed: rode fill
+    var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points',POLYS[rid]);
+    poly.setAttribute('fill','rgba(220,40,40,.38)');
+    poly.setAttribute('stroke','rgba(255,80,80,.85)');
+    poly.setAttribute('stroke-width','4');
+    poly.style.filter='drop-shadow(0 0 10px rgba(255,0,0,.7))';
+    _rtResGlowGroup.appendChild(poly);
+  });
+}
+
+function _clearRouteResGlow(){
+  _routeResFilter=null;
+  if(_rtResGlowGroup)_rtResGlowGroup.innerHTML='';
+  _updateRouteFilterBtns();
+}
+
+function _applyRouteResFilter(type){
+  _routeResFilter=(_routeResFilter===type)?null:type; // toggle
+  _drawRouteResGlow();
+  _updateRouteFilterBtns();
+}
+
+function _updateRouteFilterBtns(){
+  ['minor','items','allies','factions'].forEach(function(t){
+    var btn=document.getElementById('rtrf-'+t);
+    if(btn) btn.classList.toggle('active',_routeResFilter===t);
+  });
+}
 
 // BFS met uitsluiting van tussenregio's (voor alternatieve paden)
 function bfsPathExcluding(startRid,endRid,excludeRids){
@@ -2093,6 +2162,7 @@ function filterRouteEnds(q){renderRouteEndList(q);}
 
 function setRouteEnd(rid){
   if(!rid||!_routeStart)return;
+  _clearRouteResGlow(); // gloed verwijderen zodra eindregio gekozen
   _routeEnd=rid;
   var path=bfsPath(_routeStart,_routeEnd);
   _routes=[path]; _activeRouteIdx=0;
@@ -2176,7 +2246,7 @@ function buildRouteScenarioHtml(path,rdS,rdE){
     h+='</div></div>';
   });
 
-  h+='<button onclick="_routeStart=null;_routeEnd=null;_routes=[];_activeRouteIdx=0;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset route</button>';
+  h+='<button onclick="_routeStart=null;_routeEnd=null;_routes=[];_activeRouteIdx=0;_clearRouteResGlow();updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset route</button>';
   return h;
 }
 
@@ -2185,7 +2255,7 @@ function updateRouteSidebar(path){
   var rdS=_routeStart?RD[_routeStart]:null;
   var rdE=_routeEnd?RD[_routeEnd]:null;
   var sb=document.getElementById('sbroutes');
-  var resetBtn='<button onclick="_routeStart=null;_routeEnd=null;_routes=[];_activeRouteIdx=0;updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
+  var resetBtn='<button onclick="_routeStart=null;_routeEnd=null;_routes=[];_activeRouteIdx=0;_clearRouteResGlow();updateRouteSidebar();closeRouteOverlay();" style="margin-top:4px;width:100%;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,75,.2);border-radius:4px;color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;">&#10005; Reset</button>';
 
   if(!_routeStart){
     sb.innerHTML=tabs+'<div class="rt-placeholder">&#128336; Klik op een regio op de kaart<br>om de startpositie te kiezen.</div>';
@@ -2200,12 +2270,21 @@ function updateRouteSidebar(path){
       '<div style="font-size:15px;color:#d4a84b;font-weight:700">'+rdS.name+'</div>'+
       '<span class="rt-type-badge" style="background:'+(TYPE_BG_RT[rdS.type]||'#333')+';color:'+(TYPE_STROKE_RT[rdS.type]||'#aaa')+'">'+(TYPE_NAME_RT[rdS.type]||rdS.type)+'</span>'+
       '</div>'+
+      // Resource-filter knoppen
+      '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(212,168,75,.1);">'+
+      '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">&#128308; Markeer regio\'s op kaart</div>'+
+      '<div style="display:flex;gap:5px;flex-wrap:wrap;">'+
+      '<button id="rtrf-minor"    class="rtrf-btn'+(_routeResFilter==='minor'  ?' active':'')+'" onclick="_applyRouteResFilter(\'minor\')">&#9675; Minor Items</button>'+
+      '<button id="rtrf-items"    class="rtrf-btn'+(_routeResFilter==='items'  ?' active':'')+'" onclick="_applyRouteResFilter(\'items\')">&#9670; Overige Items</button>'+
+      '<button id="rtrf-allies"   class="rtrf-btn'+(_routeResFilter==='allies' ?' active':'')+'" onclick="_applyRouteResFilter(\'allies\')">&#9876; Allies</button>'+
+      '<button id="rtrf-factions" class="rtrf-btn'+(_routeResFilter==='factions'?' active':'')+'" onclick="_applyRouteResFilter(\'factions\')">&#9873; Factions</button>'+
+      '</div></div>'+
       '<div style="margin-bottom:8px;">'+
       '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Kies eindregio</div>'+
       '<div style="font-size:10px;color:rgba(212,168,75,.5);margin-bottom:6px;">Klik op de kaart of zoek hieronder</div>'+
       '<input id="rtEndSearch" type="text" placeholder="Zoek regio…" oninput="filterRouteEnds(this.value)" autocomplete="off"'+
       ' style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;margin-bottom:6px;">'+
-      '<div id="rtEndList" style="overflow-y:auto;max-height:300px;"></div>'+
+      '<div id="rtEndList" style="overflow-y:auto;max-height:220px;"></div>'+
       '</div>'+resetBtn;
     renderRouteEndList('');
     return;
