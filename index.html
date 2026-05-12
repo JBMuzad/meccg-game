@@ -119,7 +119,14 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .rt-placeholder{color:rgba(240,224,184,.3);font-size:12px;font-style:italic;padding:20px 0;text-align:center;line-height:1.8;}
 .rtrf-btn{padding:5px 10px;border-radius:4px;border:1px solid rgba(212,168,75,.2);background:rgba(255,255,255,.04);color:rgba(212,168,75,.5);font-size:10px;cursor:pointer;font-family:Georgia,serif;transition:background .15s,border-color .15s,color .15s;}
 .rtrf-btn:hover{background:rgba(212,168,75,.1);}
-.rtrf-btn.active{background:rgba(200,50,50,.25);border-color:rgba(220,80,80,.6);color:rgba(255,130,130,.9);}
+.rtrf-btn.active{font-weight:bold;}
+.rtrf-btn[id="rtrf-minor"].active  {background:rgba(240,180,40,.2);border-color:rgba(255,210,60,.7);color:rgba(255,220,80,.95);}
+.rtrf-btn[id="rtrf-major"].active  {background:rgba(80,160,240,.2);border-color:rgba(100,180,255,.7);color:rgba(130,200,255,.95);}
+.rtrf-btn[id="rtrf-greater"].active{background:rgba(180,60,220,.2);border-color:rgba(210,90,255,.7);color:rgba(220,130,255,.95);}
+.rtrf-btn[id="rtrf-gold"].active   {background:rgba(255,140,0,.2);border-color:rgba(255,170,30,.7);color:rgba(255,185,60,.95);}
+.rtrf-btn[id="rtrf-special"].active{background:rgba(40,220,160,.2);border-color:rgba(60,255,180,.7);color:rgba(80,255,190,.95);}
+.rtrf-btn[id="rtrf-allies"].active {background:rgba(220,40,40,.2);border-color:rgba(255,80,80,.7);color:rgba(255,120,120,.95);}
+.rtrf-btn[id="rtrf-factions"].active{background:rgba(60,200,60,.2);border-color:rgba(80,240,80,.7);color:rgba(100,240,100,.95);}
 .rt-section-title{font-size:10px;color:rgba(212,168,75,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
 .rt-dest-item{padding:7px 8px;border-radius:5px;border:1px solid rgba(212,168,75,.12);margin-bottom:6px;cursor:pointer;background:rgba(255,255,255,.02);}
 .rt-dest-item:hover{background:rgba(212,168,75,.08);border-color:rgba(212,168,75,.3);}
@@ -1955,11 +1962,27 @@ function _getResFilterRids(type){
   var matchRids=[];
   SITES_DB.forEach(function(s){
     var p=(s.playable||'').toLowerCase();
+    var t=s.t; // sitetype-code als fallback
     var match=false;
-    if(type==='minor')   match=p.indexOf('minor item')!==-1;
-    if(type==='items')   match=p.indexOf('major item')!==-1||p.indexOf('greater item')!==-1||p.indexOf('gold ring')!==-1||p.indexOf('special item')!==-1;
-    if(type==='allies')  match=p.indexOf('all')!==-1; // allies / ally
-    if(type==='factions')match=p.indexOf('faction')!==-1;
+    if(p){
+      // Gebruik exacte kaartdata
+      if(type==='minor')   match=p.indexOf('minor item')!==-1;
+      if(type==='major')   match=p.indexOf('major item')!==-1;
+      if(type==='greater') match=p.indexOf('greater item')!==-1;
+      if(type==='gold')    match=p.indexOf('gold ring')!==-1;
+      if(type==='special') match=p.indexOf('special item')!==-1;
+      if(type==='allies')  match=p.indexOf('alli')!==-1;
+      if(type==='factions')match=p.indexOf('faction')!==-1;
+    } else {
+      // Fallback op sitetype als playable-veld leeg is
+      if(type==='minor')   match=t==='border'||t==='ruins'||t==='shadow'||t==='dark';
+      if(type==='major')   match=t==='ruins'||t==='shadow'||t==='dark'||t==='free'||t==='elf-hold';
+      if(type==='greater') match=t==='ruins';
+      if(type==='gold')    match=t==='ruins'||t==='shadow'||t==='dark'||t==='free'||t==='elf-hold';
+      if(type==='special') match=t==='free'||t==='elf-hold';
+      if(type==='allies')  match=t==='haven'||t==='darkhaven'||t==='lordhaven'||t==='wizardhaven';
+      if(type==='factions')match=t==='border'||t==='shadow'||t==='dark'||t==='free'||t==='elf-hold';
+    }
     if(match){
       var rid=_nameToRid[(s.reg||'').toLowerCase()];
       if(rid&&matchRids.indexOf(rid)===-1)matchRids.push(rid);
@@ -1968,11 +1991,20 @@ function _getResFilterRids(type){
   return matchRids;
 }
 
+// Kleur per resource-type: [fill, stroke, shadow]
+var _RT_RES_COLORS={
+  'minor':   ['rgba(240,180,40,.40)','rgba(255,210,60,.9)','rgba(255,200,0,.7)'],   // goud
+  'major':   ['rgba(80,160,240,.40)','rgba(100,180,255,.9)','rgba(60,140,255,.7)'], // blauw
+  'greater': ['rgba(180,60,220,.40)','rgba(210,90,255,.9)','rgba(180,0,255,.7)'],   // paars
+  'gold':    ['rgba(255,140,0,.40)', 'rgba(255,170,30,.9)', 'rgba(255,120,0,.7)'],  // oranje
+  'special': ['rgba(40,220,160,.40)','rgba(60,255,180,.9)','rgba(0,220,140,.7)'],   // turquoise
+  'allies':  ['rgba(220,40,40,.38)', 'rgba(255,80,80,.85)','rgba(255,0,0,.7)'],     // rood
+  'factions':['rgba(60,200,60,.38)', 'rgba(80,240,80,.85)','rgba(0,200,0,.7)']     // groen
+};
+
 function _drawRouteResGlow(){
-  // Verwijder vorige gloedlaag
   if(_rtResGlowGroup)_rtResGlowGroup.innerHTML='';
-  if(!_routeResFilter){return;}
-  // Maak groep aan als nodig (eenmalig aan #sv toevoegen)
+  if(!_routeResFilter)return;
   var svEl=document.getElementById('sv');
   if(!_rtResGlowGroup){
     _rtResGlowGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -1981,16 +2013,16 @@ function _drawRouteResGlow(){
   } else if(!svEl.contains(_rtResGlowGroup)){
     svEl.appendChild(_rtResGlowGroup);
   }
+  var c=_RT_RES_COLORS[_routeResFilter]||_RT_RES_COLORS['allies'];
   var rids=_getResFilterRids(_routeResFilter);
   rids.forEach(function(rid){
     if(!POLYS[rid])return;
-    // Gloed: rode fill
     var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
     poly.setAttribute('points',POLYS[rid]);
-    poly.setAttribute('fill','rgba(220,40,40,.38)');
-    poly.setAttribute('stroke','rgba(255,80,80,.85)');
+    poly.setAttribute('fill',c[0]);
+    poly.setAttribute('stroke',c[1]);
     poly.setAttribute('stroke-width','4');
-    poly.style.filter='drop-shadow(0 0 10px rgba(255,0,0,.7))';
+    poly.style.filter='drop-shadow(0 0 10px '+c[2]+')';
     _rtResGlowGroup.appendChild(poly);
   });
 }
@@ -2273,11 +2305,14 @@ function updateRouteSidebar(path){
       // Resource-filter knoppen
       '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(212,168,75,.1);">'+
       '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">&#128308; Markeer regio\'s op kaart</div>'+
-      '<div style="display:flex;gap:5px;flex-wrap:wrap;">'+
-      '<button id="rtrf-minor"    class="rtrf-btn'+(_routeResFilter==='minor'  ?' active':'')+'" onclick="_applyRouteResFilter(\'minor\')">&#9675; Minor Items</button>'+
-      '<button id="rtrf-items"    class="rtrf-btn'+(_routeResFilter==='items'  ?' active':'')+'" onclick="_applyRouteResFilter(\'items\')">&#9670; Overige Items</button>'+
-      '<button id="rtrf-allies"   class="rtrf-btn'+(_routeResFilter==='allies' ?' active':'')+'" onclick="_applyRouteResFilter(\'allies\')">&#9876; Allies</button>'+
-      '<button id="rtrf-factions" class="rtrf-btn'+(_routeResFilter==='factions'?' active':'')+'" onclick="_applyRouteResFilter(\'factions\')">&#9873; Factions</button>'+
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+      '<button id="rtrf-minor"   class="rtrf-btn'+(_routeResFilter==='minor'  ?' active':'')+'" onclick="_applyRouteResFilter(\'minor\')">Minor Items</button>'+
+      '<button id="rtrf-major"   class="rtrf-btn'+(_routeResFilter==='major'  ?' active':'')+'" onclick="_applyRouteResFilter(\'major\')">Major Items</button>'+
+      '<button id="rtrf-greater" class="rtrf-btn'+(_routeResFilter==='greater'?' active':'')+'" onclick="_applyRouteResFilter(\'greater\')">Greater Items</button>'+
+      '<button id="rtrf-gold"    class="rtrf-btn'+(_routeResFilter==='gold'   ?' active':'')+'" onclick="_applyRouteResFilter(\'gold\')">Gold Rings</button>'+
+      '<button id="rtrf-special" class="rtrf-btn'+(_routeResFilter==='special'?' active':'')+'" onclick="_applyRouteResFilter(\'special\')">Special Items</button>'+
+      '<button id="rtrf-allies"  class="rtrf-btn'+(_routeResFilter==='allies' ?' active':'')+'" onclick="_applyRouteResFilter(\'allies\')">&#9876; Allies</button>'+
+      '<button id="rtrf-factions"class="rtrf-btn'+(_routeResFilter==='factions'?' active':'')+'" onclick="_applyRouteResFilter(\'factions\')">&#9873; Factions</button>'+
       '</div></div>'+
       '<div style="margin-bottom:8px;">'+
       '<div style="font-size:9px;color:rgba(212,168,75,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Kies eindregio</div>'+
