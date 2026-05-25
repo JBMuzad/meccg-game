@@ -32,7 +32,9 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .zi{position:absolute;bottom:10px;left:10px;display:flex;flex-direction:column;gap:3px;z-index:20;}
 .zb{width:28px;height:28px;background:rgba(4,8,16,.92);border:1px solid rgba(212,168,75,.4);color:#d4a84b;font-size:14px;cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;}
 .zb:hover{background:rgba(212,168,75,.18);}
-.sb{width:265px;flex-shrink:0;border-left:1px solid rgba(212,168,75,.18);background:#040810;display:flex;flex-direction:column;overflow:hidden;}
+.sb{width:320px;flex-shrink:0;border-left:1px solid rgba(212,168,75,.18);background:#040810;display:flex;flex-direction:column;overflow:hidden;}
+#rulesOverlay{display:none;position:fixed;inset:0;z-index:400;background:#060c14;flex-direction:column;}
+#rulesOverlay.open{display:flex;}
 .sbh{padding:8px 12px;border-bottom:1px solid rgba(212,168,75,.18);font-size:11px;color:#d4a84b;}
 .sbb{flex:1;overflow-y:auto;padding:10px 12px;}
 .sbb::-webkit-scrollbar{width:3px;}
@@ -347,7 +349,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
     </div>
 
     <!-- Rules wiki overlay -->
-    <div id="rulesOverlay" style="display:none;position:fixed;inset:0;z-index:400;background:#060c14;flex-direction:column;">
+    <div id="rulesOverlay">
       <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#040810;border-bottom:1px solid rgba(212,168,75,.25);flex-shrink:0;">
         <span style="font-family:Georgia,serif;font-size:12px;color:#d4a84b;letter-spacing:.06em;">&#128214; MECCG &mdash; Regelwiki</span>
         <button onclick="closeRules()" style="margin-left:auto;padding:4px 14px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.4);color:#d4a84b;font-size:11px;border-radius:3px;cursor:pointer;font-family:Georgia,serif;">&#10005; Sluiten</button>
@@ -738,7 +740,7 @@ document.getElementById('modal').addEventListener('click',function(e){if(e.targe
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
     document.getElementById('modal').classList.remove('open');
-    if(document.getElementById('rulesOverlay').style.display!=='none')closeRules();
+    if(document.getElementById('rulesOverlay').classList.contains('open'))closeRules();
   }
 });
 function setFilter(f,btn){
@@ -927,7 +929,7 @@ function clearRegioHighlight(){
 var _curTab='regio', _prevTab='regio', _siteFilter='ALL', _siteList=[], _routeMode=false;
 
 function closeRules(){
-  document.getElementById('rulesOverlay').style.display='none';
+  document.getElementById('rulesOverlay').classList.remove('open');
   document.getElementById('tabRules').classList.remove('on');
   switchTab(_prevTab==='rules'?'regio':_prevTab);
 }
@@ -936,18 +938,19 @@ function switchTab(tab){
   if(tab==='rules'){
     _prevTab=_curTab;
     _curTab='rules';
+    _routeMode=false;
+    _clearRouteResGlow();
     document.getElementById('tabRules').classList.add('on');
-    document.getElementById('tabRegio').classList.toggle('on',false);
-    document.getElementById('tabSites').classList.toggle('on',false);
-    document.getElementById('tabRoutes').classList.toggle('on',false);
-    document.getElementById('tabCards').classList.toggle('on',false);
-    document.getElementById('tabRes').classList.toggle('on',false);
-    document.getElementById('tabDecks').classList.toggle('on',false);
-    var ov=document.getElementById('rulesOverlay');
-    ov.style.display='flex';
+    document.getElementById('tabRegio').classList.remove('on');
+    document.getElementById('tabSites').classList.remove('on');
+    document.getElementById('tabRoutes').classList.remove('on');
+    document.getElementById('tabCards').classList.remove('on');
+    document.getElementById('tabRes').classList.remove('on');
+    document.getElementById('tabDecks').classList.remove('on');
+    document.getElementById('rulesOverlay').classList.add('open');
     return;
   }
-  document.getElementById('rulesOverlay').style.display='none';
+  document.getElementById('rulesOverlay').classList.remove('open');
   _prevTab=_curTab;
   _curTab=tab;
   _routeMode=(tab==='routes');
@@ -958,7 +961,7 @@ function switchTab(tab){
   document.getElementById('tabCards').classList.toggle('on',tab==='cards');
   document.getElementById('tabRes').classList.toggle('on',tab==='res');
   document.getElementById('tabDecks').classList.toggle('on',tab==='decks');
-  document.getElementById('tabRules').classList.toggle('on',false);
+  document.getElementById('tabRules').classList.remove('on');
   document.getElementById('sbody').style.display=tab==='regio'?'flex':'none';
   document.getElementById('sbsites').style.display=tab==='sites'?'flex':'none';
   document.getElementById('sbroutes').style.display=tab==='routes'?'':'none';
