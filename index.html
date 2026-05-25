@@ -260,6 +260,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <button class="sbtab" id="tabCards" onclick="switchTab('cards')">&#127183; Cards</button>
         <button class="sbtab" id="tabRes" onclick="switchTab('res')">&#9670; Resources</button>
         <button class="sbtab" id="tabDecks" onclick="switchTab('decks')">&#127183; Decks</button>
+        <button class="sbtab" id="tabRules" onclick="switchTab('rules')">&#128214; Rules</button>
     </div>
     <div id="sbody" style="display:flex;flex-direction:column;overflow:hidden;">
       <div style="padding:10px 10px 6px;flex-shrink:0;">
@@ -343,6 +344,15 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <img id="soImg"/>
       </div>
       <button id="soAnalyseBtn" onclick="openCardAnalysis()" style="display:none;margin-top:10px;padding:5px 12px;background:rgba(100,160,220,.15);border:1px solid rgba(100,160,220,.3);border-radius:4px;color:#7ab0e0;font-size:11px;cursor:pointer;">&#128270; Analyseer kaart</button>
+    </div>
+
+    <!-- Rules wiki overlay -->
+    <div id="rulesOverlay" style="display:none;position:fixed;inset:0;z-index:400;background:#060c14;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#040810;border-bottom:1px solid rgba(212,168,75,.25);flex-shrink:0;">
+        <span style="font-family:Georgia,serif;font-size:12px;color:#d4a84b;letter-spacing:.06em;">&#128214; MECCG &mdash; Regelwiki</span>
+        <button onclick="closeRules()" style="margin-left:auto;padding:4px 14px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.4);color:#d4a84b;font-size:11px;border-radius:3px;cursor:pointer;font-family:Georgia,serif;">&#10005; Sluiten</button>
+      </div>
+      <iframe id="rulesFrame" src="meccg-wiki.html" style="flex:1;border:none;width:100%;display:block;"></iframe>
     </div>
 
     <!-- Kaartanalyse test-venster -->
@@ -725,7 +735,12 @@ function openCard(idx){
 }
 
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('modal').classList.remove('open');});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    if(document.getElementById('rulesOverlay').style.display!=='none')closeRules();
+  }
+});
 function setFilter(f,btn){
   document.querySelectorAll('.b').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
   document.querySelectorAll('.reg').forEach(function(el){var d=RD[el.dataset.rid];if(!d)return;el.classList.remove('dimmed');if(f!=='ALL'&&d.type!==f)el.classList.add('dimmed');});
@@ -909,9 +924,31 @@ function clearRegioHighlight(){
 
 
 // -- Tabs --
-var _curTab='regio', _siteFilter='ALL', _siteList=[], _routeMode=false;
+var _curTab='regio', _prevTab='regio', _siteFilter='ALL', _siteList=[], _routeMode=false;
+
+function closeRules(){
+  document.getElementById('rulesOverlay').style.display='none';
+  document.getElementById('tabRules').classList.remove('on');
+  switchTab(_prevTab==='rules'?'regio':_prevTab);
+}
 
 function switchTab(tab){
+  if(tab==='rules'){
+    _prevTab=_curTab;
+    _curTab='rules';
+    document.getElementById('tabRules').classList.add('on');
+    document.getElementById('tabRegio').classList.toggle('on',false);
+    document.getElementById('tabSites').classList.toggle('on',false);
+    document.getElementById('tabRoutes').classList.toggle('on',false);
+    document.getElementById('tabCards').classList.toggle('on',false);
+    document.getElementById('tabRes').classList.toggle('on',false);
+    document.getElementById('tabDecks').classList.toggle('on',false);
+    var ov=document.getElementById('rulesOverlay');
+    ov.style.display='flex';
+    return;
+  }
+  document.getElementById('rulesOverlay').style.display='none';
+  _prevTab=_curTab;
   _curTab=tab;
   _routeMode=(tab==='routes');
   if(!_routeMode)_clearRouteResGlow();
@@ -921,6 +958,7 @@ function switchTab(tab){
   document.getElementById('tabCards').classList.toggle('on',tab==='cards');
   document.getElementById('tabRes').classList.toggle('on',tab==='res');
   document.getElementById('tabDecks').classList.toggle('on',tab==='decks');
+  document.getElementById('tabRules').classList.toggle('on',false);
   document.getElementById('sbody').style.display=tab==='regio'?'flex':'none';
   document.getElementById('sbsites').style.display=tab==='sites'?'flex':'none';
   document.getElementById('sbroutes').style.display=tab==='routes'?'':'none';
