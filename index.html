@@ -348,15 +348,6 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <button id="soAnalyseBtn" onclick="openCardAnalysis()" style="display:none;margin-top:10px;padding:5px 12px;background:rgba(100,160,220,.15);border:1px solid rgba(100,160,220,.3);border-radius:4px;color:#7ab0e0;font-size:11px;cursor:pointer;">&#128270; Analyseer kaart</button>
     </div>
 
-    <!-- Rules wiki overlay -->
-    <div id="rulesOverlay">
-      <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#040810;border-bottom:1px solid rgba(212,168,75,.25);flex-shrink:0;">
-        <span style="font-family:Georgia,serif;font-size:12px;color:#d4a84b;letter-spacing:.06em;">&#128214; MECCG &mdash; Regelwiki</span>
-        <button onclick="closeRules()" style="margin-left:auto;padding:4px 14px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.4);color:#d4a84b;font-size:11px;border-radius:3px;cursor:pointer;font-family:Georgia,serif;">&#10005; Sluiten</button>
-      </div>
-      <iframe id="rulesFrame" src="meccg-wiki.html" style="flex:1;border:none;width:100%;display:block;"></iframe>
-    </div>
-
     <!-- Kaartanalyse test-venster -->
     <div id="cardAnalysisOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;">
       <div style="background:#1a1710;border:1px solid rgba(212,168,75,.3);border-radius:8px;width:520px;max-height:80vh;overflow-y:auto;padding:20px;position:relative;">
@@ -410,6 +401,15 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="soOtherSites"></div>
     </div>
   </div>
+</div>
+
+<!-- Rules wiki overlay -->
+<div id="rulesOverlay">
+  <div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#040810;border-bottom:1px solid rgba(212,168,75,.25);flex-shrink:0;">
+    <span style="font-family:Georgia,serif;font-size:12px;color:#d4a84b;letter-spacing:.06em;">&#128214; MECCG &mdash; Regelwiki</span>
+    <button onclick="closeRules()" style="margin-left:auto;padding:4px 14px;background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.4);color:#d4a84b;font-size:11px;border-radius:3px;cursor:pointer;font-family:Georgia,serif;">&#10005; Sluiten</button>
+  </div>
+  <iframe id="rulesFrame" src="meccg-wiki.html" style="flex:1;border:none;width:100%;display:block;"></iframe>
 </div>
 
 <div id="routeOverlay">
