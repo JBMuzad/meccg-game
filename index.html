@@ -79,6 +79,8 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .deck-title{font-size:13px;color:#d4a84b;font-weight:700;margin-bottom:2px;}
 .deck-sub{font-size:10px;color:rgba(212,168,75,.5);}
 .deck-desc{font-size:10px;color:rgba(240,224,184,.45);line-height:1.5;margin-top:5px;font-style:italic;}
+.deck-strategy-label{font-size:9px;color:rgba(212,168,75,.55);text-transform:uppercase;letter-spacing:.1em;margin-top:7px;margin-bottom:2px;}
+.deck-strategy{font-size:10px;color:rgba(240,224,184,.7);line-height:1.6;}
 .deck-section{font-size:9px;color:rgba(212,168,75,.5);text-transform:uppercase;letter-spacing:.1em;margin:8px 0 2px;padding:0 6px;}
 .deck-card-row{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:3px;cursor:pointer;}
 .deck-card-row:hover{background:rgba(212,168,75,.1);}
@@ -3030,6 +3032,7 @@ function renderDeckDetail(deckId){
   if(isOwn) h+='<button onclick="deleteOwnDeck(\''+deckId+'\')" title="Deck verwijderen" style="background:rgba(180,60,60,.15);border:1px solid rgba(180,60,60,.35);color:rgba(200,100,100,.7);border-radius:3px;padding:3px 7px;cursor:pointer;font-size:10px;flex-shrink:0;">&#128465;</button>';
   h+='</div>';
   if(deck.description) h+='<div class="deck-desc">'+deck.description+'</div>';
+  if(deck.strategy) h+='<div class="deck-strategy-label">Strategie</div><div class="deck-strategy">'+deck.strategy+'</div>';
   h+='</div>';
 
   _DECK_SECTIONS.forEach(function(sec){

@@ -6,6 +6,7 @@
     "alignment": "Hero",
     "source": "maciak.org",
     "description": "With Saruman's deck, Glorfindel and a group of Hobbits travel into the civilized confines of Gondor, south of the White Mountains, to rally mannish factions against Sauron's hosts. The deck relies heavily on attack avoidance. The hazards mix is a pure Orc/Troll strategy.",
+    "strategy": "Speel aanvalsontwijking (Concealment × 3, Stealth × 3, Dodge × 2) om veilig door Gondor te bewegen. Glorfindel + Hobbits vormen een lichte maar mobiele ploeg. Saruman zelf houd je thuis in Isengard of stuur je naar een faction-site. Doel: Gondor-fracties spelen (Knights, Men of Anfalas/Anorien/Lebennin, Rangers) + grote items (Palantir of Orthanc, Sapling, Scroll). Dark Quarrels en Halfling Strength voor noodgevechten.",
     "starting_company": [
       { "qty": 1, "name": "Adrazar" },
       { "qty": 1, "name": "Horn of Anor" },
@@ -108,6 +109,7 @@
     "alignment": "Hero",
     "source": "maciak.org",
     "description": "Elrond leads Alatar's companies into the Orc-holds of the mountains surrounding Rivendell. Their errand is to rescue Free People captives and recover stolen items. Gates of Morning and strong warriors see them through. The hazards feature a classic mix of corruption with Undead.",
+    "strategy": "Kerncombo: Gates of Morning (×3) + The Cock Crows → gevechtsbonus bij dag. Rescue Prisoners spelen in Orc-holen (Goblin Gate, Moria, Mount Gram, Mount Gundabad). Risky Blow + Many Turns voor agressief gevecht. Elrond geeft leiderbonus. Vilya als groot eindpunt bij Rivendell. Hazards: Undead (Barrow Wight, Slayer) + corruptie (Lure of Expedience/Nature) voor tegenstander.",
     "starting_company": [
       { "qty": 1, "name": "Elladan" },
       { "qty": 1, "name": "Erkenbrand" },
@@ -203,6 +205,7 @@
     "alignment": "Hero",
     "source": "maciak.org",
     "description": "With the prompting of Pallando, Thorin II leads a company of Dwarves into the Dragon lairs and Shadow-holds east of the Misty Mountains in a quest for their people. The Dwarves operate with a good mix of fighting enhancement and attack avoidance. The hazards are Animals and Wolves.",
+    "strategy": "Dwerg-gezelschap onder Thorin II in drakengebied en Shadow-holds. Not at Home (×2) + Concealment (×3) als aanvalsontwijking. Iron Hill Dwarves + Men of Dorwinion als fracties. Grote items: Durins Axe, Arkenstone, Thrors Map bij The Lonely Mountain/Caves of Ulund. Bounty of the Hoard + Lucky Search voor extra punten. The Dwarves Are upon You (×2) voor gevechtscombo. Hazards: Animal-dreigingen (spiders, wolves) voor tegenstander.",
     "starting_company": [
       { "qty": 1, "name": "Dori" },
       { "qty": 1, "name": "Gloin" },
@@ -298,6 +301,7 @@
     "alignment": "Hero",
     "source": "maciak.org",
     "description": "Along with Beorn, Gimli and Legolas, an unlikely duo of Dwarf and Elf, carry out missions of diplomacy in the hostile territories north of Mordor. Potent combat abilities with some subtle attack avoidance characterize these heroes of Radagast. The hazards feature ranks of roguish Men.",
+    "strategy": "Twee bedrijven: Beorn-groep (noord) en Gimli+Legolas (oost). Risky Blow (×3) voor agressieve gevechten. New Friendship (×3) voor fracties bij onverwachte locaties. Noble Steed (×3) voor extra beweging. Doelites: Beornings, Easterlings, Wood Elves, Iron Hill Dwarves, Men of Dorwinion spelen. Vanishment als vluchtroute. Hazards: roguish Men (Lawless Men, Rank upon Rank, Sellswords) voor tegenstander.",
     "starting_company": [
       { "qty": 1, "name": "Beorn" },
       { "qty": 1, "name": "Gimli" },
@@ -396,6 +400,7 @@
     "alignment": "Hero",
     "source": "maciak.org",
     "description": "Gandalf sends Aragorn and Arwen into the lands along the Anduin River to find lost icons of Gondor. Their efforts also take the pair to Minas Tirith to be crowned King and Queen. The deck relies primarily on attack avoidance. The hazards contain a heavy mix of good general creatures.",
+    "strategy": "Kern: aanvalsontwijking (Concealment ×3, Stealth ×3, Dodge ×2). Aragorn + Arwen naar Minas Tirith voor Return of the King (groot eindpunt). Beautiful Gold Ring (×3) omzetten naar Lesser Ring of Magic Ring of Stealth. Noble Steed voor snelle beweging langs de Anduin. Rangers of Ithilien + Tower Guard voor fracties. Narsil als item bij Gondor-sites. Hazards: mix van draken en mannen voor brede dekking.",
     "starting_company": [
       { "qty": 1, "name": "Annalena" },
       { "qty": 1, "name": "Aragorn II" },
@@ -497,6 +502,7 @@
     "alignment": "Minion",
     "source": "maciak.org",
     "description": "Adunaphel sends traitorous bands bent upon thievery and espionage into the untainted domains of the Free Peoples. Her inherent knowledge of these areas provides some cover, but her missions are extremely difficult to carry out. The hazards feature a potent offering of Drakes.",
+    "strategy": "Moeilijk Minion-spionagdeck in Vrije-volk-gebieden. A Nice Place to Hide (×3) + Not Slay Needlessly (×3) als kern voor aanvalsontwijking in Free-domains. Secrets of Their Forging + The Least of Gold Rings → Dwarven Rings als grote items. To Satisfy the Questioner + Tokens to Show voor informatiepunten. Adunaphel zelf geeft bondgenoten kennis van Free-domain-routes. Hazards: Draken (Cave/Marsh/Rain/True Fire Drake) als zware creature-mix.",
     "starting_company": [
       { "qty": 1, "name": "Asternak" },
       { "qty": 1, "name": "Ciryaher" },
@@ -588,6 +594,7 @@
     "alignment": "Minion",
     "source": "maciak.org",
     "description": "Dwar's deck sends Lieutenant of Morgul and a detachment of Orc warriors to Dragon country and to burn a couple Border-holds down. The deck emphasizes large Orc factions and uses Doors of Night to unleash packs of Wolves as hazards.",
+    "strategy": "Grote ork-troepen met Lieutenant of Morgul als aanvoerder. Burning Rick, Cot and Tree (×2) spelen bij Border-holds (Dale, Beorns House...) voor brandpunten. Doors of Night (×3) activeren voor wolf-dreigingen (Dire Wolves, Wargs) voor tegenstander. Arkenstone + Thrors Map bij The Lonely Mountain. Swift Strokes (×3) + Under His Blow (×3) voor gevechtscombo. Regiment of Black Crows voor extra mobiliteit.",
     "starting_company": [
       { "qty": 1, "name": "Lagduf" },
       { "qty": 1, "name": "Lieutenant of Morgul" },
@@ -680,6 +687,7 @@
     "alignment": "Minion",
     "source": "maciak.org",
     "description": "Hoarmurath directs a band of Morgul scouts into the fringe Shadow areas of the Misty Mountains to steal technologies and win over independent Orc tribes.",
+    "strategy": "Verkennersdeck in Misty Mountains Shadow-zones. Records Unread (×3) spelen in Orc-holen (Goblin Gate, Moria, Mount Gram) voor kennispunten. Vile Fumes (×3) + War Wolf (×3) als kerngevecht. Blasting Fire (×3) voor extra aanvalskracht. Great Lord of Goblin Gate als grote factie bij Goblin Gate. Hazards: Undead-reeks (Plague of Wights, Ghouls, Stirring Bones, Wisp of Pale Sheen) na The Moon Is Dead + Doors of Night.",
     "starting_company": [
       { "qty": 1, "name": "Ill Favoured Fellow" },
       { "qty": 1, "name": "Gorbag" },
@@ -767,6 +775,7 @@
     "alignment": "Minion",
     "source": "maciak.org",
     "description": "The Witch-king's mission is to solidify Sauron's forces in Mordor. His minions do best when not moving — from the safety of this evil domain. They have very little to help them tactically, but in Mordor they should not need much. The hazards can create a devastating environment of roadblock.",
+    "strategy": "Blijf zoveel mogelijk in Mordor. Minimaal bewegen is de sleutel. Blasting Fire (×3) + That Aint No Secret (×3) + Great Bats (×3) voor punten zonder te reizen. Vile Fumes (×3) voor gevecht bij Mordor-sites. Fell Rider + Awaiting the Call voor troepenverzameling. Palantir of Minas Tirith als groot item. Hazards: Long Winter (×3) + Withered Lands (×3) als zware roadblock-combo voor tegenstander.",
     "starting_company": [
       { "qty": 1, "name": "Orc Brawler" },
       { "qty": 1, "name": "Orc Captain" },
@@ -855,6 +864,7 @@
     "alignment": "Minion",
     "source": "maciak.org",
     "description": "Go to Eagles' Eyrie once you get Smoke in the Wind. Go to the Borderholds when you have Burning Rick, Cot, and Tree. Go to the faction sites when you have neither. Break things. Get points. Win games.",
+    "strategy": "Drie-spoor aanpak: (1) Eagles' Eyrie met The Tormented Earth (×3) voor milieu-punten. (2) Border-holds met Bold Thrust (×3) voor breek-acties. (3) Faction-sites voor Balchoth, Easterlings, Haradrim, Corsairs als fracties. Secret Book (×3) voor extra kennispunten. Orc Quarrels (×3) als gevechtssteun. Hazards: corruptie-reeks (Lure of Expedience/Nature/Senses ×3 elk) voor zware druk op tegenstander.",
     "starting_company": [
       { "qty": 1, "name": "Hador" },
       { "qty": 1, "name": "Horseman in the Night" },
