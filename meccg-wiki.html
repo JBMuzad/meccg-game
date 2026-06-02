@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MECCG Regelwiki — Middle-earth CCG</title>
+<title>MECCG Rules Wiki &mdash; Middle-earth CCG</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -428,10 +428,10 @@ main::-webkit-scrollbar-track { background: transparent; }
 <body>
 
 <header>
-  <div class="logo">MECCG <span>/ Regelwiki</span></div>
+  <div class="logo">MECCG <span>/ Rules Wiki</span></div>
   <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="Zoek regels, termen, kaarten…" autocomplete="off" spellcheck="false">
-    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search rules, terms, cards&hellip;" autocomplete="off" spellcheck="false">
+    <span class="search-icon">&#8981;</span>
     <span id="searchCount"></span>
   </div>
 </header>
@@ -440,48 +440,48 @@ main::-webkit-scrollbar-track { background: transparent; }
 
 <nav id="sidebar">
   <div class="nav-section">
-    <div class="nav-section-title">Overzicht</div>
-    <button class="nav-item active" onclick="showSection('intro')">Introductie</button>
-    <button class="nav-item" onclick="showSection('beurt')">Beurtvolgorde</button>
-    <button class="nav-item" onclick="showSection('deckbouw')">Deckbouw</button>
+    <div class="nav-section-title">Overview</div>
+    <button class="nav-item active" onclick="showSection('intro')">Introduction</button>
+    <button class="nav-item" onclick="showSection('beurt')">Turn Sequence</button>
+    <button class="nav-item" onclick="showSection('deckbouw')">Deck Construction</button>
   </div>
   <div class="nav-section">
-    <div class="nav-section-title">Beurten & Fasen</div>
-    <button class="nav-item" onclick="showSection('untap')">1. Untap Fase</button>
-    <button class="nav-item" onclick="showSection('organisatie')">2. Organisatiefase</button>
-    <button class="nav-item" onclick="showSection('longEvent')">3. Lange-event Fase</button>
-    <button class="nav-item" onclick="showSection('beweging')">4. Bewegings/Hazard Fase</button>
-    <button class="nav-item" onclick="showSection('site')">5. Site Fase</button>
-    <button class="nav-item" onclick="showSection('eindBeurt')">6. Einde Beurt Fase</button>
+    <div class="nav-section-title">Turns &amp; Phases</div>
+    <button class="nav-item" onclick="showSection('untap')">1. Untap Phase</button>
+    <button class="nav-item" onclick="showSection('organisatie')">2. Organization Phase</button>
+    <button class="nav-item" onclick="showSection('longEvent')">3. Long-Event Phase</button>
+    <button class="nav-item" onclick="showSection('beweging')">4. Movement/Hazard Phase</button>
+    <button class="nav-item" onclick="showSection('site')">5. Site Phase</button>
+    <button class="nav-item" onclick="showSection('eindBeurt')">6. End-of-Turn Phase</button>
   </div>
   <div class="nav-section">
-    <div class="nav-section-title">Gevecht & Risico</div>
-    <button class="nav-item" onclick="showSection('gevecht')">Gevecht</button>
-    <button class="nav-item" onclick="showSection('bodyCheck')">Body Check</button>
+    <div class="nav-section-title">Combat &amp; Risk</div>
+    <button class="nav-item" onclick="showSection('gevecht')">Combat</button>
+    <button class="nav-item" onclick="showSection('bodyCheck')">Body Checks</button>
     <button class="nav-item" onclick="showSection('detainment')">Detainment</button>
     <button class="nav-item" onclick="showSection('gevechtsreeks')">Strike Sequence</button>
   </div>
   <div class="nav-section">
-    <div class="nav-section-title">Spelregels</div>
-    <button class="nav-item" onclick="showSection('bewegingRegels')">Bewegingsregels</button>
-    <button class="nav-item" onclick="showSection('hazards')">Hazards & Limiet</button>
-    <button class="nav-item" onclick="showSection('invloed')">Invloed</button>
-    <button class="nav-item" onclick="showSection('corruptie')">Corruptie</button>
-    <button class="nav-item" onclick="showSection('items')">Items & Ringen</button>
+    <div class="nav-section-title">Game Rules</div>
+    <button class="nav-item" onclick="showSection('bewegingRegels')">Movement Rules</button>
+    <button class="nav-item" onclick="showSection('hazards')">Hazards &amp; Hazard Limit</button>
+    <button class="nav-item" onclick="showSection('invloed')">Influence</button>
+    <button class="nav-item" onclick="showSection('corruptie')">Corruption</button>
+    <button class="nav-item" onclick="showSection('items')">Items &amp; Rings</button>
     <button class="nav-item" onclick="showSection('events')">Events</button>
-    <button class="nav-item" onclick="showSection('agenten')">Agenten</button>
+    <button class="nav-item" onclick="showSection('agenten')">Agents</button>
     <button class="nav-item" onclick="showSection('allies')">Allies</button>
-    <button class="nav-item" onclick="showSection('facties')">Facties</button>
+    <button class="nav-item" onclick="showSection('facties')">Factions</button>
   </div>
   <div class="nav-section">
-    <div class="nav-section-title">Speelstijlen</div>
-    <button class="nav-item" onclick="showSection('wizard')">⬡ Wizard</button>
-    <button class="nav-item" onclick="showSection('ringwraith')">⬡ Ringwraith</button>
-    <button class="nav-item" onclick="showSection('fallenWizard')">⬡ Fallen-wizard</button>
-    <button class="nav-item" onclick="showSection('balrog')">⬡ Balrog</button>
+    <div class="nav-section-title">Play Styles</div>
+    <button class="nav-item" onclick="showSection('wizard')">&#x2B21; Wizard</button>
+    <button class="nav-item" onclick="showSection('ringwraith')">&#x2B21; Ringwraith</button>
+    <button class="nav-item" onclick="showSection('fallenWizard')">&#x2B21; Fallen-wizard</button>
+    <button class="nav-item" onclick="showSection('balrog')">&#x2B21; Balrog</button>
   </div>
   <div class="nav-section">
-    <div class="nav-section-title">Reeksen</div>
+    <div class="nav-section-title">Sets</div>
     <button class="nav-item" onclick="showSection('metw')">The Wizards <span class="nav-badge">1995</span></button>
     <button class="nav-item" onclick="showSection('metd')">The Dragons <span class="nav-badge">1996</span></button>
     <button class="nav-item" onclick="showSection('medm')">Dark Minions <span class="nav-badge">1996</span></button>
@@ -491,11 +491,11 @@ main::-webkit-scrollbar-track { background: transparent; }
     <button class="nav-item" onclick="showSection('meba')">The Balrog <span class="nav-badge">1998</span></button>
   </div>
   <div class="nav-section">
-    <div class="nav-section-title">Referentie</div>
-    <button class="nav-item" onclick="showSection('glossarium')">Glossarium</button>
-    <button class="nav-item" onclick="showSection('errata')">Errata & Clarifications</button>
+    <div class="nav-section-title">Reference</div>
+    <button class="nav-item" onclick="showSection('glossarium')">Glossary</button>
+    <button class="nav-item" onclick="showSection('errata')">Errata &amp; Clarifications</button>
     <button class="nav-item" onclick="showSection('mpscore')">Marshalling Points</button>
-    <button class="nav-item" onclick="showSection('timing')">Timing & Acties</button>
+    <button class="nav-item" onclick="showSection('timing')">Timing &amp; Actions</button>
   </div>
 </nav>
 
@@ -509,544 +509,675 @@ main::-webkit-scrollbar-track { background: transparent; }
 <div class="wiki-section visible" id="sec-intro">
   <div class="hero">
     <div class="hero-eyebrow">Middle-earth Collectible Card Game</div>
-    <h1>Regelwiki</h1>
-    <p class="hero-sub">Volledige spelregelreferentie gebaseerd op de Council of Elrond geconsolideerde regels — alle reeksen van 1995 tot 1998 samengebracht.</p>
-    <p class="hero-meta">Bron: CoE Official Rulebook (update 7 feb 2026) · Vertaald naar het Nederlands</p>
+    <h1>Rules Wiki</h1>
+    <p class="hero-sub">Complete rules reference based on the Council of Elrond consolidated rules &mdash; all sets from 1995 to 1998 in one place.</p>
+    <p class="hero-meta">Source: CoE Official Rulebook (updated Feb 7, 2026) &middot; Council of Elrond Tournament Rules</p>
   </div>
   <div class="quick-nav">
-    <button class="qn-btn" onclick="showSection('beurt')">Beurtvolgorde</button>
-    <button class="qn-btn" onclick="showSection('bewegingRegels')">Bewegingsregels</button>
-    <button class="qn-btn" onclick="showSection('hazards')">Hazard Limiet</button>
-    <button class="qn-btn" onclick="showSection('gevecht')">Gevecht</button>
-    <button class="qn-btn" onclick="showSection('bodyCheck')">Body Check</button>
-    <button class="qn-btn" onclick="showSection('corruptie')">Corruptie</button>
-    <button class="qn-btn" onclick="showSection('glossarium')">Glossarium</button>
+    <button class="qn-btn" onclick="showSection('beurt')">Turn Sequence</button>
+    <button class="qn-btn" onclick="showSection('bewegingRegels')">Movement Rules</button>
+    <button class="qn-btn" onclick="showSection('hazards')">Hazard Limit</button>
+    <button class="qn-btn" onclick="showSection('gevecht')">Combat</button>
+    <button class="qn-btn" onclick="showSection('bodyCheck')">Body Checks</button>
+    <button class="qn-btn" onclick="showSection('corruptie')">Corruption</button>
+    <button class="qn-btn" onclick="showSection('glossarium')">Glossary</button>
   </div>
   <div style="padding:24px 36px">
     <div class="quick-grid">
-      <div class="qcard"><div class="qcard-title">Spelers</div><div class="qcard-val">2+</div><div class="qcard-desc">Standaard 2-speler, ook multiplayer</div></div>
-      <div class="qcard"><div class="qcard-title">Doelstelling</div><div class="qcard-val">25 MP</div><div class="qcard-desc">Marshalling Points verzamelen</div></div>
-      <div class="qcard"><div class="qcard-title">Dobbelstenen</div><div class="qcard-val">2D6</div><div class="qcard-desc">Optellen — geen individuele dobbelstenen</div></div>
-      <div class="qcard"><div class="qcard-title">Handengrootte</div><div class="qcard-val">8</div><div class="qcard-desc">Standaard basishandgrootte</div></div>
-      <div class="qcard"><div class="qcard-title">Invloed</div><div class="qcard-val">20 GI</div><div class="qcard-desc">General Influence voor karakters</div></div>
-      <div class="qcard"><div class="qcard-title">Reeksen</div><div class="qcard-val">7</div><div class="qcard-desc">1995 – 1998, ICE uitgave</div></div>
+      <div class="qcard"><div class="qcard-title">Players</div><div class="qcard-val">2+</div><div class="qcard-desc">Standard 2-player; multiplayer supported</div></div>
+      <div class="qcard"><div class="qcard-title">Goal</div><div class="qcard-val">25 MP</div><div class="qcard-desc">Accumulate Marshalling Points (Short game)</div></div>
+      <div class="qcard"><div class="qcard-title">Dice</div><div class="qcard-val">2D6</div><div class="qcard-desc">Always roll two dice and add results</div></div>
+      <div class="qcard"><div class="qcard-title">Hand Size</div><div class="qcard-val">8</div><div class="qcard-desc">Base hand size at game start (rule 1.11)</div></div>
+      <div class="qcard"><div class="qcard-title">Gen. Influence</div><div class="qcard-val">20 GI</div><div class="qcard-desc">Controls non-follower characters (rule 1.12)</div></div>
+      <div class="qcard"><div class="qcard-title">Sets</div><div class="qcard-val">7</div><div class="qcard-desc">1995&ndash;1998, published by ICE</div></div>
     </div>
-    <div class="callout callout-tip"><strong>Tip voor beginners:</strong> Start met een Wizard-alignment en gebruik een Challenge Deck. Lees eerst de Beurtvolgorde en Bewegingsregels.</div>
+    <p style="font-size:15px;color:var(--text-dim);margin:16px 0 10px">Middle-earth CCG (MECCG) is a collectible card game set in Tolkien's Middle-earth. You and your opponent race to accumulate marshalling points by sending companies of characters across the map to recover items, recruit allies and factions, and defeat enemies. Each player chooses an alignment&mdash;Wizard, Ringwraith, Fallen-wizard, or Balrog&mdash;and constructs a deck from four parts: a <strong>play deck</strong>, a <strong>location deck</strong>, a <strong>sideboard</strong>, and a <strong>pool</strong>.</p>
+    <div class="callout callout-tip"><strong>New players:</strong> Start as a Wizard player using a preconstructed Challenge Deck. Read the Turn Sequence and Movement Rules first. Aim to build companies of 3&ndash;6 characters and send them toward sites that let you play your key resources.</div>
+    <h2>The Four Alignments</h2>
+    <table>
+      <tr><th>Alignment</th><th>Avatar</th><th>Starting Sites</th><th>Set Introduced</th></tr>
+      <tr><td><strong>Wizard</strong></td><td>One of the five Istari</td><td>Rivendell</td><td>METW (1995)</td></tr>
+      <tr><td><strong>Ringwraith</strong></td><td>One of the nine Nazg&ucirc;l</td><td>Minas Morgul / Dol Guldur</td><td>MELE (1997)</td></tr>
+      <tr><td><strong>Fallen-wizard</strong></td><td>Fallen Ist&agrave;ri</td><td>White Towers or R&amp;L in Arthedain/Rhudaur</td><td>MEWH (1997)</td></tr>
+      <tr><td><strong>Balrog</strong></td><td>The Balrog</td><td>Moria / Under-gates</td><td>MEBA (1998)</td></tr>
+    </table>
   </div>
 </div>
 
-<!-- ══ BEURTVOLGORDE ══ -->
+<!-- ══ TURN SEQUENCE ══ -->
 <div class="wiki-section" id="sec-beurt">
-  <div class="section-label">Overzicht</div>
-  <h1 class="section-title">Beurtvolgorde</h1>
-  <p>Elke beurt bestaat uit zes fasen. De <strong>resource player</strong> (de speler aan de beurt) speelt resource-kaarten; de <strong>hazard player</strong> (de tegenstander) speelt hazards tijdens de Bewegings/Hazard Fase.</p>
+  <div class="section-label">Overview</div>
+  <h1 class="section-title">Turn Sequence</h1>
+  <p>Each turn has six phases. The <strong>resource player</strong> (whose turn it is) plays resource and character cards. The <strong>hazard player</strong> (the opponent) plays hazard cards during the Movement/Hazard Phase only. (Rules 2.1.1, 2.1.2)</p>
+  <div class="callout callout-warn"><strong>Twilight</strong> is the only card playable at any time by either player. It does not count against the hazard limit.</div>
   <div class="beurt-flow" style="margin-top:20px">
-    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Untap Fase</div><div class="beurt-desc">Untap of herstel gekantelde kaarten. Op een Haven: herstel gewonde karakters.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Organisatiefase</div><div class="beurt-desc">Speel een karakter, reorganiseer gezelschappen, sla items op, kies bestemmingen.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Lange-event Fase</div><div class="beurt-desc">Verwijder verlopen lange events; speel nieuwe lange events.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Bewegings/Hazard Fase</div><div class="beurt-desc">Gezelschappen bewegen naar doelsite. Tegenstander speelt hazards. Trek kaarten.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">5</div><div><div class="beurt-name">Site Fase</div><div class="beurt-desc">Betreed de site, versla automatic attacks, speel items/allies/facties.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">6</div><div><div class="beurt-name">Einde Beurt Fase</div><div class="beurt-desc">Discard of trek tot handgrootte 8. Einde beurt.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Untap Phase</div><div class="beurt-desc">Untap all non-site cards. At a Haven: heal wounded characters to tapped. Hazard player may access hazard sideboard (if opponent's avatar is in play), halving hazard limits for the turn.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Organization Phase</div><div class="beurt-desc">Play or discard one character. Reorganize companies (split/join/recompose). Transfer or store items. Tap avatar to access resource sideboard. Declare movement destinations.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Long-Event Phase</div><div class="beurt-desc">Discard your resource long-events in play. Play new resource long-events. At end of phase: hazard player discards their hazard long-events.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Movement/Hazard Phase</div><div class="beurt-desc">For each company (resource player chooses order): reveal site, set site path and hazard limit, draw cards, resolve passives, hazard player plays hazards, end phase and reset hands to base size.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">5</div><div><div class="beurt-name">Site Phase</div><div class="beurt-desc">For each company: optionally enter the site, face automatic-attacks and agent/on-guard attacks, then play items/allies/factions at the (now tapped) site. Influence attempts happen here.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">6</div><div><div class="beurt-name">End-of-Turn Phase</div><div class="beurt-desc">Either player may discard one card. Both players draw or discard to reach base hand size. Resource player signals end of turn; end-of-turn passive conditions resolve.</div></div></div>
   </div>
-  <div class="rule"><span class="rule-id">2.1</span><p>De resource player mag resource short-events en resource permanent-events spelen, en resource/karakter acties uitvoeren, tijdens elke fase van zijn beurt tenzij een regel of effect dit beperkt.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">2.1.2</span><p>De hazard player kan alleen hazards spelen tijdens de Bewegings/Hazard Fase van zijn tegenstander. Geen resources of karakter-acties tijdens de beurt van de tegenstander, tenzij een kaart dit specifiek toestaat.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="callout callout-warn"><strong>Twilight:</strong> De enige kaart die op elk moment gespeeld kan worden — als resource of als hazard. Telt niet mee voor het hazard limiet.</div>
+  <div class="rule"><span class="rule-id">2.4</span><p>When a play deck is <strong>exhausted</strong> (last card drawn): discard cards that expire on exhaustion; return site cards from discard pile to location deck; exchange up to 5 cards between discard pile and sideboard; shuffle discard pile to form new play deck. This happens immediately when the last card is drawn and cannot be responded to.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
 </div>
 
-<!-- ══ DECKBOUW ══ -->
+<!-- ══ DECK CONSTRUCTION ══ -->
 <div class="wiki-section" id="sec-deckbouw">
-  <div class="section-label">Voorbereiding</div>
-  <h1 class="section-title">Deckbouw</h1>
-  <p>Elk deck bestaat uit vier delen: <strong>locatiedeck</strong>, <strong>speeldeck</strong>, <strong>sideboard</strong> en <strong>pool</strong>.</p>
-  <h2>Speeldeck Limieten</h2>
+  <div class="section-label">Preparation</div>
+  <h1 class="section-title">Deck Construction</h1>
+  <p>Each player prepares four distinct sets of cards: a <strong>location deck</strong>, a <strong>play deck</strong>, a <strong>sideboard</strong>, and a <strong>pool</strong>. (Rule 1.3)</p>
+  <h2>Play Deck Limits (Rule 1.5)</h2>
   <table>
-    <tr><th>Onderdeel</th><th>Minimum</th><th>Maximum</th><th>Noot</th></tr>
-    <tr><td>Resources</td><td>30</td><td>50</td><td>—</td></tr>
-    <tr><td>Hazards</td><td>= resources</td><td>= resources</td><td>Min. 12 creatures</td></tr>
-    <tr><td>Niet-avatar karakters</td><td>0</td><td>10</td><td>—</td></tr>
-    <tr><td>Avatars</td><td>0</td><td>3</td><td>Max. 2 verschillende</td></tr>
-    <tr><td>Unieke kaarten</td><td>—</td><td>1 kopie</td><td>Per uniek</td></tr>
-    <tr><td>Niet-unieke kaarten</td><td>—</td><td>3 kopieën</td><td>Havens onbeperkt</td></tr>
+    <tr><th>Component</th><th>Min</th><th>Max</th><th>Notes</th></tr>
+    <tr><td>Resources</td><td>30</td><td>50</td><td>&mdash;</td></tr>
+    <tr><td>Hazards</td><td>= resources</td><td>= resources</td><td>At least 12 creatures required (1.5.1)</td></tr>
+    <tr><td>Non-avatar characters</td><td>0</td><td>10</td><td>&mdash;</td></tr>
+    <tr><td>Avatars</td><td>0</td><td>3</td><td>No more than 2 different avatar types</td></tr>
+    <tr><td>Unique cards</td><td>&mdash;</td><td>1 copy</td><td>Per unique non-avatar card (1.3.1)</td></tr>
+    <tr><td>Non-unique cards</td><td>&mdash;</td><td>3 copies</td><td>Haven cards: unlimited</td></tr>
   </table>
-  <h2>Sideboard</h2>
+  <div class="rule"><span class="rule-id">1.5.1</span><p>The following hazards count as <em>half</em> of a creature for the 12-creature minimum: an Ahunt or At Home Dragon manifestation; a creature also playable as an event; a hazard agent; a Spawn permanent-event.</p></div>
+  <div class="rule"><span class="rule-id">1.3.2</span><p>The total mind of all agent cards in a player's entire deck (play deck + sideboard + pool) cannot exceed 36.</p></div>
+  <h2>Location Deck (Rule 1.4)</h2>
+  <div class="rule"><span class="rule-id">1.4</span><p>A location deck may include any number of haven sites and one copy of each non-haven site. Wizard players: Hero site cards only. Ringwraith players: Minion site cards only. Fallen-wizard players: one of each Hero site and one of each Minion site (including havens), plus multiple copies of each Fallen-wizard site. Balrog players use Minion sites with Balrog versions required for Moria, Carn D&ucirc;m, Dol Guldur, Minas Morgul, all Under-deeps sites, and all Dark-holds.</p></div>
+  <h2>Sideboard (Rule 1.6)</h2>
   <table>
-    <tr><th>Spellengte</th><th>Max. sideboard</th></tr>
-    <tr><td>Starter / Short</td><td>30 kaarten</td></tr>
-    <tr><td>Long</td><td>35 kaarten</td></tr>
-    <tr><td>Campaign</td><td>40 kaarten</td></tr>
+    <tr><th>Game Length</th><th>Max Sideboard</th></tr>
+    <tr><td>Starter or Short</td><td>30 cards</td></tr>
+    <tr><td>Long</td><td>35 cards</td></tr>
+    <tr><td>Campaign</td><td>40 cards</td></tr>
   </table>
-  <div class="rule"><span class="rule-id">1.3.2</span><p>Het totale mind van alle agent-kaarten in het volledige deck (speeldeck + sideboard + pool) mag maximaal 36 bedragen.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">2.4</span><p>Wanneer het speeldeck leeg is (exhausted): gooi verlopen kaarten weg, haal site-kaarten terug uit de discard pile naar het locatiedeck, wissel maximaal 5 kaarten uit tussen discard pile en sideboard, schud de discard pile en dat wordt het nieuwe speeldeck.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-
-  <h2>Pool</h2>
-  <div class="rule"><span class="rule-id">1.7</span><p>De pool bevat maximaal 10 niet-avatar karakters en maximaal 2 niet-unieke, niet-hoard minor items. Pool-karakters worden gebruikt voor de Character Draft aan het begin van het spel.</p></div>
-
-  <h2>Character Draft</h2>
-  <p style="margin:10px 0;font-size:15px;color:var(--text-dim)">Beide spelers leggen tegelijk een karakter uit hun pool neer. Als beide spelers hetzelfde unieke karakter kiezen, wordt het terzijde gelegd. Anders: elk karakter gaat naar het startgezelschap. Stop wanneer je 5 karakters hebt, het mind-totaal 20 overschrijdt, of je pool leeg is.</p>
-  <div class="callout callout-tip"><strong>Startsite:</strong> Wizards beginnen altijd in Rivendell. Ringwraiths in Minas Morgul en/of Dol Guldur. Fallen-wizards bij White Towers of een Ruins & Lairs in Arthedain/Rhudaur. Balrog bij Moria en/of Under-gates.</div>
+  <div class="rule"><span class="rule-id">1.6.1</span><p>Up to 10 additional cards may be included preselected for Fallen-wizard opponents; accessible only if the opponent is Fallen-wizard. The sideboard must adhere to all deck restrictions when considered together with the play deck.</p></div>
+  <h2>Pool (Rule 1.7)</h2>
+  <div class="rule"><span class="rule-id">1.7</span><p>The pool contains up to 10 non-avatar, non-agent characters and up to two non-unique, non-hoard minor items. It adheres to all deck restrictions when combined with the play deck and sideboard (except total number of characters). Unused characters may be shuffled into the play deck or removed from the game (not placed in the sideboard).</p></div>
+  <h2>Character Draft (Rule 1.9)</h2>
+  <p style="margin:10px 0;font-size:15px;color:var(--text-dim)">After declaring alignments, players simultaneously reveal one character from their pool face-down, then reveal. Duplicate unique characters are set aside; all others join the starting company. Stop when: 5 characters (6 for Ringwraith/Balrog), total mind reaches or would exceed 20, or pool is exhausted. Up to 2 minor items from the pool may be placed under up to 2 starting characters.</p>
+  <div class="callout callout-tip"><strong>Starting Sites (Rule 1.10):</strong> Wizard: Rivendell (or avatar home site). Ringwraith: Minas Morgul and/or Dol Guldur (up to 2 companies). Fallen-wizard: White Towers or a Ruins &amp; Lairs in Arthedain/Rhudaur. Balrog: Moria and/or Under-gates (up to 2 companies).</div>
+  <div class="rule"><span class="rule-id">1.11 / 1.12</span><p>Each player draws up to 8 cards (no mulligan). Starting general influence is 20; Ringwraith and Balrog players have an additional 5 GI that cannot control characters. To determine who goes first, each player rolls 2D6; higher roll goes first (reroll ties).</p></div>
 </div>
 
-<!-- ══ UNTAP ══ -->
+<!-- ══ UNTAP PHASE ══ -->
 <div class="wiki-section" id="sec-untap">
-  <div class="section-label">Fase 1</div>
-  <h1 class="section-title">Untap Fase</h1>
-  <p>Aan het begin van elke beurt worden alle gekantelde (getapte) kaarten van de resource player teruggedraaid, tenzij een kaart dit verhindert.</p>
-  <div class="rule"><span class="rule-id">2.I.1</span><p>Als een gezelschap op een Haven-site staat aan het begin van de Untap Fase, worden gewonde karakters in dat gezelschap hersteld (wound tokens verwijderd).</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">2.I.2</span><p>Als een gezelschap niet op een Haven staat, worden getapte karakters ge-untapt maar kunnen gewonde karakters niet hersteld worden.</p></div>
-  <div class="callout callout-warn"><strong>Belangrijk:</strong> Gewonde karakters kunnen alleen herstellen op een Haven. Plan je route zodat je tijdig een Haven bezoekt.</div>
+  <div class="section-label">Phase 1</div>
+  <h1 class="section-title">Untap Phase</h1>
+  <p>At the start of each turn, the resource player untaps their cards and the hazard player has a chance to access their hazard sideboard.</p>
+  <div class="rule"><span class="rule-id">2.I.1</span><p>During the untap phase, for each of the resource player's non-site cards: either untap the card if it is tapped, OR if the card is a character at one of the player's havens, <strong>heal</strong> the character to the tapped position (not fully untapped). Site cards never untap during the untap phase.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">2.I.2</span><p>At the end of the untap phase, the hazard player may (only if the resource player's avatar is in play, and only once per turn): <strong>(a)</strong> bring up to 5 hazards from their sideboard to their discard pile; OR <strong>(b)</strong> if their play deck has at least 5 cards, bring 1 hazard from their sideboard directly into their play deck and then shuffle. If the hazard player takes either option, the base hazard limit for each of the resource player's companies is halved (rounded up) for this turn's movement/hazard phases.</p></div>
+  <div class="callout callout-warn"><strong>Healing vs. untapping:</strong> Healing moves a wounded character to the tapped position. It can only happen at a haven during the untap phase. Untapping (from tapped to untapped) happens everywhere. Wounded characters at non-haven sites are simply untapped, not healed.</div>
 </div>
 
-<!-- ══ ORGANISATIEFASE ══ -->
+<!-- ══ ORGANIZATION PHASE ══ -->
 <div class="wiki-section" id="sec-organisatie">
-  <div class="section-label">Fase 2</div>
-  <h1 class="section-title">Organisatiefase</h1>
-  <p>Tijdens de Organisatiefase bepaal je hoe je gezelschappen zijn samengesteld en waarheen ze bewegen.</p>
-  <h2>Wat kan je doen?</h2>
-  <div class="rule"><p>• Eén karakter spelen (vanuit hand naar startsite of Haven)<br>• Gezelschappen herindelen (samenvoegen of splitsen op dezelfde site)<br>• Items overdragen tussen karakters in hetzelfde gezelschap<br>• Items opslaan (stored) op een Haven<br>• Doelsite aanwijzen voor elk gezelschap dat wil bewegen</p></div>
-  <div class="rule"><span class="rule-id">2.II.Split</span><p>Splitsen van een gezelschap is alleen mogelijk tijdens de Organisatiefase. Beide resulterende gezelschappen moeten op dezelfde site starten. Elk gezelschap kan daarna onafhankelijk bewegen.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="callout callout-tip"><strong>Strategie:</strong> Splits grote gezelschappen om het hazard limiet te verlagen. Een gezelschap van 5 trekt 5 hazards; twee gezelschappen van 2-3 trekken elk slechts 2-3 hazards.</div>
+  <div class="section-label">Phase 2</div>
+  <h1 class="section-title">Organization Phase</h1>
+  <p>The organization phase prepares your characters for the turn. The resource player may perform the following steps in any order, either before or after organizing. (Rule 2.II.1)</p>
+  <h2>Playing or Discarding a Character (Rule 2.II.2)</h2>
+  <div class="rule"><span class="rule-id">2.II.2</span><p>The resource player may play <em>or</em> discard one character while organizing (only once per turn). An avatar can only be played at the avatar's home site or certain havens. A non-avatar character is played at its home site or one of the player's havens; if the avatar is in play, characters can only be played at the avatar's site or under direct influence with an existing company.</p></div>
+  <div class="rule"><span class="rule-id">2.II.2.2.3</span><p>If a follower is removed from direct influence outside of an organization phase (e.g. its controlling character is eliminated), its mind is not immediately subtracted from general influence. The character must be moved back under general or direct influence during the next organization phase or it is discarded.</p></div>
+  <h2>Setting Company Composition (Rule 2.II.3)</h2>
+  <div class="rule"><span class="rule-id">2.II.3.1</span><p>Companies at a haven have no maximum size. Companies not at a haven have a maximum size of 7. Hobbits and Orc scouts count as half a character (rounded up) toward company size. D&uacute;nedain, Dwarves, Elves, and/or Hobbits cannot be in a company with Orcs and/or Trolls (unless at a haven). A company can only have one leader (unless at a haven).</p></div>
+  <div class="rule"><span class="rule-id">2.II.3.6</span><p>A company may be split into multiple companies during the organization phase, but the resulting companies cannot be rejoined during the same organization phase, and all but one of the resulting companies must declare movement to a new site. <strong>Any of the resulting companies may move with region movement</strong> (rules erratum).</p></div>
+  <h2>Storing and Transferring Items (Rules 2.II.4, 2.II.5)</h2>
+  <div class="rule"><span class="rule-id">2.II.4</span><p>A character at a haven may store an item: make a corruption check for the item's bearer; if successful, move the card to the marshalling point pile. Stored cards are no longer borne by the character.</p></div>
+  <div class="rule"><span class="rule-id">2.II.5</span><p>Items may be transferred between two characters at the same site (not necessarily the same company): make a corruption check for the item's bearer. Transfer succeeds as long as the character is still in play after the check.</p></div>
+  <h2>Accessing Sideboard with Avatar (Rule 2.II.6)</h2>
+  <div class="rule"><span class="rule-id">2.II.6</span><p>The resource player may tap their avatar to: <strong>(a)</strong> bring up to 5 resources and/or characters from their sideboard to their discard pile; OR <strong>(b)</strong> if their play deck has at least 5 cards, bring 1 resource or character from their sideboard directly into their play deck and then shuffle. Card types must be revealed but actual names need not be.</p></div>
+  <h2>Declaring Movement (Rule 2.II.7)</h2>
+  <div class="rule"><span class="rule-id">2.II.7</span><p>Place a face-down site card from your location deck with a company to declare movement. Two companies cannot start at the same site of origin and move to the same new site. A company may move to a site card already in play (which then stays in play until end of the company's movement/hazard phase).</p></div>
+  <div class="rule"><span class="rule-id">2.II.8</span><p>At the end of the organization phase, if the total mind of the resource player's characters exceeds their maximum general influence, discard enough non-avatar characters to no longer exceed it. Characters played this turn are returned to hand instead of discarded for this purpose.</p></div>
 </div>
 
-<!-- ══ BEWEGING ══ -->
+<!-- ══ LONG-EVENT PHASE ══ -->
+<div class="wiki-section" id="sec-longEvent">
+  <div class="section-label">Phase 3</div>
+  <h1 class="section-title">Long-Event Phase</h1>
+  <p>Long-events are event cards that remain in play for a single turn cycle (one of your turns plus one of your opponent's turns).</p>
+  <div class="rule"><span class="rule-id">2.III.1</span><p>At the <strong>beginning</strong> of the long-event phase, the resource player immediately discards their own resource long-events from play.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">2.III.2</span><p>The resource player may play new resource long-events during the long-event phase.</p></div>
+  <div class="rule"><span class="rule-id">2.III.3</span><p>At the <strong>end</strong> of the long-event phase, the hazard player immediately discards their own hazard long-events from play. (The hazard player plays new hazard long-events during the next phase.)</p></div>
+  <div class="callout callout-warn"><strong>Order matters:</strong> First discard existing resource long-events, then play new ones. The classic example: Gates of Morning and Doors of Night alternate control by following this pattern.</div>
+</div>
+
+<!-- ══ MOVEMENT/HAZARD PHASE ══ -->
 <div class="wiki-section" id="sec-beweging">
-  <div class="section-label">Fase 4</div>
-  <h1 class="section-title">Bewegings/Hazard Fase</h1>
-  <p>Elk gezelschap beweegt naar zijn doelsite. Terwijl een gezelschap beweegt, speelt de hazard player hazard-kaarten.</p>
-  <h2>Volgorde per gezelschap</h2>
+  <div class="section-label">Phase 4</div>
+  <h1 class="section-title">Movement/Hazard Phase</h1>
+  <p>In an order chosen by the resource player, each company goes through its own movement/hazard phase. Each proceeds through the following 8 steps (rules 2.IV.i&ndash;viii) regardless of whether the company is moving. (Rule 2.IV)</p>
   <div class="beurt-flow">
-    <div class="beurt-step"><div class="beurt-num">a</div><div><div class="beurt-name">Startsite wordt site of origin</div><div class="beurt-desc">De huidige site is nu de "site of origin" — het gezelschap is onderweg.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">b</div><div><div class="beurt-name">Kaarten trekken</div><div class="beurt-desc">Bij beweging naar niet-Haven: trek tot het aantal op de doelsite. Bij beweging naar Haven: trek tot het aantal op de site of origin.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">c</div><div><div class="beurt-name">Hazards spelen</div><div class="beurt-desc">Hazard player speelt hazards op dit gezelschap tot het hazard limiet bereikt is.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">d</div><div><div class="beurt-name">Aankomst</div><div class="beurt-desc">Site of origin wordt verwijderd. Gezelschap staat nu op de doelsite.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Reveal the New Site (2.IV.i)</div><div class="beurt-desc">If moving, the company's face-down site card is revealed. For Under-deeps movement, make the required roll; if failed, the new site is returned and the company stays put (but still has a movement/hazard phase). If movement is illegal when revealed, the movement is negated.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Determine the Site Path (2.IV.ii)</div><div class="beurt-desc">The current site becomes the "site of origin." The resource player declares the movement type and site path. Starter Movement uses the path on the site card. Region Movement uses the declared sequence of up to 4 consecutive regions. Under-deeps Movement has no site path. Non-moving companies have no site path.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Set the Base Hazard Limit (2.IV.iii)</div><div class="beurt-desc">Base hazard limit = max(2, company size), rounded up. If the hazard player accessed their sideboard during this turn's untap phase, halve the base hazard limit (rounded up).</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Establish Order of On-going Effects (2.IV.iv)</div><div class="beurt-desc">The hazard player determines the order to apply on-going effects and effects played during the organization phase that depended on the new site or site path.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">5</div><div><div class="beurt-name">Draw Cards (2.IV.v)</div><div class="beurt-desc">Both players draw simultaneously based on the new site (if moving to a non-haven) or the site of origin (if moving to a haven). Resource player draws up to the lighter-box number (must include an avatar or mind-3+ character). Hazard player draws up to the darker-box number. Both must draw at least 1.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">6</div><div><div class="beurt-name">Resolve Passive Conditions (2.IV.vi)</div><div class="beurt-desc">Passive conditions triggered at the beginning of the movement/hazard phase are declared in resource player's chosen order. Both players may respond.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">7</div><div><div class="beurt-name">Play Hazards (2.IV.vii)</div><div class="beurt-desc">The hazard player may play hazards against this company until the hazard limit is reached: creatures (keyed to site path or site type), hazard events, agent hazards, or place one on-guard card on the new site.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">8</div><div><div class="beurt-name">End the Movement/Hazard Phase (2.IV.viii)</div><div class="beurt-desc">Both players declare done. The site of origin is discarded (if tapped, non-haven) or returned to location deck (if untapped or a haven). Both players reset hands to base hand size by drawing or discarding.</div></div></div>
   </div>
+  <div class="rule"><span class="rule-id">2.IV.iii.1</span><p>Each played hazard card counts as one against the hazard limit when it is <em>declared</em> (not when it resolves). Not exceeding the hazard limit is an active condition: there must be fewer declared hazards than the limit at declaration, and no more than the limit at resolution.</p></div>
+  <div class="rule"><span class="rule-id">2.IV.vii.4</span><p><strong>On-guard cards:</strong> The hazard player may place one card face-down on the new site as an on-guard card (counts as one against the hazard limit; may be done in response; only once per movement/hazard phase). An on-guard card may be revealed during the site phase under certain conditions.</p></div>
+  <div class="rule"><span class="rule-id">2.IV.5</span><p>At the end of all movement/hazard phases, the resource player must immediately join any companies at the same non-haven site. At a haven, joining is optional.</p></div>
 </div>
 
-<!-- ══ BEWEGINGSREGELS ══ -->
+<!-- ══ MOVEMENT RULES ══ -->
 <div class="wiki-section" id="sec-bewegingRegels">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Bewegingsregels</h1>
-  <h2>Site Path Beweging (standaard)</h2>
-  <div class="rule"><span class="rule-id">Beweging.1</span><p>Een gezelschap beweegt van zijn huidige site naar een doelsite. Het <strong>site path</strong> is de reeks regio's tussen de huidige site en de dichtstbijzijnde Haven zoals vermeld op de sitekaart. De regio's in het site path bepalen welke hazards de tegenstander kan spelen.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <h2>Regio Beweging</h2>
-  <div class="rule"><span class="rule-id">Beweging.2</span><p>Met regio-beweging kan een gezelschap naar elke site gaan die binnen <strong>4 regio's</strong> van de huidige site ligt (inclusief de startregio en de doelregio). Dit vereist specifieke kaarten of regels die regio-beweging toestaan.</p></div>
-  <div class="rule"><span class="rule-id">Beweging.3</span><p>Bij het splitsen van een gezelschap mag elk resulterende gezelschap met regio-beweging reizen. Regio-beweging is niet beperkt tot één gezelschap na een splitsing.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <h2>Regiotypes en Hazards</h2>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Movement Rules</h1>
+  <h2>Starter Movement (Rule 2.II.7.i)</h2>
+  <div class="rule"><span class="rule-id">2.II.7.i</span><p>To use Starter Movement, one of the following must be true: (a) The company's current site is a haven listed as the nearest haven on the new site card; (b) the new site is a haven listed as the nearest haven on the current site card; OR (c) both sites are havens with each listing a site path to the other. Wizard players cannot use Starter Movement to/from Gorgoroth. Fallen-wizard and Balrog players cannot use Starter Movement at all.</p></div>
+  <h2>Region Movement (Rule 2.II.7.ii)</h2>
+  <div class="rule"><span class="rule-id">2.II.7.ii</span><p>The new site must be within <strong>4 consecutive regions</strong> (or up to 6 with a special effect) from the current site, without repeating regions, including both the region of the current site and the region of the new site. The resource player declares the specific path when the new site is revealed.</p></div>
+  <div class="callout callout-tip"><strong>Rules Erratum:</strong> When a company splits, <em>any</em> of the resulting companies may move with region movement. Region movement is not limited to one company after a split.</div>
+  <h2>Under-deeps Movement (Rule 2.II.7.iii)</h2>
+  <div class="rule"><span class="rule-id">2.II.7.iii</span><p>To use Under-deeps Movement, either the current or new site must be an Under-deeps site, and the new site must be listed as adjacent on the current site card (or vice versa). The company has no site path. If a required roll is greater than 0, the company must make an Under-deeps movement roll; on failure, the new site is returned and the company stays put (this does not count as being returned to site of origin).</p></div>
+  <h2>Region Types and Playable Hazards</h2>
   <table>
-    <tr><th>Type</th><th>Afkorting</th><th>Hazards</th></tr>
+    <tr><th>Region Type</th><th>Symbol</th><th>Typical Hazard Creature Types</th></tr>
     <tr><td>Free-domain</td><td>F</td><td>Men</td></tr>
     <tr><td>Border-land</td><td>B</td><td>Men, Orcs, Trolls</td></tr>
     <tr><td>Wilderness</td><td>W</td><td>Wolves, Spiders, Animals, Drakes</td></tr>
     <tr><td>Shadow-land</td><td>S</td><td>Orcs, Trolls, Men, Undead</td></tr>
-    <tr><td>Dark-domain</td><td>D</td><td>Nazgûl, Orcs, Trolls, Dragons</td></tr>
-    <tr><td>Coastal Sea</td><td>C</td><td>Corsairs, Sea monsters</td></tr>
+    <tr><td>Dark-domain</td><td>D</td><td>Nazg&ucirc;l, Orcs, Trolls, Dragons</td></tr>
+    <tr><td>Coastal Sea</td><td>C</td><td>Corsairs, Sea Creatures</td></tr>
   </table>
-  <div class="callout callout-warn"><strong>Site path:</strong> Elke regio in het site path (van huidige site naar Haven) telt mee voor het bepalen welke hazards speelbaar zijn — niet enkel de doelregio.</div>
+  <div class="callout callout-warn"><strong>Site path:</strong> Every region in the site path (all regions between current site and destination, per the movement type used) counts for determining which hazards are playable &mdash; not just the destination region. With Starter Movement, the site path shows region types but only names the containing regions. With Region Movement, all region types and names are specified.</div>
+  <h2>Ringwraith Movement Restrictions (Rule 2.II.7.R1)</h2>
+  <div class="rule"><span class="rule-id">2.II.7.R1</span><p>A company containing a Ringwraith can only move to a non-Darkhaven site if the Ringwraith is in a mode (Black Rider, Fell Rider, or Heralded Lord). Ringwraith companies can only use Starter Movement and cannot have a site path containing a Coastal Sea region. Ringwraith and Balrog players may treat Dagorlad and &Ucirc;dun as adjacent.</p></div>
 </div>
 
 <!-- ══ HAZARDS ══ -->
 <div class="wiki-section" id="sec-hazards">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Hazards & Hazard Limiet</h1>
-  <h2>Hazard Limiet</h2>
-  <div class="rule"><span class="rule-id">Hazard.1</span><p>Het hazard limiet van een gezelschap is gelijk aan <strong>max(2, grootte van het gezelschap)</strong>. Een gezelschap van 1 heeft dus een hazard limiet van 2; een gezelschap van 5 heeft een limiet van 5.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Hazards &amp; Hazard Limit</h1>
+  <h2>Hazard Limit (Rule 2.IV.iii)</h2>
+  <div class="rule"><span class="rule-id">2.IV.iii</span><p>The base hazard limit for a company equals the size of the company or 2, whichever is greater (rounded up). It is halved (rounded up) if the hazard player accessed the sideboard during this turn's untap phase.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
   <div class="quick-grid">
-    <div class="qcard"><div class="qcard-title">Gezelschap 1</div><div class="qcard-val">2</div><div class="qcard-desc">Minimum limiet</div></div>
-    <div class="qcard"><div class="qcard-title">Gezelschap 2</div><div class="qcard-val">2</div><div class="qcard-desc">—</div></div>
-    <div class="qcard"><div class="qcard-title">Gezelschap 3</div><div class="qcard-val">3</div><div class="qcard-desc">—</div></div>
-    <div class="qcard"><div class="qcard-title">Gezelschap 5</div><div class="qcard-val">5</div><div class="qcard-desc">Maximum typisch</div></div>
+    <div class="qcard"><div class="qcard-title">Company size 1</div><div class="qcard-val">2</div><div class="qcard-desc">Minimum limit (max=2)</div></div>
+    <div class="qcard"><div class="qcard-title">Company size 2</div><div class="qcard-val">2</div><div class="qcard-desc">&mdash;</div></div>
+    <div class="qcard"><div class="qcard-title">Company size 3</div><div class="qcard-val">3</div><div class="qcard-desc">&mdash;</div></div>
+    <div class="qcard"><div class="qcard-title">Company size 5</div><div class="qcard-val">5</div><div class="qcard-desc">&mdash;</div></div>
   </div>
-  <h2>Speelbaarheid van Hazards</h2>
-  <div class="rule"><span class="rule-id">Hazard.2</span><p>Een hazard creature is speelbaar als zijn <strong>keyed region type</strong> overeenkomt met minstens één regio in het site path van het bewegende gezelschap, of als het gekeyed is aan het site type van de doelsite.</p></div>
-  <div class="rule"><span class="rule-id">Hazard.3</span><p>Twilight telt nooit mee voor het hazard limiet en kan op elk moment gespeeld worden.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="callout callout-tip"><strong>Strategie:</strong> Houd je gezelschappen klein (2 karakters) om het hazard limiet laag te houden. Maar pas op: een kleiner gezelschap heeft minder vechtcapaciteit.</div>
+  <h2>Playing Creatures (Rule 2.IV.vii.2)</h2>
+  <div class="rule"><span class="rule-id">2.IV.vii.2</span><p>A creature must be "keyed" when played. The hazard player must specify one of: (a) a region type on the creature's card matching a region in the company's site path; (b) a site type on the creature's card matching the company's new site (or current site if not moving); (c) a specific region name in the site path where the creature is playable per its text; (d) a specific site name matching the company's new or current site per its text.</p></div>
+  <div class="rule"><span class="rule-id">2.IV.vii.3</span><p>Hazard events count as one against the hazard limit and may target the company, its entities, its site path, or the new/current site. Hazard long-events and untargeted hazard permanent-events may also be played.</p></div>
+  <h2>On-Guard Cards (Rule 2.IV.vii.4)</h2>
+  <div class="rule"><span class="rule-id">2.IV.vii.4</span><p>The hazard player may place one card face-down on the new site as an on-guard card (once per movement/hazard phase, counts as one against the hazard limit, may be done in response). An on-guard card is revealed during the site phase if it is: a creature keyable to the site (when the site has an automatic-attack); or a hazard event affecting an existing automatic-attack.</p></div>
+  <div class="callout callout-tip"><strong>Strategy:</strong> Smaller companies reduce the hazard limit. A 2-character company draws at most 2 hazards per phase. But smaller companies have less combat strength, so balance both concerns.</div>
+  <h2>Nazg&ucirc;l Sideboard Access (Rule 2.IV.vii.5)</h2>
+  <div class="rule"><span class="rule-id">2.IV.vii.5</span><p>The hazard player may tap and discard a Nazg&ucirc;l permanent-event to bring up to 5 hazards from their sideboard to their discard pile, or (if play deck has 5+ cards) bring 1 hazard from sideboard into play deck and shuffle. This counts as one against the hazard limit.</p></div>
 </div>
 
-<!-- ══ SITE FASE ══ -->
+<!-- ══ SITE PHASE ══ -->
 <div class="wiki-section" id="sec-site">
-  <div class="section-label">Fase 5</div>
-  <h1 class="section-title">Site Fase</h1>
-  <p>Tijdens de Site Fase kan elk gezelschap de site betreden om resources te spelen.</p>
-  <div class="rule"><span class="rule-id">Site.1</span><p>Om een item, ally, factie of informatie-resource te spelen op een site, moet het gezelschap eerst de <strong>automatic attack</strong> van die site doorstaan. De site wordt getapt nadat één dergelijke resource gespeeld is. Niet-Haven sites worden pas ge-untapt wanneer het speeldeck leeg raakt en opnieuw geschud wordt.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">Site.2</span><p>Een gezelschap kan de automatic attack doorstaan (of annuleren) zonder daarna een resource te spelen. Als het later terugkomt, moet het de automatic attack opnieuw doorstaan.</p></div>
-  <div class="callout callout-warn"><strong>Één item per site-bezoek:</strong> Per keer dat je een niet-Haven site betreedt, kan je slechts één item/ally/factie/informatie-resource spelen. De site wordt dan getapt.</div>
-</div>
-
-<!-- ══ GEVECHT ══ -->
-<div class="wiki-section" id="sec-gevecht">
-  <div class="section-label">Gevecht</div>
-  <h1 class="section-title">Gevecht</h1>
-  <p>Gevecht bestaat uit een of meer aanvallen. Elke aanval heeft een of meer strikes.</p>
-  <h2>Aanvalsvolgorde</h2>
-  <div class="rule"><span class="rule-id">Gevecht.1</span><p>Aanvallen worden één voor één opgelost. De aanvaller wijst strikes toe aan karakters van het verdedigende gezelschap, tenzij de kaart anders vermeldt. De verdediger kiest welke <strong>niet-getapte</strong> karakters welke strikes krijgen; de aanvaller vult de rest in.</p></div>
-  <h2>Prowess Modifiers</h2>
-  <table>
-    <tr><th>Situatie</th><th>Modifier</th></tr>
-    <tr><td>Ongewond, getapt karakter</td><td>-1 prowess</td></tr>
-    <tr><td>Gewond karakter</td><td>-2 prowess</td></tr>
-    <tr><td>Niet tappen (-3 modifier)</td><td>-3 prowess, karakter tapt niet</td></tr>
-  </table>
-  <div class="rule"><span class="rule-id">Gevecht.2</span><p>Als een aanval meer strikes heeft dan het gezelschap karakters heeft, worden de extra strikes als -1 prowess modificaties verdeeld over de verdedigers naar keuze van de aanvaller.</p></div>
-  <div class="callout callout-tip"><strong>Slechts één skill-kaart per strike:</strong> Alleen één resource-kaart die een vaardigheid vereist mag gespeeld worden tegen een gegeven strike.</div>
-</div>
-
-<!-- ══ BODY CHECK ══ -->
-<div class="wiki-section" id="sec-bodyCheck">
-  <div class="section-label">Gevecht</div>
-  <h1 class="section-title">Body Check</h1>
-  <p>Wanneer een karakter gewond wordt, moet het een body check doen om te bepalen of het geëlimineerd wordt.</p>
-  <div class="rule"><span class="rule-id">Body.1</span><p>Wanneer een karakter gewond raakt: gooi 2D6. Als de uitkomst <strong>≥ het body attribuut</strong> van het karakter is, wordt het karakter geëlimineerd en verwijderd uit het spel.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">Body.2</span><p>Wanneer alle strikes van een creature mislukken: voor elke strike maakt de creature ook een body check. Als de uitkomst ≥ de body van de creature is, wordt de creature geëlimineerd (en gaan de marshalling points naar de verdediger).</p></div>
-  <div class="quick-grid">
-    <div class="qcard"><div class="qcard-title">Body 7 (bv. Legolas)</div><div class="qcard-val">7+</div><div class="qcard-desc">Gooi 7 of meer op 2D6 = geëlimineerd</div></div>
-    <div class="qcard"><div class="qcard-title">Body 9 (bv. Aragorn)</div><div class="qcard-val">9+</div><div class="qcard-desc">Gooi 9 of meer op 2D6 = geëlimineerd</div></div>
-    <div class="qcard"><div class="qcard-title">Body 10</div><div class="qcard-val">10+</div><div class="qcard-desc">Alleen 10, 11 of 12 = geëlimineerd</div></div>
-    <div class="qcard"><div class="qcard-title">Body –</div><div class="qcard-val">∞</div><div class="qcard-desc">Kan niet geëlimineerd worden door body check</div></div>
+  <div class="section-label">Phase 5</div>
+  <h1 class="section-title">Site Phase</h1>
+  <p>In an order chosen by the resource player, each company has a site phase. For each company, the resource player may do nothing (ending the site phase immediately) or <strong>enter</strong> the site. (Rule 2.V)</p>
+  <div class="beurt-flow">
+    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Reveal On-Guard Attacks (2.V.i)</div><div class="beurt-desc">Hazard player may reveal on-guard cards if the card is a creature keyable to the site (and the site has an automatic-attack), or a hazard event affecting an existing automatic-attack at the site.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Automatic-Attacks (2.V.ii)</div><div class="beurt-desc">If the site has automatic-attacks, they are initiated one by one in the order listed on the site card. Once all automatic-attacks have been faced (whether or not defeated), the company has successfully entered the site. A character at its home site (if named) may tap to cancel an automatic-attack there.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Reveal Agent Attacks (2.V.iii)</div><div class="beurt-desc">Immediately after automatic-attacks, the hazard player may declare that an agent at the company's site will attack (agent must be revealed). Each agent may only attack once per site phase. Agent attacks are not keyed to anything.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Resolve On-Guard and Agent Attacks (2.V.iv)</div><div class="beurt-desc">Any declared on-guard creature or agent attacks are initiated and resolved in an order chosen by the resource player.</div></div></div>
   </div>
-  <div class="rule"><span class="rule-id">Body.3</span><p>Items van een geëlimineerd karakter mogen onmiddellijk herverdeeld worden aan niet-gewonde karakters in hetzelfde gezelschap (één item per karakter).</p></div>
-  <div class="callout callout-danger"><strong>Avatar geëlimineerd:</strong> Als je Wizard of Ringwraith geëlimineerd wordt: -5 MP en je kan geen nieuwe avatar spelen. Dit is vrijwel altijd een verliezende positie.</div>
+  <div class="rule"><span class="rule-id">2.V.1</span><p><strong>Playing resources at a site:</strong> Allies, factions, and items can only be played during the site phase by an untapped character at an untapped site, tapping both the character and the site when played. The resource player can only take actions during the site phase after successfully entering the site.</p></div>
+  <div class="rule"><span class="rule-id">2.V.5</span><p><strong>Additional minor item:</strong> When a resource that taps the site is successfully played, the resource player may immediately play one additional minor item (even if the site doesn't list minor items) by tapping an untapped character.</p></div>
+  <div class="rule"><span class="rule-id">2.V.6</span><p><strong>On-guard cards (site phase):</strong> The hazard player may also reveal an on-guard card when the company attempts to play a resource that would tap the site, if the card is a hazard event that would directly affect the company or an influence check, AND the card could have been legally played during the movement/hazard phase. Forbidden: cards that return the company to its site of origin; tap the site; potentially remove a character (except via combat or corruption); force the company to do nothing; or directly tap a company character.</p></div>
+  <div class="callout callout-warn"><strong>One tapping resource per site visit:</strong> Once a resource that taps the site has been played, the site is tapped and no more items/allies/factions can be played there until the site resets (when the play deck is exhausted and re-shuffled).</div>
+</div>
+
+<!-- ══ END-OF-TURN PHASE ══ -->
+<div class="wiki-section" id="sec-eindBeurt">
+  <div class="section-label">Phase 6</div>
+  <h1 class="section-title">End-of-Turn Phase</h1>
+  <p>The turn ends in three steps. (Rule 2.VI)</p>
+  <div class="rule"><span class="rule-id">2.VI.i</span><p><strong>Step 1:</strong> Either player may discard one card from their hand.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">2.VI.ii</span><p><strong>Step 2:</strong> Both players reset their hands by drawing or discarding to their base hand size.</p></div>
+  <div class="rule"><span class="rule-id">2.VI.iii</span><p><strong>Step 3:</strong> The resource player signals the end of the turn. All end-of-turn passive conditions are declared and resolved in resource player's chosen order. No other actions may be taken during this step unless specifically allowed at end of turn.</p></div>
+  <div class="callout callout-tip">Cards may be played during the end-of-turn phase after hand size has been reconciled (between steps 2 and 3).</div>
+</div>
+
+<!-- ══ COMBAT ══ -->
+<div class="wiki-section" id="sec-gevecht">
+  <div class="section-label">Combat &amp; Risk</div>
+  <h1 class="section-title">Combat</h1>
+  <p>Combat is initiated when a hazard creature resolves, when entering a site with automatic-attacks, or during Company vs. Company Combat. The resolution of a declared attack proceeds through 5 steps. (Rule 3)</p>
+  <div class="beurt-flow">
+    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Pre-Assignment Actions (3.i)</div><div class="beurt-desc">Either player may take actions to cancel the attack or modify attributes of the attack as a whole (number of strikes, prowess, body, who assigns strikes, etc.). Once strikes are assigned, the attack can no longer be cancelled.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Defending Player Assigns Strikes (3.ii)</div><div class="beurt-desc">The defending player assigns untapped characters to strikes. The defending player may defer assigning one or more strikes even if untapped characters are available.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Opponent Assigns Remaining Strikes (3.iii)</div><div class="beurt-desc">The attacking player assigns any remaining strikes to unassigned characters (up to the number of characters facing the attack). Excess strikes cannot be cancelled but need not be defeated for the attack to be defeated.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Strike Sequences (3.iv)</div><div class="beurt-desc">In an order chosen by the defending player, perform a Strike Sequence for each assigned strike. Players may take actions before, between, and after strike sequences (as allowed in the current phase).</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">5</div><div><div class="beurt-name">Resolve the Attack (3.v)</div><div class="beurt-desc">Creature: if all assigned strikes defeated, creature goes to defending player's MP pile. If any strike not defeated: creature is discarded. Automatic-attacks: if all assigned strikes defeated, the attack is defeated. Agent attacks: if all strikes defeated and all body checks fail, a Hero/Fallen-wizard player may take the agent as kill MPs.</div></div></div>
+  </div>
+  <h2>Prowess Modifiers During Combat</h2>
+  <table>
+    <tr><th>Situation</th><th>Modifier</th></tr>
+    <tr><td>Unwounded, tapped character facing a strike</td><td>&minus;1 prowess</td></tr>
+    <tr><td>Wounded character facing a strike</td><td>&minus;2 prowess</td></tr>
+    <tr><td>Taking &minus;3 to stay untapped</td><td>&minus;3 prowess; character does not tap after the strike</td></tr>
+    <tr><td>Character supporting (tapping for +1)</td><td>+1 prowess to the facing character</td></tr>
+  </table>
+  <div class="rule"><span class="rule-id">3.i.5</span><p>Effects that allow a character to face multiple strikes must be declared before strikes are assigned. If a character is eliminated by one of its strikes, any remaining unresolved strikes assigned to it are considered successful.</p></div>
+  <div class="rule"><span class="rule-id">3.v.W1/R1</span><p>When a Wizard or Fallen-wizard player defeats a creature with a * next to its marshalling points, the creature is removed from play (not placed in the MP pile). When a Ringwraith or Balrog player defeats a creature without a * next to its MPs, the creature is removed from play instead.</p></div>
+</div>
+
+<!-- ══ BODY CHECKS ══ -->
+<div class="wiki-section" id="sec-bodyCheck">
+  <div class="section-label">Combat &amp; Risk</div>
+  <h1 class="section-title">Body Checks</h1>
+  <p>A body check is made when a character is wounded (fails a strike) or when a creature is defeated.</p>
+  <div class="rule"><span class="rule-id">3.I.1</span><p>To resolve a body check: the player who does NOT control the entity rolls 2D6 and applies any modifications (including +1 if the entity was already wounded before the strike). If the modified roll is <strong>higher than the entity's body</strong>, the entity fails the body check and is eliminated.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="quick-grid">
+    <div class="qcard"><div class="qcard-title">Body 7</div><div class="qcard-val">8+</div><div class="qcard-desc">Roll 8 or higher to eliminate (e.g. Legolas body 7)</div></div>
+    <div class="qcard"><div class="qcard-title">Body 9</div><div class="qcard-val">10+</div><div class="qcard-desc">Roll 10 or higher to eliminate (e.g. Aragorn)</div></div>
+    <div class="qcard"><div class="qcard-title">Body 10</div><div class="qcard-val">11+</div><div class="qcard-desc">Roll 11 or 12 to eliminate</div></div>
+    <div class="qcard"><div class="qcard-title">Body &mdash;</div><div class="qcard-val">&infin;</div><div class="qcard-desc">Cannot be eliminated by body check</div></div>
+  </div>
+  <div class="rule"><span class="rule-id">3.I.2</span><p>If a character fails a body check, the character is eliminated. For each unwounded character in the same company, one item from the eliminated character may be immediately transferred to that unwounded character (one item per character). All other non-follower cards the eliminated character controlled are discarded. This reassignment is synonymous with the failed body check (no actions may be taken in between).</p></div>
+  <div class="rule"><span class="rule-id">3.I.3</span><p>If an Orc or Troll character would be both discarded and eliminated as the result of a body check, the character is discarded instead of eliminated.</p></div>
+  <div class="rule"><span class="rule-id">3.I.1.R1</span><p>If a body check roll against a Ringwraith is exactly equal to 7 or 8 (before modifications), the Ringwraith is returned to its player's hand rather than eliminated. Until re-played, that player cannot reveal a different Ringwraith.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="callout callout-danger"><strong>Avatar eliminated:</strong> If your Wizard or Ringwraith is eliminated: &minus;5 MP and no new avatar may be played. This is almost always a losing position.</div>
 </div>
 
 <!-- ══ DETAINMENT ══ -->
 <div class="wiki-section" id="sec-detainment">
-  <div class="section-label">Gevecht</div>
+  <div class="section-label">Combat &amp; Risk</div>
   <h1 class="section-title">Detainment</h1>
-  <div class="rule"><span class="rule-id">Det.1</span><p>Een aanval is <strong>detainment</strong> als dit op de kaart vermeld staat. Een geslaagde strike van een detainment-aanval <em>verwondt</em> het karakter niet — het karakter tapt enkel.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">Det.2</span><p>Aanvallen gekeyed aan Darkhavens zijn altijd detainment. Aanvallen van agenten op characters in een Darkhaven zijn detainment.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="callout callout-tip"><strong>Gevolg:</strong> Bij detainment geen body check, geen wonden. Karakter tapt alleen. Kaarten die speciale effecten hebben bij wonden, hebben <em>geen</em> effect bij detainment-strikes.</div>
+  <div class="rule"><span class="rule-id">3.II.2</span><p>If an attack is detainment: a successful strike taps the character instead of wounding them; a failed strike results in no body check (the strike simply fails). No body checks are ever initiated from detainment attacks.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">3.II.3</span><p>Detainment creature attacks are worth 0 marshalling points. If all strikes of a detainment creature attack were assigned and defeated, the creature is removed from play (not placed in the MP pile).</p></div>
+  <div class="rule"><span class="rule-id">3.II.R1</span><p>A Ringwraith player treats as detainment: any attack keyed to a Dark-domain, Dark-hold, Shadow-hold, or Darkhaven (including keyed by name to such a region or site); any Orc, Troll, Undead, or Man attack keyed to Shadow-land; and all agent attacks against their companies.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">3.II.5</span><p>A Nazg&ucirc;l attack against a minion company is detainment, unless the attack is an automatic-attack (which always attacks normally).</p></div>
+  <div class="callout callout-tip"><strong>Key consequence:</strong> With detainment, there are no wounds and no body checks. Cards that trigger special effects when a character is wounded have no effect during detainment strikes.</div>
 </div>
 
 <!-- ══ STRIKE SEQUENCE ══ -->
 <div class="wiki-section" id="sec-gevechtsreeks">
-  <div class="section-label">Gevecht</div>
+  <div class="section-label">Combat &amp; Risk</div>
   <h1 class="section-title">Strike Sequence</h1>
-  <p>De strike sequence is de volgorde van acties bij het oplossen van een individuele strike.</p>
+  <p>Once strikes are assigned, the defending player chooses the order to resolve them. For each assigned strike, a Strike Sequence is performed (Annotation 18 / Rule 3.iv). Players may take actions <em>between</em> strike sequences as allowed by the current phase.</p>
   <div class="beurt-flow">
-    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Strike toewijzen</div><div class="beurt-desc">Aanvaller en verdediger spreken af welk karakter welke strike krijgt.</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Kaarten spelen</div><div class="beurt-desc">Beide spelers mogen kaarten spelen die de strike beïnvloeden (prowess modifiers, cancel-kaarten, etc.).</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Dob gooien</div><div class="beurt-desc">Verdediger gooit 2D6 en telt op bij zijn prowess. Als prowess + worp > aanvalsprowess: strike mislukt (succesvol verdedigd).</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Resultaat</div><div class="beurt-desc">Strike geslaagd: karakter gewond of geëlimineerd. Strike mislukt: karakter tapt (tenzij -3 modifier gekozen).</div></div></div>
-    <div class="beurt-step"><div class="beurt-num">5</div><div><div class="beurt-name">Body check (indien gewond)</div><div class="beurt-desc">Gooi 2D6 ≥ body = geëlimineerd. Items herverdelen mogelijk.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">1</div><div><div class="beurt-name">Attacking Player Actions (3.iv.1)</div><div class="beurt-desc">If during the opponent's movement/hazard phase, the hazard player may take hazard actions affecting the strike (still counts against hazard limit).</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">2</div><div><div class="beurt-name">Allocate Excess Strikes (3.iv.2)</div><div class="beurt-desc">The non-defending player may allocate unallocated excess strikes as &minus;1 modifications to the prowess of the character facing this strike. On the last strike, all remaining excess strikes must be allocated.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">3</div><div><div class="beurt-name">Apply &minus;3 to Stay Untapped (3.iv.3)</div><div class="beurt-desc">The defending player may apply &minus;3 to the character's prowess to prevent that character from tapping after the strike (whether the strike succeeds or fails).</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">4</div><div><div class="beurt-name">Tap for +1 Support (3.iv.4)</div><div class="beurt-desc">The defending player may tap one or more untapped characters in the same company who haven't been assigned a strike. Each tapped character applies +1 to the prowess of the character facing the strike.</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">5</div><div><div class="beurt-name">Defending Player Actions (3.iv.5)</div><div class="beurt-desc">The defending player may take resource/character actions affecting the strike, including playing up to one resource per character that requires a skill. A strike may be cancelled up until the dice-roll is made (even if the attack itself could not be cancelled).</div></div></div>
+    <div class="beurt-step"><div class="beurt-num">6</div><div><div class="beurt-name">Roll 2D6 and Resolve (3.iv.6 &amp; 3.iv.7)</div><div class="beurt-desc">The defending player rolls 2D6 and adds the character's prowess after all modifications. If roll &gt; strike prowess: strike fails; character taps (unless &minus;3 taken); body check against the creature. If roll &lt; strike prowess: strike succeeds; character is immediately wounded; body check against the character. If roll = strike prowess: strike is ineffectual; character taps (unless &minus;3 taken).</div></div></div>
   </div>
+  <div class="callout callout-tip"><strong>One skill resource per character per strike:</strong> Up to one resource that requires a skill may be played per character per strike during step 5.</div>
 </div>
 
-<!-- ══ INVLOED ══ -->
+<!-- ══ INFLUENCE ══ -->
 <div class="wiki-section" id="sec-invloed">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Invloed</h1>
-  <h2>General Influence (GI)</h2>
-  <div class="rule"><span class="rule-id">GI.1</span><p>Elke speler begint met <strong>20 punten General Influence</strong>. Het totale mind van alle karakters in spel (niet als followers) mag nooit meer zijn dan de beschikbare GI. Beschikbaar GI stopt altijd op nul — kan nooit negatief worden.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">GI.2</span><p>Ongebruikte GI helpt karakters weerstand bieden tegen bepaalde kaarten (Call of Home, Muster Disperses, etc.).</p></div>
-  <h2>Direct Influence (DI)</h2>
-  <div class="rule"><span class="rule-id">DI.1</span><p>Sommige karakters hebben Direct Influence. Als een karakter's DI ≥ het mind van een ander karakter, kan het die als <strong>follower</strong> controleren. Followers tellen niet mee voor het GI-totaal van de controller.</p></div>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Influence</h1>
+  <h2>General Influence (GI) (Rule 1.12, 2.II.2.2.2)</h2>
+  <div class="rule"><span class="rule-id">1.12</span><p>Every player starts with <strong>20 points of general influence</strong>. The cumulative mind of a player's non-avatar, non-follower characters is subtracted from GI. Available GI can never go below zero. If characters would exceed GI at the end of the organization phase, the player must discard enough non-avatar characters to no longer exceed it.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
   <div class="quick-grid">
-    <div class="qcard"><div class="qcard-title">Start GI</div><div class="qcard-val">20</div><div class="qcard-desc">Wizard/Fallen-wizard</div></div>
-    <div class="qcard"><div class="qcard-title">Start GI</div><div class="qcard-val">25</div><div class="qcard-desc">Ringwraith (+5 niet-karakter GI)</div></div>
-    <div class="qcard"><div class="qcard-title">Start GI</div><div class="qcard-val">25</div><div class="qcard-desc">Balrog (+5 niet-karakter GI)</div></div>
+    <div class="qcard"><div class="qcard-title">Wizard GI</div><div class="qcard-val">20</div><div class="qcard-desc">Base general influence</div></div>
+    <div class="qcard"><div class="qcard-title">Ringwraith GI</div><div class="qcard-val">20+5</div><div class="qcard-desc">+5 bonus unusable for character control</div></div>
+    <div class="qcard"><div class="qcard-title">Balrog GI</div><div class="qcard-val">20+5</div><div class="qcard-desc">+5 bonus unusable for character control</div></div>
+    <div class="qcard"><div class="qcard-title">Fallen-wizard GI</div><div class="qcard-val">varies</div><div class="qcard-desc">Set by white hand number on avatar when played</div></div>
   </div>
+  <h2>Direct Influence (DI) (Rule 2.II.2.2)</h2>
+  <div class="rule"><span class="rule-id">DI</span><p>Some characters have direct influence (the black hand symbol on a character card). A character may control another character as a <strong>follower</strong> if the character's DI is at least equal to the follower's mind. Followers' minds are subtracted from their controller's DI (not from GI). Followers cannot have followers.</p></div>
+  <div class="rule"><span class="rule-id">2.II.2.2.4</span><p>Direct influence restricted to certain races/cards only applies once (not per character). When DI would be reduced, unrestricted DI is reduced before restricted DI.</p></div>
+  <h2>Influence Attempts (Rule 8)</h2>
+  <div class="rule"><span class="rule-id">8.1</span><p>During the site phase, a resource player may declare an influence attempt against an opponent's ally, character, faction, or item by tapping a character (active condition), subject to: not the player's first turn; the company has entered its site; no prior influence attempt or CvCC attack this turn; the target is not an avatar or controlled by an avatar. For items, the player must also reveal an identical item from hand.</p></div>
+  <div class="rule"><span class="rule-id">8.3</span><p><strong>Resolving:</strong> Roll 2D6 + influencing character's unused DI &minus; opponent's unused GI &minus; opponent's roll (2D6) &minus; controlling character's unused DI (if any). Compare to target's mind (or faction requirement). If result &gt; that value, the influence attempt succeeds and the target is discarded.</p></div>
+  <div class="rule"><span class="rule-id">8.W1</span><p>Wizard players suffer &minus;5 to influence rolls against Ringwraith or Balrog player cards (and vice versa). Fallen-wizard players suffer &minus;5 against Ringwraith or Balrog player cards.</p></div>
 </div>
 
-<!-- ══ CORRUPTIE ══ -->
+<!-- ══ CORRUPTION ══ -->
 <div class="wiki-section" id="sec-corruptie">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Corruptie</h1>
-  <div class="rule"><span class="rule-id">Cor.1</span><p>Karakters accumuleren Corruption Points (CP) door het dragen van bepaalde items of door corruptie-hazards. Een karakter dat een corruption check moet doen, gooit 2D6 en telt zijn huidige CP af. Als de uitkomst ≤ 0 is, slaagt de check niet — het karakter is gecorrumpeerd en verlaat het spel.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="rule"><span class="rule-id">Cor.2</span><p>De One Ring geeft zware corruptie. Een karakter dat The One Ring draagt, maakt corruption checks aan het einde van elke bewegings/hazard fase.</p></div>
-  <div class="callout callout-danger"><strong>Avatar corruptie:</strong> Als de Wizard of Ringwraith een corruption check mislukt, wordt die geëlimineerd. Zie regels onder de respectieve speelstijl.</div>
-  <h2>Corruptie Verminderen</h2>
-  <div class="rule"><span class="rule-id">Cor.3</span><p>Een ander karakter in hetzelfde gezelschap kan tappen om een corruptie-kaart te verwijderen van een ander karakter. Dit geeft -3 op de worp. Athelas en andere heal-kaarten kunnen corruptie verminderen.</p></div>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Corruption</h1>
+  <div class="rule"><span class="rule-id">7.1</span><p>To resolve a corruption check: the character's player rolls 2D6 and applies modifications. The result is compared to the character's <strong>corruption point total</strong> (sum of all corruption points on cards the character controls):</p>
+  <ul style="margin:8px 0 0 16px;font-size:14px;color:var(--text-dim)">
+    <li>Roll &gt; corruption total: check <strong>succeeds</strong>, no effect.</li>
+    <li>Roll = or one less than corruption total: Hero character is discarded; Wizard avatar is eliminated; Minion character or Fallen-wizard avatar only taps (check counts as successful).</li>
+    <li>Roll &lt; two below corruption total: character <strong>fails</strong> and is eliminated; all non-follower cards discarded.</li>
+  </ul><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">7.1.1</span><p>Other characters in the same company may tap (one at a time, each as a separate action) to apply +1 to the corruption check roll per character tapped. This cannot be done during an opponent's turn.</p></div>
+  <div class="rule"><span class="rule-id">7.1.R1 / 7.1.B1</span><p>A character in the same company as a Ringwraith or Balrog receives an additional +2 modifier to corruption checks.</p></div>
+  <div class="rule"><span class="rule-id">7.2.1</span><p>Only one corruption card may be played on each character per turn. A corruption card (keyword "corruption") can only be played when doing so would initiate a new chain of effects.</p></div>
+  <div class="rule"><span class="rule-id">7.4</span><p>Allies, Ringwraiths, and Balrogs are not affected by corruption and never make corruption checks.</p></div>
+  <div class="callout callout-danger"><strong>Free Council:</strong> At the end of the game, all non-Ringwraith, non-Balrog characters make a final corruption check. Manage your characters' corruption totals carefully throughout the game.</div>
+  <h2>Removing Corruption Cards (Rule 7.3)</h2>
+  <div class="rule"><span class="rule-id">7.3</span><p>When attempting to remove a corruption card that requires tapping a character to make a roll, the player may apply a &minus;3 modification to the roll to not tap the character. This cannot be done if an attempt to remove the same corruption card was made this turn, and no more untapped attempts may be made for the rest of the turn once one untapped attempt has been made.</p></div>
 </div>
 
-<!-- ══ ITEMS ══ -->
+<!-- ══ ITEMS & RINGS ══ -->
 <div class="wiki-section" id="sec-items">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Items & Ringen</h1>
-  <h2>Itemtypes</h2>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Items &amp; Rings</h1>
+  <h2>Item Types</h2>
   <table>
-    <tr><th>Type</th><th>Speelbaar op</th><th>MP waarde</th></tr>
-    <tr><td>Minor item</td><td>Elke niet-Haven site</td><td>0-1</td></tr>
-    <tr><td>Major item</td><td>Ruins & Lairs / Shadow-holds / etc.</td><td>2</td></tr>
-    <tr><td>Greater item</td><td>Specifieke sites</td><td>4</td></tr>
-    <tr><td>Gold ring item</td><td>Specifieke sites</td><td>0 (tot getest)</td></tr>
-    <tr><td>Special ring item</td><td>Na ring test</td><td>Variabel</td></tr>
+    <tr><th>Type</th><th>Typical Sites</th><th>MP Value</th><th>Notes</th></tr>
+    <tr><td>Minor item</td><td>Any non-haven site</td><td>0&ndash;1</td><td>Also playable as additional item after tapping site</td></tr>
+    <tr><td>Major item</td><td>Ruins &amp; Lairs, Shadow-holds, Dark-holds</td><td>2</td><td>&mdash;</td></tr>
+    <tr><td>Greater item</td><td>Specific sites</td><td>4</td><td>Includes hoard items</td></tr>
+    <tr><td>Gold Ring item</td><td>Various sites</td><td>0 until tested</td><td>Must be tested to become a Ring Special item</td></tr>
+    <tr><td>Ring Special item</td><td>After ring test</td><td>Varies</td><td>Replaces the Gold Ring item</td></tr>
   </table>
-  <h2>Ringen Testen</h2>
-  <div class="rule"><span class="rule-id">Ring.1</span><p>Speel eerst een gold ring item op de juiste site. Gebruik dan een kaart of effect om de ring te testen: gooi 2D6 en zie de uitkomst op de gold ring kaart. Als je het bijbehorende special ring item in hand hebt, vervang je het gold ring item daarmee. Het gold ring item wordt hoe dan ook ge-discard na het testen.</p></div>
-  <div class="rule"><span class="rule-id">Ring.2</span><p>The One Ring is een greater item voor doeleinden van deck-bouw maar heeft speciale regels voor gebruik en corruptie.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
+  <div class="rule"><span class="rule-id">6.1.3</span><p>A character may bear multiple items of the same keyword, but only one weapon, one armor, one shield, and one helmet may be <em>used</em> at a time. If a character begins using a new item of a type it's already using, the previous item's effects immediately cease.</p></div>
+  <div class="rule"><span class="rule-id">6.1.W1 / 6.1.R1</span><p>A Wizard player's characters cannot <em>use</em> Minion items (may still bear them). A Ringwraith player's characters cannot use Hero items. Ringwraiths may bear items but those items cannot be used. Same rule applies to Balrog players.</p></div>
+  <h2>Ring Testing (Rule 6.2)</h2>
+  <div class="rule"><span class="rule-id">6.2</span><p>When a Gold Ring item is "tested," the item's player makes a roll, applies modifications, and may immediately play a Ring Special item matching the final result. The Ring Special item replaces the Gold Ring item, which is discarded regardless of whether a Ring Special item was played. Replacing a Gold Ring does not tap the site and does not require an untapped site or character.</p></div>
+  <div class="rule"><span class="rule-id">6.2.R1</span><p>Any Gold Ring item borne by a character in a Ringwraith's company is automatically tested at the beginning of the end-of-turn phase, with a &minus;2 modification to the ring test roll. Gold Ring items tested at Barad-d&ucirc;r have a &minus;3 modification.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">6.2.F2</span><p>A Fallen-wizard player may play Ring Special items regardless of the alignment of the Gold Ring item tested. Hero Gold Ring items tested by a Fallen-wizard player have an additional &minus;1 modification.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
 </div>
 
 <!-- ══ EVENTS ══ -->
 <div class="wiki-section" id="sec-events">
-  <div class="section-label">Regels</div>
+  <div class="section-label">Game Rules</div>
   <h1 class="section-title">Events</h1>
   <table>
-    <tr><th>Type</th><th>Duur</th><th>Actie</th></tr>
-    <tr><td><strong>Short-event</strong></td><td>Onmiddellijk</td><td>Speel en discard direct. Effect is eenmalig.</td></tr>
-    <tr><td><strong>Long-event</strong></td><td>Tot volgende Long-event Fase</td><td>Blijft in spel tot de Long-event Fase van de volgende beurt.</td></tr>
-    <tr><td><strong>Permanent-event</strong></td><td>Blijvend</td><td>Blijft in spel tot een kaart of effect het discards.</td></tr>
+    <tr><th>Type</th><th>Duration</th><th>How Played</th></tr>
+    <tr><td><strong>Short-event</strong></td><td>Immediate; discarded upon resolution</td><td>Anytime allowed by phase; must have an immediate effect on the game</td></tr>
+    <tr><td><strong>Long-event</strong></td><td>Until next long-event phase (one turn cycle)</td><td>Resources: during long-event phase. Hazards: during opponent's movement/hazard phase</td></tr>
+    <tr><td><strong>Permanent-event</strong></td><td>Until discarded by a rule or effect</td><td>Only if it would have an immediate or potential effect on the game</td></tr>
   </table>
-  <div class="rule"><span class="rule-id">Event.1</span><p>Als alle karakters in een gezelschap het spel verlaten, worden alle permanent-events gespeeld op dat gezelschap als geheel onmiddellijk ge-discard.</p></div>
-  <div class="rule"><span class="rule-id">Event.2</span><p>Permanent-events die ge-discard worden wanneer het speeldeck leeg raakt, worden samen met de rest van de discard pile door het nieuwe speeldeck geschud.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
+  <div class="rule"><span class="rule-id">5.1.2</span><p>A short-event cannot be played unless it would have some effect on the current board state. If it finishes resolving without any other effect, it is returned to its player's hand rather than being discarded.</p></div>
+  <div class="rule"><span class="rule-id">5.3.1</span><p>A permanent-event played on a card only affects that specific card (not other copies with the same name, such as sites) unless otherwise specified. A permanent-event not played "on" a card affects all versions of its affected cards.</p></div>
+  <div class="rule"><span class="rule-id">2.3</span><p>If all characters in a company leave play, all permanent-events played on the company as a whole are immediately discarded.</p></div>
+  <div class="rule"><span class="rule-id">5.F1</span><p>Stage resource permanent-events (Fallen-wizard) can only be played during the organization phase.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
 </div>
 
-<!-- ══ AGENTEN ══ -->
+<!-- ══ AGENTS ══ -->
 <div class="wiki-section" id="sec-agenten">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Agenten</h1>
-  <div class="rule"><span class="rule-id">Agent.1</span><p>Agenten zijn speciale karakters die door de hazard player gespeeld worden. Een agent-kaart in het deck van een Ringwraith telt tegelijk als karakter- en hazard-kaart totdat het als één van beide gespeeld wordt.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span><span class="tag tag-algemeen">MEDM</span></div></div>
-  <div class="rule"><span class="rule-id">Agent.2</span><p>Een getapte agent kan een actie nemen om te un-tappen (van getapt naar niet-getapt). Een agent mag tappen om creatures te spelen op een site als een gezelschap naar die site beweegt.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Agent.3</span><p>De hazard player mag een agent terugsturen naar zijn home site ongeacht of de agent getapt of gewond is.</p></div>
-  <div class="callout callout-warn"><strong>Agent mind totaal:</strong> Het totale mind van alle agent-kaarten in het volledige deck (speeldeck + sideboard + pool) mag maximaal 36 bedragen.</div>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Agents</h1>
+  <p>Agents are special cards that may be played as hazards (or as characters by Ringwraith and Fallen-wizard players). (Rules 4, MEDM)</p>
+  <div class="rule"><span class="rule-id">1.3.2</span><p>The total mind of all agent cards in a player's deck cannot exceed 36. For Wizard and Balrog players, agents in the deck count as hazard cards (not characters) for deck-building and throughout the game, but count as half a creature for the 12-creature minimum. For Ringwraith and Fallen-wizard players, agents count as characters for deck-building requirements.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">4.1</span><p>The hazard player may use one against the hazard limit to have an in-play agent take an "agent action" during the opponent's movement/hazard phase. Options include: moving the agent to an adjacent site; returning the agent to a home site; healing a wounded agent; untapping a tapped agent; turning a revealed agent face-down; or tapping to make creatures keyable to the agent's current site.</p></div>
+  <div class="rule"><span class="rule-id">4.2</span><p>The hazard player may reveal a face-down agent during a resource player's movement/hazard phase (does not count against the hazard limit). An agent at a site with illegal movement history when revealed is immediately discarded.</p></div>
+  <div class="rule"><span class="rule-id">4.4</span><p>An agent played as a hazard cannot move to any version of a haven (including Edhellond, Grey Havens, L&oacute;rien, Rivendell), and cannot move to a Wizardhaven in play unless it is an Elf agent.</p></div>
+  <div class="callout callout-warn"><strong>Agent attacks (rule 3.iv.6.1):</strong> For agent combat, both players roll 2D6. The agent gets +2 prowess and +1 body if face-up at its home site, +5 prowess and +1 body if face-down at its home site, +2 prowess if face-down elsewhere, and &minus;2 prowess if wounded.</div>
 </div>
 
 <!-- ══ ALLIES ══ -->
 <div class="wiki-section" id="sec-allies">
-  <div class="section-label">Regels</div>
+  <div class="section-label">Game Rules</div>
   <h1 class="section-title">Allies</h1>
-  <div class="rule"><span class="rule-id">Ally.1</span><p>Een ally wordt gespeeld tijdens de <strong>Site Fase</strong> op de specifieke site vermeld op de ally-kaart. Eén karakter in het gezelschap tapt om de ally te spelen. De site wordt getapt.</p></div>
-  <div class="rule"><span class="rule-id">Ally.2</span><p>Allies tellen als karakters voor gevechts-doeleinden (strikes krijgen, tappen voor +1 prowess). Voor andere doeleinden zijn ze geen karakters, tenzij de kaart dit specificeert.</p></div>
-  <div class="rule"><span class="rule-id">Ally.3</span><p>Als de tekst op een ally zegt "Discard if he/she moves to": de ally wordt ge-discard aan het <strong>begin van de Bewegings/Hazard Fase</strong>. Als de tekst "Discard if he/she is at" zegt: ge-discard aan het begin van de Site Fase.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Ally.4</span><p>Allies kunnen tappen om strikes van Slayers en Assassins te annuleren. Als een ally bepaalde aanvallen niet kan ontvangen, kan hij nog steeds tappen om +1 prowess te geven aan een karakter dat zo'n aanval wél moet onderstaan.</p></div>
-  <div class="callout callout-tip"><strong>MP's:</strong> Ally marshalling points tellen alleen mee bij de Free Council als de ally nog in spel is. Als de ally ge-discard wordt, verlies je zijn MP's.</div>
+  <div class="rule"><span class="rule-id">2.V.2</span><p>To play an ally: the company must have successfully entered the site; the site must be untapped; the resource player taps an untapped character (active condition). The ally is placed under that character's control and the site taps. Playing an ally is not an influence attempt; the ally's mind is not subtracted from the controller's DI.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">2.V.2.2</span><p>Allies are <em>not</em> characters, but are treated as characters for: combat-specific actions (facing strikes, tapping to support or cancel attacks, being affected by cards referring to characters during combat); "skill only" cards or effects; and healing.</p></div>
+  <div class="rule"><span class="rule-id">2.V.2.3</span><p>If an ally's controlling character leaves play, the ally is immediately discarded.</p></div>
+  <div class="rule"><span class="rule-id">6.1.6</span><p>Allies cannot bear or use items.</p></div>
+  <div class="callout callout-tip"><strong>Ally MP rules:</strong> Ally marshalling points only count at the Free Council if the ally is still in play. "Discard if he/she moves to [region/site]" means the ally is discarded at the beginning of the movement/hazard phase when that movement is declared.</div>
 </div>
 
-<!-- ══ FACTIES ══ -->
+<!-- ══ FACTIONS ══ -->
 <div class="wiki-section" id="sec-facties">
-  <div class="section-label">Regels</div>
-  <h1 class="section-title">Facties</h1>
-  <div class="rule"><span class="rule-id">Factie.1</span><p>Een factie wordt in spel gebracht via een influence-poging. Een karakter tapt en maakt een worp (2D6 + invloedscore vs. de moeilijkheidswaarde op de factiekaart). De site moet ge-untapt zijn en het karakter moet op de juiste site zijn.</p></div>
-  <div class="rule"><span class="rule-id">Factie.2</span><p>Warrior-kaart Muster: vervangt volledige tekst door "Warrior only. Een influence check against a faction by a warrior is modified by adding the warrior's prowess to a maximum modifier of +5."</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="callout callout-warn"><strong>Opslaan vs. in spel houden:</strong> Facties moeten in spel blijven (niet opgeslagen) om hun MP's te tellen bij de Free Council.</div>
+  <div class="section-label">Game Rules</div>
+  <h1 class="section-title">Factions</h1>
+  <div class="rule"><span class="rule-id">2.V.3</span><p>To play a faction: the company has entered the site; the site is untapped; an untapped character taps (active condition). The resource player reveals the faction, then makes an influence check: roll 2D6 + character's available DI + any other modifications. If result &gt; faction's requirement, the faction is played into the MP pile and the site taps. Otherwise the faction is discarded.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">Faction std</span><p>Standard modifications apply if the indicated race matches the race of the character that tapped to play the faction, or if the indicated faction is already in play (regardless of controlling player).</p></div>
+  <div class="callout callout-warn"><strong>Factions in play vs. stored:</strong> Factions must remain in play (not stored) to count their MPs at the Free Council.</div>
 </div>
 
 <!-- ══ WIZARD ══ -->
 <div class="wiki-section" id="sec-wizard">
-  <div class="section-label">Speelstijl</div>
-  <h1 class="section-title">⬡ Wizard</h1>
-  <p>De klassieke speelstijl. Vertegenwoordigt de Vijf Tovenaars (Gandalf, Saruman, Radagast, Pallando, Alatar) en hun strijd voor de Vrije Volkeren.</p>
-  <div class="callout callout-tip"><strong>Startsite:</strong> Rivendell. <strong>Karakters:</strong> Alleen hero karakters. <strong>Resources:</strong> Alleen hero resources.</div>
-  <h2>Deckbouw Regels</h2>
-  <div class="rule"><span class="rule-id">1.3.W1</span><p>Avatar karakters kunnen alleen Wizard-avatars zijn.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
-  <div class="rule"><span class="rule-id">1.3.W2</span><p>Niet-avatar karakters kunnen alleen hero-karakters zijn. Agent-kaarten in een Wizard-deck worden behandeld als hazard-kaarten voor deckbouw en alle andere doeleinden in het spel.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
-  <div class="rule"><span class="rule-id">1.3.W3</span><p>Resources kunnen alleen hero resources zijn, met uitzondering van minion items en/of hazards die als resources gespeeld mogen worden.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
-  <h2>Wizard Eliminatie</h2>
-  <div class="rule"><span class="rule-id">2.2</span><p>Als een Wizard geëlimineerd wordt (door body check of corruption check): geplaatst in removed-from-play pile, -5 miscellaneous MP. Geen nieuwe avatar kan gespeeld worden.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <div class="section-label">Play Style</div>
+  <h1 class="section-title">&#x2B21; Wizard</h1>
+  <p>The classic starting alignment. You play one of the five Istari (Gandalf, Saruman, Radagast, Pallando, Alatar) sent by the Valar to counsel the Free Peoples against Sauron. Introduced in Middle-earth: The Wizards (METW, 1995).</p>
+  <div class="callout callout-tip"><strong>Starting site:</strong> Rivendell (or avatar home site). <strong>Characters:</strong> Hero characters only. <strong>Resources:</strong> Hero resources only. <strong>GI:</strong> 20.</div>
+  <h2>Deck Rules (Rules 1.3.W1&ndash;W3)</h2>
+  <div class="rule"><span class="rule-id">1.3.W1</span><p>Avatar characters can only be Wizard avatars.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.W2</span><p>Non-avatar characters can only be Hero characters. Agent character cards in a Wizard deck are treated as hazard cards in all areas throughout the game and count as half a creature for the 12-creature deck-building requirement.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.W3</span><p>Resources can only be Hero resources, except for Minion items and/or hazards that may be played as resources.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <div class="rule"><span class="rule-id">1.4.W1</span><p>Location deck may only include Hero site cards (and the five designated Balrog-only sites).</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <h2>Movement Restrictions</h2>
+  <div class="rule"><span class="rule-id">2.II.7.i.W1</span><p>Cannot use Starter Movement to or from sites in Gorgoroth. With Region Movement to/from Gorgoroth, cannot move through Imlad Morgul without starting or stopping there.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <h2>Marshalling Points</h2>
+  <div class="rule"><span class="rule-id">10.W1</span><p>For Wizard players, Minion items borne by their characters are worth half of the item's normal marshalling points (rounded up).</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <div class="rule"><span class="rule-id">2.2</span><p>If the Wizard avatar is eliminated, it is placed in the removed-from-play pile, giving &minus;5 miscellaneous marshalling points. No new avatar can be revealed.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
+  <h2>Winning with The One Ring (Rule 10.1.W1)</h2>
+  <div class="rule"><span class="rule-id">10.1.W1</span><p>If a Wizard player plays <em>Cracks of Doom</em> or <em>Gollum's Fate</em> and all conditions on the card are met, that player wins immediately.</p><div class="rule-tags"><span class="tag tag-wizard">Wizard</span></div></div>
 </div>
 
 <!-- ══ RINGWRAITH ══ -->
 <div class="wiki-section" id="sec-ringwraith">
-  <div class="section-label">Speelstijl · MELE 1997</div>
-  <h1 class="section-title">⬡ Ringwraith</h1>
-  <p>Introductie: <em>The Lidless Eye</em> (1997). Vertegenwoordigt de Negen Ringwraiths van Sauron.</p>
-  <div class="callout callout-tip"><strong>Startsites:</strong> Minas Morgul en/of Dol Guldur (max. 2 startgezelschappen). <strong>Karakters:</strong> Alleen minion karakters. <strong>GI:</strong> 20 + 5 extra (niet voor karakters).</div>
-  <div class="rule"><span class="rule-id">1.9.R1</span><p>Een Ringwraith-speler mag tot 6 startkarakters draften in plaats van 5.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
-  <div class="rule"><span class="rule-id">1.10.R1</span><p>De Ringwraith-speler mag 2 startgezelschappen hebben bij Minas Morgul en/of Dol Guldur.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
-  <div class="rule"><span class="rule-id">1.3.R2</span><p>Agent-kaarten in een Ringwraith-deck tellen als zowel karakter- als hazard-kaart totdat ze als één van beide gespeeld worden.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
-  <h2>Beperkte Hazards</h2>
-  <div class="rule"><span class="rule-id">1.8.1</span><p>De volgende kaarten kunnen niet gespeeld worden tegen een Ringwraith-tegenstander: Hazards die een agent vereisen, Bane of the Ithil-stone, The Black Enemy's Wrath, Foul Fumes, In the Heart of His Realm, Mordor in Arms, Mûmak, Worn and Famished.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="section-label">Play Style &middot; MELE 1997</div>
+  <h1 class="section-title">&#x2B21; Ringwraith</h1>
+  <p>Introduced in Middle-earth: The Lidless Eye (MELE, 1997). You play one of the nine Nazg&ucirc;l, the Ringwraiths of Sauron, gathering forces to crush the Free Peoples.</p>
+  <div class="callout callout-tip"><strong>Starting sites:</strong> Minas Morgul and/or Dol Guldur (up to 2 starting companies). <strong>Characters:</strong> Minion characters only (agents count as characters). <strong>GI:</strong> 20 + 5 bonus (bonus cannot control characters).</div>
+  <h2>Deck Rules (Rules 1.3.R1&ndash;R3)</h2>
+  <div class="rule"><span class="rule-id">1.3.R1</span><p>Avatar characters can only be Ringwraith avatars.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.R2</span><p>Characters can only be Minion characters, with agent characters counting as characters for deck-building requirements.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.R3</span><p>Resources can only be Minion resources, except for Hero items and/or hazards that may be played as resources.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <h2>Special Rules</h2>
+  <div class="rule"><span class="rule-id">1.9.R1 / 1.10.R1</span><p>May draft up to 6 starting characters. May have up to 2 starting companies at Minas Morgul and/or Dol Guldur.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">2.II.7.R1</span><p>A company containing a Ringwraith can only move to a non-Darkhaven site if the Ringwraith is in a mode (Black Rider, Fell Rider, or Heralded Lord). Ringwraith companies may only use Starter Movement and cannot have Coastal Sea regions in their site path. Ringwraith players may treat Dagorlad and &Ucirc;dun as adjacent.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">2.II.2.1.R3</span><p>Characters in a Ringwraith's company can only be other Ringwraiths, unless at a Darkhaven.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">6.2.R1</span><p>Gold Ring items borne in a Ringwraith company are automatically tested at the start of the end-of-turn phase (&minus;2 to the roll). Items tested at Barad-d&ucirc;r have an additional &minus;1 (total &minus;3).</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <div class="rule"><span class="rule-id">10.2.R1</span><p>A Ringwraith player cannot freely call to end the game. Once normal game-length conditions are met, a Ringwraith player must play <em>Sudden Call</em> to end the game.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <h2>Ringwraith Followers (Rules 2.II.2.1.R4&ndash;R8)</h2>
+  <div class="rule"><span class="rule-id">2.II.2.1.R4</span><p>A Ringwraith avatar may be played as a "Ringwraith follower" if the player has a card allowing it and already has a Ringwraith in play at a Darkhaven or the follower's home site. A Ringwraith follower requires 1 point of DI to control, uses skills and DI normally, but its other effects and Unleashed cards cannot be initiated.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
 </div>
 
-<!-- ══ FALLEN WIZARD ══ -->
+<!-- ══ FALLEN-WIZARD ══ -->
 <div class="wiki-section" id="sec-fallenWizard">
-  <div class="section-label">Speelstijl · MEWH 1997</div>
-  <h1 class="section-title">⬡ Fallen-wizard</h1>
-  <p>Introductie: <em>The White Hand</em> (1997). Gecorrumpeerde Tovenaars die hun eigen regels spelen.</p>
-  <div class="callout callout-tip"><strong>Startsite:</strong> White Towers of Ruins & Lairs in Arthedain/Rhudaur. <strong>Karakters:</strong> Hero én minion. <strong>Stage resources:</strong> Verplicht in de pool.</div>
-  <h2>Deckbouw Restricties</h2>
-  <div class="rule"><span class="rule-id">1.3.F1</span><p>Maximaal 3 kopieën van elke niet-unieke Stage resource, maximaal 2 van elke niet-unieke karakter, maximaal 2 van elke niet-unieke hero resource, maximaal 2 van elke niet-unieke minion resource.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
-  <div class="rule"><span class="rule-id">1.7.F1</span><p>Een Fallen-wizard pool moet tot 3 Stage resource permanent-events bevatten met exact 3 stage points gecombineerd, waarvan minstens één niet-uniek.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
-  <h2>Verboden Kaarten</h2>
-  <div class="rule"><span class="rule-id">1.5.F6</span><p>Verboden in Fallen-wizard deck: Bade to Rule, The Balrog (Ally), Cracks of Doom, Favor of the Valar, Gollum's Fate, Hour of Need, Kill All But Not the Halflings, The Lidless Eye, Glamour of Surpassing Excellence, Messenger of Mordor, News Must Get Through, News of the Shire, Old Road, The Sun Unveiled, Use Your Legs, The Windlord Found Me, Wizard Uncloaked.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <div class="section-label">Play Style &middot; MEWH 1997</div>
+  <h1 class="section-title">&#x2B21; Fallen-wizard</h1>
+  <p>Introduced in Middle-earth: The White Hand (MEWH, 1997). Corrupted Wizards who have strayed from the mission of the Free Peoples, now pursuing their own agenda with a mix of Hero and Minion cards.</p>
+  <div class="callout callout-tip"><strong>Starting site:</strong> White Towers or a Ruins &amp; Lairs in Arthedain/Rhudaur. <strong>Characters:</strong> Hero and Minion. <strong>Stage resources:</strong> Required in the pool (exactly 3 stage points). <strong>GI:</strong> Set by avatar's white hand number.</div>
+  <h2>Deck Rules (Rules 1.3.F1&ndash;F6)</h2>
+  <div class="rule"><span class="rule-id">1.3.F1</span><p>Additional restrictions on non-unique cards: max 3 copies of each non-unique Stage resource card; max 2 of each non-unique character card; max 2 of each non-unique Hero resource card; max 2 of each non-unique Minion resource card.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.F3&ndash;F5</span><p>Avatar characters can only be Fallen-wizard avatars. Non-avatar characters may be either Hero or Minion. Non-Orc, non-Troll characters are treated as Hero characters.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <div class="rule"><span class="rule-id">1.7.F1</span><p>Pool must include up to 3 Stage resource permanent-events totaling exactly 3 stage points, including at least one non-unique resource.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <div class="rule"><span class="rule-id">1.5.F6</span><p>Forbidden cards in Fallen-wizard decks include: Bade to Rule, The Balrog (Ally), Cracks of Doom, Favor of the Valar, Gollum's Fate, Hour of Need, Kill All But Not the Halflings, The Lidless Eye, Glamour of Surpassing Excellence, Messenger of Mordor, News Must Get Through, News of the Shire, Old Road, The Sun Unveiled, Use Your Leg, The Windlord Found Me, Wizard Uncloaked.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <h2>Covert and Overt Companies</h2>
+  <div class="rule"><span class="rule-id">2.IV.vii.F1</span><p>For hazard purposes, a Fallen-wizard player's covert companies are considered Hero companies; overt companies are considered Minion companies. A company is covert if it does not contain a Balrog, Orc, Troll, or Ringwraith in Fell Rider mode (or a card that makes it overt).</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <div class="rule"><span class="rule-id">2.II.2.2.F1&ndash;F2</span><p>Cannot play a character with mind greater than 5. Cannot play Orc or Troll characters unless a Stage resource in play specifically allows it.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <h2>Declaring a Fallen-wizard (Rule 1.8.F1)</h2>
+  <div class="rule"><span class="rule-id">1.8.F1</span><p>Must declare the specific Fallen-wizard avatar at game start. If the opponent is a Wizard player, the opponent may switch any Wizard versions of that avatar in their play deck or sideboard with a different Wizard avatar. Wizard players cannot play the corresponding Wizard avatar of a declared Fallen-wizard avatar.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
 </div>
 
 <!-- ══ BALROG ══ -->
 <div class="wiki-section" id="sec-balrog">
-  <div class="section-label">Speelstijl · MEBA 1998</div>
-  <h1 class="section-title">⬡ Balrog</h1>
-  <p>Introductie: <em>The Balrog</em> (1998). Speelt als de Balrog van Moria in de diepten van de aarde.</p>
-  <div class="callout callout-tip"><strong>Startsites:</strong> Moria en/of Under-gates. <strong>Karakters:</strong> Alleen Orc/Troll minions. <strong>GI:</strong> 20 + 5 extra.</div>
-  <div class="rule"><span class="rule-id">1.3.B4</span><p>Niet-avatar karakters: alleen Orc of Troll. Karakters: mind < 9 tenzij Balrog-specifiek. Facties: alleen Orc, Troll, Wolf, Animal of Dragon.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
-  <div class="rule"><span class="rule-id">1.4.B1</span><p>Balrog-versies van de volgende sites zijn verplicht: Moria, Carn Dûm, Dol Guldur, Minas Morgul, alle Under-deeps sites, alle Dark-holds.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
-  <div class="rule"><span class="rule-id">1.8.2</span><p>Een speler kan geen The Balrog (Ally), The Black Council, Durin's Bane, Balrog of Moria of Reluctant Final Parting spelen tegen een Balrog-tegenstander. Hij mag deze kaarten wel verwijderen uit zijn hand om één kaart uit zijn sideboard in zijn speeldeck te brengen.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
-  <div class="rule"><span class="rule-id">Balrog.MP</span><p>Balrog-spelers ontvangen geen MP's voor hero items gespeeld op hun Darkhavens.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
+  <div class="section-label">Play Style &middot; MEBA 1998</div>
+  <h1 class="section-title">&#x2B21; Balrog</h1>
+  <p>Introduced in Middle-earth: The Balrog (MEBA, 1998). You play as the Balrog of Moria, lurking in the Under-deeps with Orc and Troll minions.</p>
+  <div class="callout callout-tip"><strong>Starting sites:</strong> Moria and/or Under-gates (up to 2 starting companies). <strong>Characters:</strong> Orc and Troll only. <strong>GI:</strong> 20 + 5 bonus (bonus cannot control characters). <strong>Avatar played at:</strong> The Under-gates.</div>
+  <h2>Deck Rules (Rules 1.3.B1&ndash;B5)</h2>
+  <div class="rule"><span class="rule-id">1.3.B4</span><p>Non-avatar characters can only be Orc or Troll. Characters can only have mind less than 9 unless Balrog-specific. Factions can only be Orc, Troll, Wolf, Animal, or Dragon.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.B3</span><p>Resources can only be Minion resources and/or hazards that may be played as resources.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">1.4.B1</span><p>Location deck may include Minion sites other than those requiring a Balrog version: Moria, Carn D&ucirc;m, Dol Guldur, Minas Morgul, all Under-deeps sites, and all Dark-holds must use the Balrog version of the site. The Balrog version of Geann a-Lisch is treated as a Ruins &amp; Lairs with no Darkhaven effects.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">1.3.B5</span><p>Forbidden cards include: Above the Abyss, Bade to Rule, The Balrog (Ally), Balrog of Moria, The Black Council, Black Horse, Black Rider, By the Ringwraith's Word, Creature of an Older World, Durin's Bane, Fell Rider, The Fiery Blade, Helm of Fear, Heralded Lord, Kill All But NOT the Halflings, The Lidless Eye, Morgul-Blade, News of the Shire, Open to the Summons, Orders from Lugburz, Padding Feet, The Ring Leaves its Mark, Ringwraith cards, Ringwraith Unleashed cards, Sauron, They Ride Together, Use Your Legs, While The Yellow Face Sleeps.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <h2>Special Rules</h2>
+  <div class="rule"><span class="rule-id">1.9.B1 / 1.10.B1</span><p>May draft up to 6 starting characters. May have up to 2 starting companies at Moria and/or the Under-gates. Cannot use Starter Movement. May treat Dagorlad and &Ucirc;dun as adjacent.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">2.II.2.2.B3</span><p>When a Balrog player plays a non-unique character with mind of 3 or less, that character may come from the player's hand, discard pile, or sideboard.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">1.8.1</span><p>Against a Balrog opponent, no player may play The Balrog (Ally), The Black Council, Durin's Bane, Balrog of Moria, or Reluctant Final Parting. However, a player may remove any of these cards from their hand to bring one card of any type from their sideboard into their play deck and shuffle.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <div class="rule"><span class="rule-id">10.1.B1</span><p>If a Balrog player has <em>Challenge the Power</em> in play and all conditions are met, that player wins immediately.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
 </div>
 
-<!-- ══ REEKSEN ══ -->
+<!-- ══ SETS ══ -->
 <div class="wiki-section" id="sec-metw">
-  <div class="section-label">Reeks · 1995</div>
+  <div class="section-label">Set &middot; 1995</div>
   <h1 class="section-title">Middle-earth: The Wizards</h1>
-  <p>De basisreeks. Introduceert het volledige basismechanisme: Wizards, hero karakters, site path beweging, marshalling points.</p>
-  <div class="callout callout-tip"><strong>Origins Award</strong> winnaar: Best Card Game of 1995.</div>
-  <h2>Nieuwe Regels in METW</h2>
-  <div class="rule"><p>• Volledig beurtmechanisme (6 fasen)<br>• Site path beweging<br>• Hazard limiet systeem<br>• General Influence & Direct Influence<br>• Body checks en corruptie<br>• Free Council als eindspel</p></div>
+  <p>The base set. Introduces the core game system: Wizard alignment, Hero characters, site-path movement, marshalling points, general and direct influence, corruption, body checks, and the Free Council end game. Winner of the Origins Award for Best Card Game of 1995.</p>
+  <h2>Rules Introduced</h2>
+  <div class="rule"><p>&bull; Full 6-phase turn structure &bull; Starter and Region Movement &bull; Hazard limit system (max(2, company size)) &bull; General Influence and Direct Influence &bull; Body checks and corruption checks &bull; Free Council as the end-game procedure &bull; Allies, Factions, Items (minor, major, greater) &bull; Long-events and permanent-events</p></div>
 </div>
 
 <div class="wiki-section" id="sec-metd">
-  <div class="section-label">Reeks · 1996</div>
+  <div class="section-label">Set &middot; 1996</div>
   <h1 class="section-title">Middle-earth: The Dragons</h1>
-  <p>Introduceert Draken als krachtige hazards, Hoard-sites, en de Pool-regel.</p>
-  <h2>Nieuwe Regels in METD</h2>
-  <div class="rule"><p>• <strong>Pool:</strong> Tot 10 niet-avatar karakters en 2 minor items buiten het speeldeck als startreserve<br>• <strong>Hoard-sites:</strong> Sites met een Dragon automatic-attack bevatten een hoard. Als een Dragon-manifestatie verslagen wordt, verliest de site zijn hoard-status en automatic attack.<br>• <strong>Dragon manifestaties:</strong> Ahunt en At Home varianten</p></div>
-  <div class="rule"><span class="rule-id">METD.Hoard</span><p>Elke site die aan het begin van de beurt een Dragon automatic-attack had, bevat een hoard. (Niet alle sites die ooit een Dragon hadden.)</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="callout callout-warn"><strong>Origins Award</strong> winnaar: Best Graphic Presentation of a Card Game or Expansion, 1996.</div>
+  <p>Introduces Dragons as powerful hazards, hoard sites, the Pool rule, and Dragon manifestations. Winner of the Origins Award for Best Graphic Presentation of a Card Game or Expansion, 1996.</p>
+  <h2>Rules Introduced</h2>
+  <div class="rule"><p>&bull; <strong>Pool:</strong> Up to 10 non-avatar characters and 2 minor items outside the play deck, used for the character draft &bull; <strong>Hoard sites:</strong> Any site with a Dragon automatic-attack at the beginning of a turn contains a hoard; hoard items are only playable at hoard sites &bull; <strong>Dragon manifestations:</strong> Ahunt, At Home, and creature manifestations; defeating any removes all manifestations of that Dragon for the rest of the game &bull; Unique Dragon lairs</p></div>
+  <div class="rule"><span class="rule-id">g.man.3</span><p>When a Dragon manifestation is defeated or removed from play, all other manifestations of the same Dragon are removed from play, no further manifestations may be played for the rest of the game, and the Dragon's lair loses its automatic-attack.</p></div>
 </div>
 
 <div class="wiki-section" id="sec-medm">
-  <div class="section-label">Reeks · 1996</div>
+  <div class="section-label">Set &middot; 1996</div>
   <h1 class="section-title">Middle-earth: Dark Minions</h1>
-  <p>Introduceert Agenten als speelbare hazard-karakters en extra Orc/Troll hazards.</p>
-  <h2>Nieuwe Regels in MEDM</h2>
-  <div class="rule"><p>• <strong>Agenten:</strong> Karakters die als hazards gespeeld worden. Kunnen bewegen, sites bezoeken en invloed uitoefenen op karakter van de tegenstander.<br>• <strong>Agent mind limiet:</strong> Totaal max. 36 mind over alle agent-kaarten in het volledige deck<br>• <strong>Creature: agent:</strong> Telt als ½ creature voor de 12-creature minimumvereiste</p></div>
+  <p>Introduces Agents as playable hazard characters, Under-deeps movement, and prisoner/rescue mechanics.</p>
+  <h2>Rules Introduced</h2>
+  <div class="rule"><p>&bull; <strong>Agents:</strong> Cards playable as hazards that can move, attack, and influence characters. Agent attacks use a special roll procedure &bull; <strong>Agent mind limit:</strong> Total mind of all agents in deck cannot exceed 36 &bull; <strong>Under-deeps Movement:</strong> Movement between adjacent Under-deeps sites with a required roll &bull; <strong>Prisoners and Rescue-attacks:</strong> Hazard hosts can take characters prisoner; other companies can attempt rescue</p></div>
 </div>
 
 <div class="wiki-section" id="sec-mele">
-  <div class="section-label">Reeks · 1997</div>
+  <div class="section-label">Set &middot; 1997</div>
   <h1 class="section-title">Middle-earth: The Lidless Eye</h1>
-  <p>Introduceert de Ringwraith-speelstijl. Volledig nieuwe alignment met eigen regels, sites (Darkhavens) en karakters.</p>
-  <h2>Nieuwe Regels in MELE</h2>
-  <div class="rule"><p>• <strong>Ringwraith alignment:</strong> Minion karakters, Darkhavens als startpunten<br>• <strong>Minion resources:</strong> Eigen resourcekaarten voor Ringwraith spelers<br>• <strong>Sideboard wissel:</strong> Bij deck exhaustion: max. 5 kaarten wisselen tussen discard pile en sideboard<br>• <strong>Ring testing:</strong> Uitgebreide regels voor gold ring items</p></div>
-  <div class="rule"><span class="rule-id">MELE.GI</span><p>Ringwraith-spelers hebben 5 extra GI punten die niet voor karakters gebruikt mogen worden, maar wel bovenop de beschikbare GI tellen.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
+  <p>Introduces the Ringwraith play style with Minion characters, Darkhavens, and a full parallel card system for the forces of Sauron.</p>
+  <h2>Rules Introduced</h2>
+  <div class="rule"><p>&bull; <strong>Ringwraith alignment:</strong> Minion characters, Darkhavens as safe sites, Ringwraith mode rules (Black Rider, Fell Rider, Heralded Lord) &bull; <strong>Ringwraith followers:</strong> Additional Ringwraith avatars playable as followers under DI &bull; <strong>Detainment:</strong> Attacks that tap instead of wound certain companies &bull; <strong>Company vs. Company Combat (CvCC):</strong> Resource player's company may attack hazard player's company at end of site phase &bull; <strong>On-guard cards:</strong> Face-down hazard cards placed on sites during movement/hazard phase &bull; <strong>Gold Ring testing rules expanded</strong> &bull; <strong>Sideboard exchange on exhaustion</strong> (up to 5 cards)</p></div>
+  <div class="rule"><span class="rule-id">1.12.R1</span><p>Ringwraith players receive an additional 5 GI that cannot be used to control characters. Characters in a Ringwraith's company receive +2 to corruption checks.</p><div class="rule-tags"><span class="tag tag-ringwraith">Ringwraith</span></div></div>
 </div>
 
 <div class="wiki-section" id="sec-meas">
-  <div class="section-label">Reeks · 1997</div>
+  <div class="section-label">Set &middot; 1997</div>
   <h1 class="section-title">Middle-earth: Against the Shadow</h1>
-  <p>Uitbreiding voor de Ringwraith-speelstijl met extra minion karakters, sites in het Zuiden en Oosten, en nieuwe hazards.</p>
-  <h2>Nieuwe Regels in MEAS</h2>
-  <div class="rule"><p>• Extra minion resources en hazards<br>• Nieuwe sites in Harad, Rhûn en Khand<br>• Uitgebreide factie-opties voor Ringwraith-spelers</p></div>
+  <p>Expands the Ringwraith play style with additional Minion characters, new sites in the South and East (Harad, Rh&ucirc;n, Khand), expanded faction options, and new hazards. Also adds region cards for use with Region Movement maps.</p>
+  <h2>What's New</h2>
+  <div class="rule"><p>&bull; Additional Minion resources and hazards &bull; New sites in Harad, Rh&ucirc;n, Khand, and Far East &bull; Expanded faction and character options for Ringwraith players &bull; Additional Dragon manifestations and hazard events</p></div>
 </div>
 
 <div class="wiki-section" id="sec-mewh">
-  <div class="section-label">Reeks · 1997</div>
+  <div class="section-label">Set &middot; 1997</div>
   <h1 class="section-title">Middle-earth: The White Hand</h1>
-  <p>Introduceert de Fallen-wizard speelstijl. Gecorrumpeerde Tovenaars met Stage resources en eigen startsites.</p>
-  <h2>Nieuwe Regels in MEWH</h2>
-  <div class="rule"><p>• <strong>Fallen-wizard alignment:</strong> Mix van hero en minion<br>• <strong>Stage resources:</strong> Permanent-events die extra mogelijkheden ontgrendelen<br>• <strong>Hidden Haven:</strong> Kan op een Ruins & Lairs gespeeld worden als Fallen-wizard startsite<br>• <strong>Covert/Overt status:</strong> Fallen-wizard gezelschappen kunnen covert of overt zijn, wat beïnvloedt of bepaalde aanvallen detainment zijn</p></div>
-  <div class="rule"><span class="rule-id">MEWH.Opponent</span><p>Als een speler zich als Fallen-wizard declareert, mag zijn Wizard-tegenstander de bijbehorende Wizard-avatar uit zijn deck vervangen door een andere Wizard-avatar.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
+  <p>Introduces the Fallen-wizard play style with Stage resources, covert/overt company status, and a unique mix of Hero and Minion mechanics.</p>
+  <h2>Rules Introduced</h2>
+  <div class="rule"><p>&bull; <strong>Fallen-wizard alignment:</strong> Mix of Hero and Minion characters; treated as Hero or Minion depending on company's covert/overt status &bull; <strong>Stage resources:</strong> Permanent-events that unlock additional capabilities (e.g. playing Orc characters) &bull; <strong>Hidden Haven:</strong> Ruins &amp; Lairs site may serve as a Wizardhaven for Fallen-wizard players &bull; <strong>Modified GI:</strong> General influence set by white-hand number on avatar card &bull; <strong>Fallen-wizard avatar declaration</strong> at game start, allowing opponent to swap their corresponding Wizard avatar</p></div>
+  <div class="rule"><span class="rule-id">2.II.2.1.F2</span><p>When a Fallen-wizard avatar is played, the player's general influence immediately becomes the number in the white hand on the left side of the avatar card, for as long as the avatar is in play.</p><div class="rule-tags"><span class="tag tag-fallen">Fallen-wizard</span></div></div>
 </div>
 
 <div class="wiki-section" id="sec-meba">
-  <div class="section-label">Reeks · 1998</div>
+  <div class="section-label">Set &middot; 1998</div>
   <h1 class="section-title">Middle-earth: The Balrog</h1>
-  <p>Introduceert de Balrog-speelstijl. Speelt diep in de Underdeeps van Moria met Orc en Troll minions.</p>
-  <h2>Nieuwe Regels in MEBA</h2>
-  <div class="rule"><p>• <strong>Balrog alignment:</strong> Enkel Orc/Troll minions, max. mind 8 (tenzij Balrog-specifiek)<br>• <strong>Under-deeps:</strong> Nieuwe sitecategorie diep onder de grond met eigen bewegingsregels<br>• <strong>Balrog-specifieke sites:</strong> Eigen versies van Moria, Carn Dûm, Dol Guldur, Minas Morgul<br>• <strong>Geann a-Lisch:</strong> Wordt behandeld als Ruins & Lairs zonder Darkhaven effecten</p></div>
-  <div class="rule"><span class="rule-id">MEBA.Under</span><p>Beweging naar een aangrenzende Under-deeps site vereist een worp. Als de worp mislukt, keert het gezelschap terug naar zijn site of origin.</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
+  <p>Introduces the Balrog play style, the Under-deeps site category, and Balrog-specific site versions. The final set published by Iron Crown Enterprises.</p>
+  <h2>Rules Introduced</h2>
+  <div class="rule"><p>&bull; <strong>Balrog alignment:</strong> Single avatar (The Balrog), only Orc/Troll characters, mind less than 9 &bull; <strong>Under-deeps sites:</strong> New site category beneath the surface with required movement rolls &bull; <strong>Balrog-specific site versions:</strong> Unique versions of Moria, Carn D&ucirc;m, Dol Guldur, Minas Morgul, and all Under-deeps/Dark-holds &bull; <strong>Balrog never makes corruption checks</strong> &bull; <strong>Trophies:</strong> Orc/Troll characters may take defeated creatures as trophies (minor items with bonus prowess/DI based on total trophy MPs)</p></div>
+  <div class="rule"><span class="rule-id">3.IV.3</span><p><strong>Trophy bonuses:</strong> 1 total MP on trophies: +1 DI. 2 MPs: +1 DI, +1 prowess. 3 MPs: +2 DI, +1 prowess. 4+ MPs: +2 DI, +2 prowess (maximum prowess bonus applies a cap of 9).</p><div class="rule-tags"><span class="tag tag-balrog">Balrog</span></div></div>
 </div>
 
-<!-- ══ GLOSSARIUM ══ -->
+<!-- ══ GLOSSARY ══ -->
 <div class="wiki-section" id="sec-glossarium">
-  <div class="section-label">Referentie</div>
-  <h1 class="section-title">Glossarium</h1>
+  <div class="section-label">Reference</div>
+  <h1 class="section-title">Glossary</h1>
   <div id="glossList">
-    <div class="gloss-item"><div class="gloss-term">Ally</div><div class="gloss-def">Resource die een persoonlijkheid vertegenwoordigt die de Vrije Volkeren helpt (bv. Tom Bombadil, Treebeard). Wordt gespeeld tijdens de Site Fase.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Automatic Attack</div><div class="gloss-def">Aanval die doorstaan moet worden om een site te betreden en te verkennen. Staat op de sitekaart. Kan niet vermeden worden door Stealth.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Avatar</div><div class="gloss-def">De Wizard, Ringwraith, Fallen-wizard of Balrog die jou vertegenwoordigt in het spel. Als je avatar geëlimineerd wordt, verlies je -5 MP en kan geen nieuwe gespeeld worden.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Body Check</div><div class="gloss-def">Worp (2D6) wanneer een karakter gewond raakt. Als de uitkomst ≥ body attribuut: karakter geëlimineerd.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Company</div><div class="gloss-def">Groep karakters die samen reizen en acties ondernemen.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Corruption Check</div><div class="gloss-def">Worp (2D6 - Corruption Points) om te kijken of een karakter gecorrumpeerd wordt en het spel verlaat.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Darkhaven</div><div class="gloss-def">Haven-equivalent voor Ringwraith en Balrog spelers. Minas Morgul en Dol Guldur zijn de startende Darkhavens.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Detainment</div><div class="gloss-def">Type aanval waarbij succesvolle strikes het karakter enkel tappen (niet verwonden). Geen body check mogelijk.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Direct Influence (DI)</div><div class="gloss-def">Attribuut van sommige karakters waarmee ze andere karakters als follower kunnen controleren.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Discard Pile</div><div class="gloss-def">Stapel ge-discarde kaarten naast het speeldeck. Wordt het nieuwe speeldeck wanneer het speeldeck leeg raakt.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Exhausted Deck</div><div class="gloss-def">Speeldeck is leeg. Trigger voor sideboard-wissel, site-kaarten terugplaatsen en herschudden van de discard pile.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Faction</div><div class="gloss-def">Resource die een groep mensen of wezens vertegenwoordigt (bv. Riders of Rohan). Wordt in spel gebracht via een influence-poging.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Fallen-wizard</div><div class="gloss-def">Gecorrumpeerde Tovenaar. Mix van hero en minion kaarten. Introduceert Stage resources. Speelt vanuit White Towers of Rhudaur/Arthedain.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Follower</div><div class="gloss-def">Karakter gecontroleerd door het Direct Influence van een ander karakter. Telt niet mee voor de GI-pool van de controller.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Free Council</div><div class="gloss-def">Eindspelmoment: MP's worden geteld en de winnaar bepaald. Alle karakters maken eerst één corruptie-check.</div></div>
-    <div class="gloss-item"><div class="gloss-term">General Influence (GI)</div><div class="gloss-def">Pool van 20 punten (25 voor Ringwraith/Balrog) om karakters te controleren. Totaal mind van karakters mag GI niet overschrijden.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Hand Size</div><div class="gloss-def">Aantal kaarten dat een speler in de hand houdt. Standaard 8. Reset aan het einde van de bewegings/hazard fase.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Haven</div><div class="gloss-def">Veilige startplaats voor Wizard-spelers (bv. Rivendell, Lórien). Karakters herstellen hier. Items kunnen hier opgeslagen worden.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Hazard Limit</div><div class="gloss-def">Maximaal aantal hazards dat de tegenstander op een bewegend gezelschap mag spelen: max(2, grootte gezelschap).</div></div>
-    <div class="gloss-item"><div class="gloss-term">Hoard</div><div class="gloss-def">Sites met een Dragon automatic-attack bevatten een hoard. Na verslaan van de Dragon: geen hoard meer.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Long-event</div><div class="gloss-def">Event-kaart die in spel blijft tot de volgende Long-event Fase van de volgende beurt.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Marshalling Points (MP)</div><div class="gloss-def">Overwinningspunten. Doelstelling: 25 MP vergaren. Komen van karakters, items, allies, facties, en verslagen creatures.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Mind</div><div class="gloss-def">Attribuut van karakters. Bepaalt hoeveel GI nodig is om het karakter te controleren.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Permanent-event</div><div class="gloss-def">Event-kaart die in spel blijft totdat een kaart of effect hem discards.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Pool</div><div class="gloss-def">Set van tot 10 niet-avatar karakters (en 2 minor items) buiten het speeldeck. Gebruikt voor de Character Draft.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Prowess</div><div class="gloss-def">Aanvalskracht van een karakter of creature. Bepaalt de moeilijkheidsgraad van een strike.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Removed-from-play</div><div class="gloss-def">Pile voor geëlimineerde avatars en andere kaarten die permanent uit het spel verwijderd zijn.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Short-event</div><div class="gloss-def">Event-kaart die direct na spelen ge-discard wordt. Eenmalig effect.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Sideboard</div><div class="gloss-def">Reserve deck (30-40 kaarten). Kaarten kunnen gewisseld worden met de discard pile bij exhaustion van het speeldeck (max. 5).</div></div>
-    <div class="gloss-item"><div class="gloss-term">Site of Origin</div><div class="gloss-def">De site van een gezelschap aan het begin van de Bewegings/Hazard Fase. Het gezelschap is "en route" naar zijn doelsite.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Site Path</div><div class="gloss-def">Reeks regio's tussen de huidige site en de dichtstbijzijnde Haven, zoals vermeld op de sitekaart. Bepaalt welke hazards speelbaar zijn.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Stage Resource</div><div class="gloss-def">Fallen-wizard specifieke permanent-events die extra mogelijkheden ontgrendelen (bv. het spelen van Orc karakters).</div></div>
-    <div class="gloss-item"><div class="gloss-term">Strike</div><div class="gloss-def">Individuele aanval binnen een grotere aanval (attack). Een aanval kan meerdere strikes hebben.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Tap / Untap</div><div class="gloss-def">Kaart 90° draaien (tap) om aan te geven dat hij gebruikt is. Terugdraaien (untap) aan het begin van de volgende Untap Fase.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Trophy</div><div class="gloss-def">Verslagen creature-kaart die de winnaar bijhoudt voor marshalling points.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Twilight</div><div class="gloss-def">Speciale kaart: kan op elk moment gespeeld worden als resource of hazard. Telt nooit mee voor het hazard limiet.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Under-deeps</div><div class="gloss-def">Sitecategorie diep onder de grond. Geïntroduceerd in The Balrog. Vereist een worp om naar een aangrenzende Under-deeps site te bewegen.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Unique</div><div class="gloss-def">Kaart waarvan slechts één kopie tegelijk in spel kan zijn (over beide spelers heen). Max. 1 kopie per deck.</div></div>
-    <div class="gloss-item"><div class="gloss-term">Wound</div><div class="gloss-def">Toestand van een beschadigd karakter. Gewonde karakters krijgen -2 prowess. Herstelling alleen mogelijk op een Haven (Untap Fase).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Action</div><div class="gloss-def">A one-time activity that changes the board state when performed (e.g. drawing a card, rolling dice, moving a company, tapping/discarding/playing a card, etc.).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Agent</div><div class="gloss-def">A card that may be played as a hazard (or as a character by Ringwraith/Fallen-wizard players). Agents can move, attack, and make influence attempts. Total mind of all agents in a deck cannot exceed 36.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Ally</div><div class="gloss-def">A resource representing a non-character personality (e.g. Tom Bombadil, Treebeard). Played during the site phase by tapping a character; taps the site. Allies are not characters except for combat, skill-only effects, and healing purposes.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Automatic-Attack</div><div class="gloss-def">An attack listed on a site card that must be faced in order to enter the site. Cannot be avoided by Stealth or Secret Entrance. A character at its (named) home site may tap to cancel it.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Avatar</div><div class="gloss-def">The Wizard, Ringwraith, Fallen-wizard, or Balrog card representing the player in the game. If eliminated: &minus;5 miscellaneous MPs, no new avatar may be played.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Body Check</div><div class="gloss-def">A 2D6 roll made by the non-controlling player against an entity's body. If the modified roll &gt; body: entity is eliminated. Body checks resolve immediately after wounds/defeats.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Chain of Effects</div><div class="gloss-def">A sequence of declared (but unresolved) actions that resolves in reverse order of declaration (Last In, First Out). The resource player always has priority to initiate a new chain.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Company</div><div class="gloss-def">A group of characters moving and acting together at a single site. Maximum size 7 at non-haven sites (Hobbits/Orc scouts count as half). No maximum at havens.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Corruption Check</div><div class="gloss-def">A 2D6 roll compared to a character's corruption point total. Result &gt; total: success. Result = total or one less: Hero discarded, Wizard eliminated, Minion taps. Result &lt; by 2+: character eliminated.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Corruption Points (CP)</div><div class="gloss-def">Points on cards a character controls that form the corruption point total. Items, some hazards, and other cards can add CPs. The One Ring adds substantial corruption.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Darkhaven</div><div class="gloss-def">A Minion haven site (the Ringwraith/Balrog equivalent of a Hero haven). Minas Morgul and Dol Guldur are the primary starting Darkhavens for Ringwraith players; Moria and Under-gates for Balrog.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Detainment</div><div class="gloss-def">An attack type where successful strikes tap characters instead of wounding them. No body checks are ever made from detainment strikes. Detainment creatures yield no MPs when defeated.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Direct Influence (DI)</div><div class="gloss-def">A character attribute (black hand symbol) used to control followers, make influence attempts, and recruit factions. A character can control a follower whose mind &le; the character's available DI.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Discard Pile</div><div class="gloss-def">The pile of discarded cards beside the play deck. When the play deck is exhausted, the discard pile (after sideboard exchange and returning site cards) is shuffled to form the new play deck.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Exhausted Deck</div><div class="gloss-def">When the last card is drawn from the play deck: return site cards to location deck, exchange up to 5 cards with sideboard, then shuffle the discard pile into the new play deck. This happens immediately.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Faction</div><div class="gloss-def">A resource representing a large group or unique Dragon that can be recruited. Played via an influence check during the site phase. Factions must remain in play (not stored) to count MPs.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Fallen-wizard</div><div class="gloss-def">A corrupted Wizard who has strayed from the Free Peoples' cause. Plays a mix of Hero and Minion cards; uses Stage resources; covert/overt company status. Introduced in MEWH (1997).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Follower</div><div class="gloss-def">A character controlled by another character's direct influence. The follower's mind is deducted from the controlling character's DI rather than from the player's GI. Followers cannot have followers.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Free Council</div><div class="gloss-def">The end-game procedure for Wizard players. When the game ends: all non-Ringwraith/non-Balrog characters make corruption checks, then MPs are totaled, doubled/halved as needed, duplicates revealed, and avatar penalties applied.</div></div>
+    <div class="gloss-item"><div class="gloss-term">General Influence (GI)</div><div class="gloss-def">A pool of 20 points (25 for Ringwraith/Balrog, of which 5 cannot control characters) used to control non-follower characters. Available GI = GI &minus; sum of non-follower character minds; always stops at zero.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Hand Size</div><div class="gloss-def">Number of cards a player holds. Base hand size is 8. Reset at end of each movement/hazard phase and end-of-turn phase. Effects may modify base hand size cumulatively.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Haven</div><div class="gloss-def">A safe site for Hero characters (Rivendell, L&oacute;rien, etc.). Characters heal at havens during the untap phase. Items may be stored at havens. Companies at havens have no size limit.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Hazard Limit</div><div class="gloss-def">The maximum number of hazard cards the hazard player may play against a company per movement/hazard phase: max(2, company size), rounded up. Halved (rounded up) if the hazard player accessed their sideboard during the untap phase.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Hoard</div><div class="gloss-def">A designation indicating that certain items are playable at a site. Any site that has a Dragon automatic-attack at the beginning of a turn contains a hoard. Defeated Dragon manifestations remove the hoard.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Long-event</div><div class="gloss-def">An event card that stays in play for one full turn cycle (one rotation of all players' turns). Resource long-events are discarded at the start of the resource player's long-event phase.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Manifestation</div><div class="gloss-def">A mechanically different version of the same entity. Only one manifestation of a unique entity can be in play at a time (except Dragon manifestations). Avatar manifestations may be played even if other manifestations of the same avatar exist in play.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Marshalling Points (MP)</div><div class="gloss-def">Victory points. Goal: 25 MP (Short game). Sources: character MPs, ally MPs, item MPs, faction MPs, kill MPs (defeated creatures), miscellaneous MPs. Eliminated avatar: &minus;5 MP.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Mind</div><div class="gloss-def">Character attribute (white head symbol) indicating how much GI or DI is needed to control the character. Also used in influence attempts against characters and allies.</div></div>
+    <div class="gloss-item"><div class="gloss-term">On-Guard Card</div><div class="gloss-def">A hazard card placed face-down on a site during the movement/hazard phase (counts 1 against hazard limit). May be revealed during the site phase if specific conditions are met.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Permanent-event</div><div class="gloss-def">An event card that stays in play until discarded by a rule or effect. Can only be played if it would have an immediate or potential effect on the game. Discarded immediately if all characters in its company leave play.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Pool</div><div class="gloss-def">Up to 10 non-avatar characters (and 2 minor items) set aside before the game for the character draft. Unused pool characters may be shuffled into the play deck or removed from the game.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Prowess</div><div class="gloss-def">The combat strength of a character, creature, or attack. Used in strike resolution: defender rolls 2D6 + prowess vs. the attack's prowess.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Removed-from-play</div><div class="gloss-def">A pile for eliminated avatars and other cards permanently removed from the game. Cards with * MPs go here when defeated by Wizard players instead of to the MP pile.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Short-event</div><div class="gloss-def">An event card that resolves and is immediately discarded. Must have some immediate effect on the board state (cannot be played just to discard it).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Sideboard</div><div class="gloss-def">A reserve set of 30&ndash;40 cards accessed during the game. Hazard player may access during opponent's untap phase (halves hazard limits). Resource player may access by tapping avatar. Up to 5 cards exchanged with discard pile on deck exhaustion.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Site of Origin</div><div class="gloss-def">The site a company is departing from during its movement/hazard phase. Once the new site is revealed, the company is "between" sites until the site of origin is removed at the end of the movement/hazard phase.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Site Path</div><div class="gloss-def">The sequence of regions between a company's current site and new site, as determined by the movement type used. Determines which creature hazards are playable against the company.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Stage Resource</div><div class="gloss-def">Fallen-wizard-specific permanent-events that unlock additional capabilities (e.g. playing Orc characters). Exactly 3 stage points totaling to 3 must be in the Fallen-wizard pool at game start. Only playable during the organization phase.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Strike</div><div class="gloss-def">An individual attack within a larger attack. Resolved through the Strike Sequence (steps 1&ndash;6 per 3.iv). An attack may have multiple strikes.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Tap / Untap</div><div class="gloss-def">Tapping a card (rotating 90&deg;) marks it as used. Untapping (rotating back) happens at the start of the untap phase for all non-site cards. Site cards never untap via the untap phase; they reset only when the play deck is exhausted.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Trophy</div><div class="gloss-def">A defeated creature card held by an Orc or Troll character that faced one of its strikes. Treated as a minor item worth 0 CP; provides prowess/DI bonuses based on total printed MP value. Cannot be transferred or stored.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Twilight</div><div class="gloss-def">The only card playable at any time by either player as either a resource or a hazard. Never counts against the hazard limit. The sole exception to phase-based play restrictions.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Under-deeps</div><div class="gloss-def">A site category deep beneath Middle-earth. Introduced in MEBA. Movement between adjacent Under-deeps sites requires a roll; failure keeps the company at its current site (not treated as returning to site of origin).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Unique</div><div class="gloss-def">A card type of which only one copy may exist in play simultaneously (across both players). Max 1 copy per deck (except avatars). Only face-up agents count for uniqueness checks.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Wound / Wounded</div><div class="gloss-def">A character state (the card is inverted/rotated 180&deg;) resulting from a successful strike. Wounded characters receive &minus;2 prowess in combat. Can only heal at a haven during the untap phase (moves to tapped). Triggers a body check immediately after wounding.</div></div>
   </div>
 </div>
 
 <!-- ══ ERRATA ══ -->
 <div class="wiki-section" id="sec-errata">
-  <div class="section-label">Referentie</div>
-  <h1 class="section-title">Errata & Clarifications</h1>
-  <p>Officiële correcties op kaartteksten en regelklaringen.</p>
-  <h2>Belangrijkste Kaart-errata</h2>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Muster:</strong> Volledige tekst vervangen door "Warrior only. Een influence check against a faction by a warrior is modified by adding the warrior's prowess to a maximum modifier of +5."</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Treebeard:</strong> Vervang "Redhorn Gap" door "Redhorn Gate". Kan bewegen in: Fangorn, Rohan, Gap of Isen, Wold & Foothills, Enedhwaith, Old Pukel-land, Brown Lands, Anduin Vales, Redhorn Gate. Wordt ge-discard aan begin van M/H fase bij verboden regio's.</p><div class="rule-tags"><span class="tag tag-errata">Errata CoE 2024</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Tom Bombadil:</strong> Speelbaar bij Old Forest. Tap om een hazard te annuleren gericht op een gezelschap dat beweegt naar een site in: Arthedain, Cardolan, Rhudaur of The Shire. Discard bij verboden regio's.</p><div class="rule-tags"><span class="tag tag-errata">Errata CoE 2024</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Rescue Prisoners:</strong> Geeft 2 MP, niet 3. MP's tellen alleen wanneer de kaart opgeslagen is.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>River:</strong> Moet luiden "Playable on a site. If a company that has moved to this site this turn does not tap a ranger, it must do nothing during its site phase." Je hebt tot het begin van de site fase om een ranger te tappen.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Siege:</strong> Verander Border-land symbool in eerste regel naar Border-hold symbool. Verdwijnt wanneer alle kopieën van de betreffende site ge-discard zijn.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Sacrifice of Form:</strong> Vervang "-3 to any body checks" door "+3 to any body checks".</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Not at Home:</strong> Kan alleen automatic attacks annuleren van Dragon, Drake of Troll, niet andere aanvallen.</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <div class="rule"><span class="rule-id">Errata</span><p><strong>Lure of Nature:</strong> Vervang "at the end of each movement/hazard phase" door "after all other hazards have been played."</p><div class="rule-tags"><span class="tag tag-errata">Errata</span></div></div>
-  <h2>Belangrijke Regelklaringen</h2>
-  <div class="rule"><span class="rule-id">CRF</span><p><strong>Regio-beweging na splitsing:</strong> Bij het splitsen van een gezelschap mogen alle resulterende gezelschappen met regio-beweging reizen. Niet beperkt tot één gezelschap.</p><div class="rule-tags"><span class="tag tag-errata">Rules Errata</span></div></div>
-  <div class="rule"><span class="rule-id">CRF</span><p><strong>Karakter spelen zonder invloed:</strong> Je mag een karakter spelen als je onvoldoende invloed hebt. Maar aan het einde van de Organisatiefase moet elk karakter zonder voldoende invloed teruggestuurd worden naar je hand.</p><div class="rule-tags"><span class="tag tag-errata">Rules Errata</span></div></div>
-  <div class="rule"><span class="rule-id">CRF</span><p><strong>On-guard kaarten:</strong> Een on-guard kaart kan alleen onthuld worden als hij ook gespeeld had kunnen worden tijdens de Bewegings/Hazard Fase. Alle doelwitten moeten bestaan hebben tijdens die fase.</p><div class="rule-tags"><span class="tag tag-errata">Rules Errata</span></div></div>
+  <div class="section-label">Reference</div>
+  <h1 class="section-title">Errata &amp; Clarifications</h1>
+  <p>Official corrections from the Council of Elrond Collected Rulings File (CRF). The CRF is maintained by the CoE Rules Committee; CRF 22 was published January 2026.</p>
+  <h2>Key Card Errata</h2>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Muster:</strong> Replace full text with: "Warrior only. An influence check against a faction by a warrior is modified by adding the warrior's prowess to a maximum modifier of +5."</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>River:</strong> Should read: "Playable on a site. If a company that has moved to this site this turn does not tap a ranger, it must do nothing during its site phase." A ranger must be tapped by the beginning of the site phase.</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Sacrifice of Form:</strong> Replace "&minus;3 to any body checks" with "+3 to any body checks."</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Alatar [CoE IE 2018]:</strong> "he must tap and make a corruption check immediately following the attack" becomes "he must make a corruption check immediately following the attack, and, if untapped, he must tap."</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Nazg&ucirc;l body modification [CoE 2024]:</strong> "...gives &minus;1 penalty to one..." becomes "...modifies any one character's body by &minus;1 for the rest of the turn."</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>An Unexpected Party [CoE 2026]:</strong> Change "on a given turn" to "during this organization phase."</p><div class="rule-tags"><span class="tag tag-errata">Card Errata CRF 22</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Not at Home:</strong> Can only cancel automatic-attacks from Dragon, Drake, or Troll creatures.</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Lure of Nature:</strong> Replace "at the end of each movement/hazard phase" with "after all other hazards have been played."</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Errata</span><p><strong>Siege:</strong> Change Border-land symbol in first line to Border-hold symbol. The card disappears when all copies of the affected site are discarded.</p><div class="rule-tags"><span class="tag tag-errata">Card Errata</span></div></div>
+  <h2>Key Rules Clarifications (CRF)</h2>
+  <div class="rule"><span class="rule-id">Rules Erratum</span><p><strong>Region movement after splitting:</strong> When a company splits, any of the resulting companies may move with region movement. Region movement is not limited to one company of a split.</p><div class="rule-tags"><span class="tag tag-errata">Rules Errata</span></div></div>
+  <div class="rule"><span class="rule-id">Rules Erratum</span><p><strong>Company returned to site of origin:</strong> If a company is returned to its site of origin, it may do nothing during its site phase. A company failing its Under-deeps movement roll is not affected by this rule. A company that is sent back is not considered to have moved to that site this turn.</p><div class="rule-tags"><span class="tag tag-errata">Rules Errata</span></div></div>
+  <div class="rule"><span class="rule-id">CRF</span><p><strong>Playing a character over influence:</strong> A player may play a character even if they have insufficient influence at the time of playing. However, at the end of the organization phase, any character without sufficient influence must be returned to the player's hand (or discarded if not played this turn).</p><div class="rule-tags"><span class="tag tag-errata">Rules Clarification</span></div></div>
+  <div class="rule"><span class="rule-id">CRF</span><p><strong>On-guard cards:</strong> An on-guard card can only be revealed if it could have been legally played during the movement/hazard phase. All targets must have existed during that phase. Cards that directly tap a character in the company, return the company to its site of origin, tap the site, or force the company to do nothing cannot be revealed on-guard.</p><div class="rule-tags"><span class="tag tag-errata">Rules Clarification</span></div></div>
+  <div class="rule"><span class="rule-id">CRF Hazard Limit</span><p><strong>Hazard limit modifications:</strong> When a card modifying the hazard limit leaves play or no longer has its conditions met, the hazard limit reverts to what it would have been without that effect applied.</p><div class="rule-tags"><span class="tag tag-errata">Rules Clarification</span></div></div>
+  <div class="rule"><span class="rule-id">CRF Free Council tie</span><p><strong>Tie at Free Council [CoE 2002]:</strong> If there is a tie, one corruption point is added to each non-Wizard, non-Ringwraith character in play. All characters then make corruption checks, after which marshalling points are recounted.</p><div class="rule-tags"><span class="tag tag-errata">Rules Clarification</span></div></div>
+  <div class="rule"><span class="rule-id">CRF Hoard</span><p><strong>Hoard sites [CRF 17]:</strong> Any site that had a Dragon automatic-attack at the beginning of the current turn contains a hoard. Not "any site that ever had a Dragon automatic-attack."</p><div class="rule-tags"><span class="tag tag-errata">Rules Clarification</span></div></div>
 </div>
 
-<!-- ══ MP SCORE ══ -->
+<!-- ══ MARSHALLING POINTS ══ -->
 <div class="wiki-section" id="sec-mpscore">
-  <div class="section-label">Referentie</div>
+  <div class="section-label">Reference</div>
   <h1 class="section-title">Marshalling Points</h1>
-  <p>Marshalling Points (MP) bepalen wie wint. Doelstelling: 25 MP vergaren voor de Free Council.</p>
+  <p>Marshalling points (MPs) determine the winner. Goal: 25 MPs (Short game). Counted and adjusted at the Free Council / Audience with Sauron / Day of Reckoning.</p>
+  <h2>MP Sources (Rule 10.3.ii)</h2>
   <table>
-    <tr><th>Bron</th><th>MP</th><th>Voorwaarde</th></tr>
-    <tr><td>Minor item</td><td>0–1</td><td>In bezit van karakter</td></tr>
-    <tr><td>Major item</td><td>2</td><td>In bezit van karakter</td></tr>
-    <tr><td>Greater item</td><td>4</td><td>In bezit van karakter</td></tr>
-    <tr><td>Ally</td><td>1–2</td><td>Ally in spel bij gezelschap</td></tr>
-    <tr><td>Factie</td><td>2–5</td><td>Factie in spel</td></tr>
-    <tr><td>Verslagen creature</td><td>Variabel</td><td>Trophy in MP pile</td></tr>
-    <tr><td>Avatar geëlimineerd</td><td>-5</td><td>Eigen avatar verslagen</td></tr>
-    <tr><td>Speciale kaarten</td><td>Variabel</td><td>Zie kaarttekst</td></tr>
+    <tr><th>Category (Symbol)</th><th>Source</th><th>Notes</th></tr>
+    <tr><td>Character (octagon)</td><td>Character cards in play</td><td>Subtract negative MPs from eliminated characters</td></tr>
+    <tr><td>Ally (triangle up)</td><td>Ally cards in play</td><td>Only counts if ally is still in play</td></tr>
+    <tr><td>Item (square)</td><td>Item cards in play or stored</td><td>Stored items count; Minion items = half for Wizard players (rounded up)</td></tr>
+    <tr><td>Faction (triangle down)</td><td>Faction cards in play</td><td>Must be in play, not stored</td></tr>
+    <tr><td>Kill (circle)</td><td>Defeated non-detainment creatures/agents</td><td>Not from cards you yourself played</td></tr>
+    <tr><td>Miscellaneous (diamond)</td><td>Other cards (information, special resources)</td><td>&minus;5 if avatar was eliminated (applied last)</td></tr>
   </table>
-  <div class="callout callout-warn"><strong>Free Council:</strong> Alleen kaarten die nog in spel zijn bij de Free Council tellen mee. Opgeslagen items en kaarten in de discard pile tellen niet.</div>
-  <div class="rule"><span class="rule-id">MP.1</span><p>Kaarten opgeslagen op een Haven tellen als "in spel" voor MP-doeleinden — ze worden beschouwd als veilig bewaard.</p></div>
+  <h2>Free Council Modifications (Rules 10.3.iii&ndash;vi)</h2>
+  <div class="rule"><span class="rule-id">10.3.iii</span><p><strong>Doubling:</strong> If a player has zero or fewer MPs in a source (other than Kill or Miscellaneous), their opponent's MPs from that source are doubled.</p></div>
+  <div class="rule"><span class="rule-id">10.3.iv</span><p><strong>Half rule:</strong> If more than half of a player's total MPs come from a single source (ignoring negative sources), that player reduces that source until it equals no more than half their total.</p></div>
+  <div class="rule"><span class="rule-id">10.3.v</span><p><strong>Duplicate reveal:</strong> Each player may reveal cards from their hand that match unique cards giving the opponent MPs. For each card revealed, the opponent's total is reduced by 1.</p></div>
+  <div class="rule"><span class="rule-id">10.3.vi</span><p><strong>Avatar penalty:</strong> &minus;5 MPs applied after all other modifications if a player's avatar was eliminated.</p></div>
+  <h2>Calling the Game (Rule 10.2)</h2>
+  <table>
+    <tr><th>Game Length</th><th>Player May Call When</th><th>Automatic End When</th></tr>
+    <tr><td>Starter (1-deck)</td><td>20+ MPs and deck exhausted once</td><td>Both decks exhausted once</td></tr>
+    <tr><td>Short (2-deck)</td><td>25+ MPs and deck exhausted once, or deck exhausted twice</td><td>Both decks exhausted twice</td></tr>
+    <tr><td>Long (3-deck)</td><td>30+ MPs and deck exhausted twice, or deck exhausted three times</td><td>Both decks exhausted three times</td></tr>
+    <tr><td>Campaign (4-deck)</td><td>40+ MPs and deck exhausted three times, or deck exhausted four times</td><td>Both decks exhausted four times</td></tr>
+  </table>
+  <div class="callout callout-warn"><strong>Note:</strong> MPs from cards at Under-deeps sites do NOT count toward the calling threshold. Ringwraith and Balrog players must play <em>Sudden Call</em> to end the game; they cannot call freely.</div>
 </div>
 
-<!-- ══ TIMING ══ -->
+<!-- ══ TIMING & ACTIONS ══ -->
 <div class="wiki-section" id="sec-timing">
-  <div class="section-label">Referentie</div>
-  <h1 class="section-title">Timing & Acties</h1>
-  <h2>Chain of Effects</h2>
-  <div class="rule"><span class="rule-id">Tim.1</span><p>Een reeks acties die als reactie op elkaar verklaard worden is een <strong>chain of effects</strong>. Alle kaarten worden gespeeld en getapt met dezelfde "snelheid" — effecten treden onmiddellijk in.</p></div>
-  <div class="rule"><span class="rule-id">Tim.2</span><p>Wanneer spelers klaar zijn met acties in een fase en alle end-of-phase acties opgelost zijn, begint de volgende fase onmiddellijk — geen mogelijkheid voor extra acties tussen fasen of beurten.</p></div>
-  <h2>AEP (Actions at End of Phase)</h2>
-  <div class="rule"><span class="rule-id">Tim.3</span><p>AEP-acties kunnen alleen plaatsvinden aan het einde van een fase. De AEP-periode begint wanneer alle spelers verklaren geen verdere niet-AEP acties te willen ondernemen, en eindigt wanneer alle acties opgelost zijn.</p><div class="rule-tags"><span class="tag tag-errata">CoE IE 2018</span></div></div>
-  <h2>Passieve Condities</h2>
-  <div class="rule"><span class="rule-id">Tim.4</span><p>Als een kaart specificeert dat een actie plaatsvindt als gevolg van een passieve conditie, wordt die actie automatisch de eerste actie in de volgende chain of effects. De conditie moet nog bestaan wanneer de resulterende actie opgelost wordt, anders wordt de actie geannuleerd.</p></div>
-  <div class="callout callout-tip"><strong>Twilight timing:</strong> Twilight kan op elk moment gespeeld worden — ook als reactie op een actie in een chain of effects. Telt niet mee voor het hazard limiet en is de enige uitzondering op de timing regels.</div>
-</div>
-
-<!-- ══ UNTAP FASE ══ (detail) -->
-<div class="wiki-section" id="sec-untap" style="display:none"></div>
-<div class="wiki-section" id="sec-longEvent" style="display:none">
-  <div class="section-label">Fase 3</div>
-  <h1 class="section-title">Lange-event Fase</h1>
-  <div class="rule"><span class="rule-id">LE.1</span><p>Aan het begin van de Lange-event Fase worden alle lange-events in spel ge-discard. Daarna mag de resource player nieuwe lange-events spelen.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
-  <div class="callout callout-warn"><strong>Volgorde:</strong> Eerst alle bestaande lange-events verwijderen, dan pas nieuwe spelen. Gates of Morning en Doors of Night volgen dit patroon.</div>
-</div>
-<div class="wiki-section" id="sec-eindBeurt" style="display:none">
-  <div class="section-label">Fase 6</div>
-  <h1 class="section-title">Einde Beurt Fase</h1>
-  <div class="rule"><span class="rule-id">EOT.1</span><p>Elke speler discardt of trekt kaarten totdat hij precies 8 kaarten in de hand heeft (of zijn huidige handgrootte als die gemodificeerd is). Daarna is de beurt voorbij en begint de tegenstander.</p><div class="rule-tags"><span class="tag tag-algemeen">Algemeen</span></div></div>
+  <div class="section-label">Reference</div>
+  <h1 class="section-title">Timing &amp; Actions</h1>
+  <h2>Chain of Effects (Rule 9.5)</h2>
+  <div class="rule"><span class="rule-id">9.5</span><p>A chain of effects begins when a new action is declared. Before it resolves, either player may respond by declaring their own action. Once neither player wishes to respond, the sequence resolves in <strong>reverse order of declaration</strong> (Last In, First Out). The resource player always has priority to initiate a new chain of effects.</p><div class="rule-tags"><span class="tag tag-algemeen">All alignments</span></div></div>
+  <div class="rule"><span class="rule-id">9.5.3</span><p>If a rule or effect happens "immediately," it resolves without initiating a chain of effects and without either player being allowed to respond.</p></div>
+  <h2>Active Conditions (Rule 9.2)</h2>
+  <div class="rule"><span class="rule-id">9.2</span><p>Active conditions are requirements for an action to be declared and resolved. Tapping a card as an active condition is synonymous with the declaration itself (not a separate action). If any active condition is no longer valid upon resolution, unresolved effects are negated but the conditions already performed remain.</p></div>
+  <h2>Passive Conditions (Rule 9.6)</h2>
+  <div class="rule"><span class="rule-id">9.6</span><p>When a passive condition comes into effect during a chain of effects, the resulting action(s) are declared in a subsequent chain that immediately follows the current chain resolving. Passive conditions that would result in a card being discarded resolve immediately (not in a subsequent chain).</p></div>
+  <div class="rule"><span class="rule-id">9.6.4</span><p>Passive conditions triggered at the "beginning" of a phase must be declared in a single chain before any other actions during that phase. Passive conditions at the "end" of a phase must be declared in a single chain once both players declare they are finished taking actions.</p></div>
+  <h2>Key Annotations</h2>
+  <div class="rule"><span class="rule-id">Ann. 12</span><p>An attack is resolved and concluded when the final strike, all special actions from the final strike, and the associated body check are resolved.</p></div>
+  <div class="rule"><span class="rule-id">Ann. 13</span><p>An attack may not be cancelled once its strikes have been assigned. A strike may not be cancelled once the dice-roll for the strike has been made.</p></div>
+  <div class="rule"><span class="rule-id">Ann. 14</span><p>A cancelled attack has no effect on its target company, except that the company is considered to have faced the attack in its history.</p></div>
+  <div class="rule"><span class="rule-id">Ann. 18</span><p>During a Strike Sequence, once the defending player chooses to resolve a strike, the only actions that may be taken until the dice-roll are: hazard actions affecting the strike; the attacker allocating &minus;1 modifications from excess strikes; the defending character taking a &minus;3 to stay untapped; the defending character playing resources that affect the strike.</p></div>
+  <div class="rule"><span class="rule-id">Ann. 22</span><p>When a character fails a body check, items may be immediately reassigned to unwounded characters (one per character). This reassignment is synonymous with the failed body check &mdash; no actions may take place in between. Unassigned items are discarded.</p></div>
+  <div class="rule"><span class="rule-id">Ann. 25</span><p>A company is considered to be at its site card at all times <em>except</em> from the moment the new site card is revealed during the movement/hazard phase until the old site card is discarded at the end of the same movement/hazard phase.</p></div>
+  <div class="callout callout-tip"><strong>Twilight timing:</strong> Twilight is the only card playable at any time by either player. It never counts against the hazard limit and may be played in response to any action in any chain of effects.</div>
 </div>
 
 </div><!-- /wikiContent -->
@@ -1128,7 +1259,7 @@ function buildIndex() {
       var term = (g.querySelector('.gloss-term') || {}).textContent || '';
       var def = (g.querySelector('.gloss-def') || {}).textContent || '';
       SEARCH_INDEX.push({
-        type: 'gloss', sectionId: sectionId, sectionTitle: 'Glossarium',
+        type: 'gloss', sectionId: sectionId, sectionTitle: 'Glossary',
         id: term, title: term, text: def
       });
     });
@@ -1181,7 +1312,7 @@ function doSearch(q) {
     return true;
   });
 
-  document.getElementById('searchCount').textContent = matches.length ? matches.length + ' resultaten' : '';
+  document.getElementById('searchCount').textContent = matches.length ? matches.length + ' results' : '';
   wikiContent.style.display = 'none';
 
   if (!matches.length) {
