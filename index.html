@@ -325,9 +325,12 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
     </div>
     <div class="sbb" id="sbroutes" style="display:none"></div>
     <div class="sbb" id="sbcards" style="display:none;padding:0;flex-direction:column;">
-      <div style="padding:10px 10px 6px;flex-shrink:0;">
+      <div style="padding:10px 10px 6px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;">
         <input id="cardSearch" type="text" placeholder="Zoek kaart…" oninput="searchCards(this.value)"
           style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;">
+        <select id="cardSetFilter" class="deck-select" onchange="searchCards(document.getElementById('cardSearch').value)" style="width:100%;font-size:11px;padding:5px 8px;">
+          <option value="">— Alle reeksen —</option>
+        </select>
       </div>
       <div id="cardResults" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
     </div>
@@ -1910,9 +1913,10 @@ function _buildCardList(){
       });
     });
 
+    _populateCardSetFilter();
     var q=document.getElementById('cardSearch').value;
     if(q&&q.length>=2)searchCards(q);
-    else el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam om te zoeken.</div>';
+    else el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam of kies een reeks.</div>';
     if(_curTab==='res') renderResources();
     // Als site overlay open is, herlaad het type nu kaartdata beschikbaar is
     if(document.getElementById('siteOverlay').classList.contains('open')){
@@ -1929,25 +1933,56 @@ function _buildCardList(){
   });
 }
 
+function _populateCardSetFilter(){
+  var sel=document.getElementById('cardSetFilter');
+  if(!sel)return;
+  var cur=sel.value;
+  // Verzamel unieke sets uit _allCards
+  var seen={};
+  _allCards.forEach(function(c){if(c.set)seen[c.set]=true;});
+  // Sorteer: officiële sets eerst (geen DC-prefix), dan dream cards
+  var official=[],dream=[];
+  Object.keys(seen).forEach(function(s){
+    (SET_NAMES[s]&&SET_NAMES[s].indexOf('DC:')===-1?official:dream).push(s);
+  });
+  official.sort();dream.sort();
+  sel.innerHTML='<option value="">— Alle reeksen —</option>';
+  official.concat(dream).forEach(function(s){
+    var opt=document.createElement('option');
+    opt.value=s;
+    opt.textContent=SET_NAMES[s]||s;
+    sel.appendChild(opt);
+  });
+  sel.value=cur;
+}
+
 function searchCards(q){
   if(!_cardsLoaded){_buildCardList();return;}
   var el=document.getElementById('cardResults');
-  if(!q||q.length<2){
-    el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ minstens 2 tekens.</div>';
+  var setFilter=(document.getElementById('cardSetFilter').value)||'';
+  var hasQ=q&&q.length>=2;
+  if(!hasQ&&!setFilter){
+    el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam of kies een reeks.</div>';
     return;
   }
-  var ql=q.toLowerCase();
-  var results=_allCards.filter(function(c){return c.name.toLowerCase().indexOf(ql)!==-1;}).slice(0,50);
+  var ql=(q||'').toLowerCase();
+  var results=_allCards.filter(function(c){
+    var nameOk=!hasQ||c.name.toLowerCase().indexOf(ql)!==-1;
+    var setOk=!setFilter||c.set===setFilter;
+    return nameOk&&setOk;
+  }).slice(0,60);
   if(!results.length){el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Geen kaarten gevonden.</div>';return;}
   el.innerHTML='';
   results.forEach(function(c){
     var div=document.createElement('div');
     div.className='card-result-item';
+    var sc=(c.set||'').toUpperCase();
+    var setLabel=SET_NAMES[sc]||c.set||'';
     var dcBadge=c.dreamcard?'<span style="font-size:9px;color:#7a9fd4;margin-left:4px;">dream</span>':'';
     div.innerHTML=
       '<img class="card-result-thumb" src="'+c.imgUrl+'" alt="" onerror="this.style.display=\'none\'">'+
       '<div><div class="card-result-name">'+c.name+dcBadge+'</div>'+
-      '<div class="card-result-meta">'+(c.type||'')+(c.alignment?' · '+c.alignment:'')+(c.set?' · '+c.set:'')+'</div></div>';
+      '<div class="card-result-meta">'+(c.type||'')+(c.alignment?' · '+c.alignment:'')+(setLabel?' · '+setLabel:'')+'</div></div>';
     div.onclick=function(){openCardOverlay(c);};
     el.appendChild(div);
   });
