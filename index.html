@@ -3241,16 +3241,17 @@ function _executeDeckPrint(deckId){
   var h='<!DOCTYPE html><html><head><meta charset="UTF-8">';
   h+='<title>'+deck.deck_name+'</title>';
   h+='<style>';
-  /* @page margin=0: browser voegt GEEN eigen marge toe.
-     De A4-afmeting en de 8mm padding zitten volledig in .page,
-     zodat elk platform (iOS Safari, Chrome, Edge) identiek rendert. */
-  h+='@page{size:210mm 297mm;margin:0}';
+  /* Geen expliciete page-breedte in CSS: iOS Safari zou dan de inhoud
+     schalen om te passen en kaarten worden te klein afgedrukt.
+     mm-eenheden zijn absolute fysieke maten in print-CSS en worden
+     correct gerenderd zolang we de browser de paginagrootte laten bepalen. */
+  h+='@page{size:A4 portrait;margin:8mm}';
+  h+='@page:left{margin:8mm}@page:right{margin:8mm}';
   h+='*{box-sizing:border-box;margin:0;padding:0}';
   h+='html,body{margin:0;padding:0;font-size:0;line-height:0;background:#fff}';
-  h+='.page{width:210mm;height:297mm;padding:8mm;display:block;';
-  h+='break-after:page;page-break-after:always;overflow:hidden}';
+  h+='.page{display:block;break-after:page;page-break-after:always}';
   h+='.page:last-child{break-after:auto;page-break-after:auto}';
-  h+='.page.back{padding-top:12mm}'; /* 8mm basis + 4mm correctie duplex */
+  h+='.page.back{padding-top:4mm}';
   h+='.grid{display:flex;flex-wrap:wrap;gap:2.5mm}';
   h+='.card{width:63mm;height:88mm;border:.4mm solid #bbb;border-radius:2mm;overflow:hidden;';
   h+='break-inside:avoid;background:#ede6d5;display:flex;align-items:center;justify-content:center;flex-shrink:0}';
