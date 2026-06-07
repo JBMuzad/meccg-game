@@ -184,6 +184,9 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .card-result-name{font-size:12px;color:#e8d8a0;font-weight:600;}
 .card-result-meta{font-size:10px;color:rgba(212,168,75,.5);}
 .card-result-thumb{width:32px;height:44px;object-fit:cover;border-radius:2px;border:1px solid rgba(212,168,75,.2);flex-shrink:0;background:rgba(212,168,75,.08);}
+.card-type-btn{font-size:9px;padding:2px 7px;border-radius:10px;border:1px solid rgba(212,168,75,.25);background:transparent;color:rgba(212,168,75,.5);cursor:pointer;font-family:Georgia,serif;line-height:1.5;white-space:nowrap;}
+.card-type-btn:hover{background:rgba(212,168,75,.1);color:#d4a84b;}
+.card-type-btn.active{background:rgba(212,168,75,.2);color:#d4a84b;border-color:#d4a84b;}
 
 /* Card overlay */
 #cardOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:300;align-items:center;justify-content:center;}
@@ -328,9 +331,10 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div style="padding:10px 10px 6px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;">
         <input id="cardSearch" type="text" placeholder="Zoek kaart…" oninput="searchCards(this.value)"
           style="width:100%;box-sizing:border-box;padding:7px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(212,168,75,.25);border-radius:5px;color:#e8d8a0;font-family:Georgia,serif;font-size:12px;outline:none;">
-        <select id="cardSetFilter" class="deck-select" onchange="searchCards(document.getElementById('cardSearch').value)" style="width:100%;font-size:11px;padding:5px 8px;">
+        <select id="cardSetFilter" class="deck-select" onchange="_onCardSetChange()" style="width:100%;font-size:11px;padding:5px 8px;">
           <option value="">— Alle reeksen —</option>
         </select>
+        <div id="cardTypeFilter" style="display:flex;flex-wrap:wrap;gap:3px;min-height:0;"></div>
       </div>
       <div id="cardResults" style="overflow-y:auto;flex:1;padding:0 6px 6px;"></div>
     </div>
@@ -1933,6 +1937,53 @@ function _buildCardList(){
   });
 }
 
+var _cardTypeFilter='';
+
+function _onCardSetChange(){
+  _cardTypeFilter='';
+  _renderCardTypeFilter();
+  searchCards(document.getElementById('cardSearch').value);
+}
+
+function _renderCardTypeFilter(){
+  var wrap=document.getElementById('cardTypeFilter');
+  if(!wrap)return;
+  if(!_cardsLoaded){wrap.innerHTML='';return;}
+  var setFilter=document.getElementById('cardSetFilter').value||'';
+  // Count cards per type within current set scope
+  var counts={};
+  _allCards.forEach(function(c){
+    if(setFilter&&c.set!==setFilter)return;
+    var t=c.type||'?';
+    counts[t]=(counts[t]||0)+1;
+  });
+  var types=Object.keys(counts);
+  if(!types.length){wrap.innerHTML='';return;}
+  // Preferred order
+  var order=['Character','Resource','Hazard','Site','Region'];
+  types.sort(function(a,b){
+    var ai=order.indexOf(a),bi=order.indexOf(b);
+    if(ai===-1&&bi===-1)return a.localeCompare(b);
+    if(ai===-1)return 1;
+    if(bi===-1)return -1;
+    return ai-bi;
+  });
+  // If current type filter no longer in new set, reset
+  if(_cardTypeFilter&&counts[_cardTypeFilter]===undefined)_cardTypeFilter='';
+  wrap.innerHTML='';
+  types.forEach(function(t){
+    var btn=document.createElement('button');
+    btn.className='card-type-btn'+(t===_cardTypeFilter?' active':'');
+    btn.textContent=t+(setFilter?' ('+counts[t]+')':'');
+    btn.onclick=function(){
+      _cardTypeFilter=(t===_cardTypeFilter?'':t);
+      _renderCardTypeFilter();
+      searchCards(document.getElementById('cardSearch').value);
+    };
+    wrap.appendChild(btn);
+  });
+}
+
 function _populateCardSetFilter(){
   var sel=document.getElementById('cardSetFilter');
   if(!sel)return;
@@ -1954,6 +2005,7 @@ function _populateCardSetFilter(){
     sel.appendChild(opt);
   });
   sel.value=cur;
+  _renderCardTypeFilter();
 }
 
 function searchCards(q){
@@ -1961,7 +2013,7 @@ function searchCards(q){
   var el=document.getElementById('cardResults');
   var setFilter=(document.getElementById('cardSetFilter').value)||'';
   var hasQ=q&&q.length>=2;
-  if(!hasQ&&!setFilter){
+  if(!hasQ&&!setFilter&&!_cardTypeFilter){
     el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Typ een kaartnaam of kies een reeks.</div>';
     return;
   }
@@ -1969,8 +2021,9 @@ function searchCards(q){
   var results=_allCards.filter(function(c){
     var nameOk=!hasQ||c.name.toLowerCase().indexOf(ql)!==-1;
     var setOk=!setFilter||c.set===setFilter;
-    return nameOk&&setOk;
-  }).slice(0,60);
+    var typeOk=!_cardTypeFilter||c.type===_cardTypeFilter;
+    return nameOk&&setOk&&typeOk;
+  }).slice(0,120);
   if(!results.length){el.innerHTML='<div style="color:rgba(212,168,75,.35);font-size:11px;text-align:center;padding-top:20px;">Geen kaarten gevonden.</div>';return;}
   el.innerHTML='';
   results.forEach(function(c){
