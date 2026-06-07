@@ -1346,5 +1346,84 @@
       { "qty": 1, "name": "Wizard Uncloaked" },
       { "qty": 2, "name": "Wizard's Laughter" }
     ]
+  },
+  {
+    "id": "automatic_attack",
+    "deck_name": "An Automatic-Attack Deck",
+    "wizard": "",
+    "alignment": "Hero",
+    "source": "MECCG Strategy",
+    "description": "A pure hazard package built around enhancing opponent automatic-attacks. Awaken Denizens, Awaken Minions, Incite Denizens and Incite Minions boost site auto-attacks at Ruins & Lairs, Shadow-holds and Dark-holds. True Fire-drakes, Slayer and Were-worm cover opponents who avoid those site types. Doors of Night (×3) ensures the strategy fires consistently. Designed to be paired with any resource deck — hazards do not rely on a large hazard limit.",
+    "strategy": "Enhance automatic-attacks at your opponent's sites with Awaken Denizens, Awaken Minions, Incite Denizens and Incite Minions. Watch out for this backfiring on your own companies. Cards placed on-guard can bluff with even a Muster. If opponents primarily travel to Free-holds and Border-holds the enhancement strategy will not hurt them much, so the deck is filled out to cover that blind spot: Foolish Words, Fell Winter, Assassin, Eye of Sauron, Greed and creature hazards. Hazard sideboard cards can only be accessed when your opponent's Wizard is in play — plan to use that option two or three times. Luckily the deck does not rely on a large hazard limit.",
+    "starting_company": [],
+    "characters": [],
+    "resources": [],
+    "hazards": [
+      { "qty": 1, "name": "Assassin" },
+      { "qty": 1, "name": "Awaken Denizens" },
+      { "qty": 2, "name": "Awaken Minions" },
+      { "qty": 2, "name": "Cave Drake" },
+      { "qty": 3, "name": "Doors of Night" },
+      { "qty": 2, "name": "Eye of Sauron" },
+      { "qty": 1, "name": "Fell Winter" },
+      { "qty": 1, "name": "Foolish Words" },
+      { "qty": 1, "name": "Greed" },
+      { "qty": 2, "name": "Incite Denizens" },
+      { "qty": 2, "name": "Incite Minions" },
+      { "qty": 2, "name": "Slayer" },
+      { "qty": 3, "name": "True Fire-drake" },
+      { "qty": 2, "name": "Twilight" },
+      { "qty": 1, "name": "Were-worm" }
+    ],
+    "sites": [],
+    "sideboard": [
+      { "qty": 1, "name": "Bane of the Ithil-stone" },
+      { "qty": 1, "name": "Earcaraxe" },
+      { "qty": 2, "name": "Foolish Words" },
+      { "qty": 1, "name": "Lure of Power" },
+      { "qty": 1, "name": "Noose of the Sea" },
+      { "qty": 1, "name": "The Will of the Ring" },
+      { "qty": 1, "name": "Winds of Wrath" }
+    ]
+  },
+  {
+    "id": "wolves_and_drakes",
+    "deck_name": "Wolves and Drakes",
+    "wizard": "",
+    "alignment": "Hero",
+    "source": "MECCG Strategy",
+    "description": "A hazard package built around Worm's Stench (×3), which allows Wolves and Drakes to be combined into one coherent strategy. Cave-drake, Rain-drake and True Fire-drake cover Coastal Sea movement; Watcher in the Water, Wargs, Wolves and Dire Wolves hit land routes. Fell Winter (×2) increases Wilderness prevalence and adds pressure against faction and Border-hold resource decks. Recommended to pair with an avoidance-based resource deck that includes two or three Twilights and Star-glass as a starting adversary item.",
+    "strategy": "Worm's Stench enables the marriage of Drakes and Wolves into one hazard mix. The combination covers both land (Watcher in the Water, Wargs, Wolves, Dire Wolves) and Coastal Sea movement (Cave-drake, Rain-drake, True Fire-drake) equally well. Fell Winter increases Wilderness frequency and provides pressure against faction and Border-hold strategies. Wake of War (×3) adds extra attack power. Include two or three Twilights in your accompanying resource mix. Star-glass is an excellent starting adversary item to bring. With so many attack enhancers in the mix, pair this with an avoidance-heavy resource strategy.",
+    "starting_company": [],
+    "characters": [],
+    "resources": [],
+    "hazards": [
+      { "qty": 2, "name": "Cave-drake" },
+      { "qty": 1, "name": "Clouds" },
+      { "qty": 2, "name": "Dire Wolves" },
+      { "qty": 2, "name": "Doors of Night" },
+      { "qty": 2, "name": "Fell Winter" },
+      { "qty": 1, "name": "Morgul-rats" },
+      { "qty": 1, "name": "Mouth of Sauron" },
+      { "qty": 2, "name": "Peril Returned" },
+      { "qty": 1, "name": "Rain-drake" },
+      { "qty": 2, "name": "True Fire-drake" },
+      { "qty": 3, "name": "Wake of War" },
+      { "qty": 3, "name": "Wargs" },
+      { "qty": 2, "name": "Watcher in the Water" },
+      { "qty": 1, "name": "The Will of Sauron" },
+      { "qty": 2, "name": "Wolves" },
+      { "qty": 3, "name": "Worm's Stench" }
+    ],
+    "sites": [],
+    "sideboard": [
+      { "qty": 1, "name": "Doors of Night" },
+      { "qty": 1, "name": "Morgul-rats" },
+      { "qty": 1, "name": "Noose of the Sea" },
+      { "qty": 1, "name": "Shadow of Mordor" },
+      { "qty": 3, "name": "Slayer" },
+      { "qty": 2, "name": "Storms of Osse" },
+      { "qty": 1, "name": "Were-worm" }
+    ]
   }
 ]
