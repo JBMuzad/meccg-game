@@ -1149,5 +1149,92 @@
       { "qty": 1, "name": "Trickery" },
       { "qty": 2, "name": "Winds of Wrath" }
     ]
+  },
+  {
+    "id": "coastal_sea_roadblock",
+    "deck_name": "Coastal Sea/Roadblock",
+    "wizard": "Gandalf",
+    "alignment": "Hero",
+    "source": "MECCG Strategy",
+    "description": "Círdan leads an Elven coastal company through the havens and islands of Middle-earth, acquiring resources at Grey Havens, Dol Amroth, Edhellond, Isle of the Dead that Live, and Isle of the Ulond. Three Fellowships, Bounty of the Hoard, and Look More Closely Later drive steady point accumulation. The hazard mix — weather roadblocks (Long Winter, Fell Winter, Snowstorm), drakes, and Shadow of Mordor — locks opponents in place while the company advances along the coast.",
+    "strategy": "Two cards inspired this deck: Isle of the Ulond and Shadow of Mordor. Your company works the coastal sea, playing resources at Dol Amroth, Edhellond, Grey Havens, Isle of the Dead that Live, Isle of the Ulond, and Tolfalas. Play three Fellowships early to reach Grey Havens quickly and bring Gandalf or Pallando into play. Bounty of the Hoard and Look More Closely Later are the resource engines — Look More Closely Later lets you stack multiple resources at a site well beyond the normal one-per-site limit. Nenseldë the Wingild is your key ally. On the hazard side, Snowstorm, Long Winter, Fell Winter, and Doors of Night form a roadblock that denies opponent movement through Wilderness, while Cave-drakes, True Fire-drakes, and Slayer threaten any company that does push through. Shadow of Mordor targets their resources. Sideboard brings Lure of Power and Morgul-rats for corruption pressure, or Aragorn II and Blue Mountain Dwarves if you need extra muscle.",
+    "starting_company": [
+      { "qty": 1, "name": "Annalena" },
+      { "qty": 1, "name": "Arwen" },
+      { "qty": 1, "name": "Cirdan" },
+      { "qty": 1, "name": "Elrohir" },
+      { "qty": 1, "name": "Wacho" },
+      { "qty": 1, "name": "Healing Herbs" }
+    ],
+    "characters": [
+      { "qty": 1, "name": "Glorfindel II" },
+      { "qty": 1, "name": "Galva" },
+      { "qty": 1, "name": "Gandalf" },
+      { "qty": 1, "name": "Pallando" },
+      { "qty": 1, "name": "Vöteli" }
+    ],
+    "resources": [
+      { "qty": 2, "name": "Bounty of the Hoard" },
+      { "qty": 3, "name": "Concealment" },
+      { "qty": 1, "name": "Dreams of Lore" },
+      { "qty": 1, "name": "Elves of Lindon" },
+      { "qty": 3, "name": "Fellowship" },
+      { "qty": 1, "name": "Glamdring" },
+      { "qty": 3, "name": "Hauberk of Bright Mail" },
+      { "qty": 2, "name": "Hiding" },
+      { "qty": 3, "name": "Look More Closely Later" },
+      { "qty": 1, "name": "Magical Harp" },
+      { "qty": 2, "name": "Marvels Told" },
+      { "qty": 1, "name": "Nenselde the Wingild" },
+      { "qty": 3, "name": "Not at Home" },
+      { "qty": 1, "name": "Thror's Map" },
+      { "qty": 1, "name": "Torque of Hues" },
+      { "qty": 1, "name": "Twilight" },
+      { "qty": 1, "name": "When I Know Anything" }
+    ],
+    "hazards": [
+      { "qty": 1, "name": "Assassin" },
+      { "qty": 3, "name": "Cave-drake" },
+      { "qty": 3, "name": "Doors of Night" },
+      { "qty": 1, "name": "Earcaraxe" },
+      { "qty": 1, "name": "Fell Winter" },
+      { "qty": 1, "name": "Foolish Words" },
+      { "qty": 1, "name": "Foul Fumes" },
+      { "qty": 1, "name": "Long Winter" },
+      { "qty": 1, "name": "Many Sorrows Befall" },
+      { "qty": 1, "name": "Mouth of Sauron" },
+      { "qty": 1, "name": "Peril Returned" },
+      { "qty": 3, "name": "Shadow of Mordor" },
+      { "qty": 2, "name": "Slayer" },
+      { "qty": 2, "name": "Snowstorm" },
+      { "qty": 3, "name": "True Fire-drake" },
+      { "qty": 2, "name": "Twilight" },
+      { "qty": 1, "name": "Will of Sauron" }
+    ],
+    "sites": [
+      { "qty": 1, "name": "Dol Amroth" },
+      { "qty": 1, "name": "Edhellond" },
+      { "qty": 1, "name": "Grey Havens" },
+      { "qty": 1, "name": "Isle of the Dead that Live" },
+      { "qty": 1, "name": "Isle of the Ulond" },
+      { "qty": 1, "name": "Rivendell" },
+      { "qty": 1, "name": "Tolfalas" }
+    ],
+    "sideboard": [
+      { "qty": 1, "name": "Aragorn II" },
+      { "qty": 1, "name": "Blue Mountain Dwarves" },
+      { "qty": 2, "name": "Dark Quarrels" },
+      { "qty": 1, "name": "Earcaraxe Ahunt" },
+      { "qty": 2, "name": "Lure of Power" },
+      { "qty": 1, "name": "Marvels Told" },
+      { "qty": 3, "name": "Morgul-rats" },
+      { "qty": 1, "name": "No Escape from My Magic" },
+      { "qty": 1, "name": "Scroll of Isildur" },
+      { "qty": 1, "name": "Shelob" },
+      { "qty": 1, "name": "Vanishment" },
+      { "qty": 1, "name": "The Will of the Ring" },
+      { "qty": 1, "name": "Winds of Wrath" },
+      { "qty": 2, "name": "Wizard Uncloaked" }
+    ]
   }
 ]
