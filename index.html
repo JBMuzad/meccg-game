@@ -3125,6 +3125,9 @@ function _executeDeckPrint(deckId){
     ||_loadOwnDecks().filter(function(d){return d.id===deckId;})[0];
   if(!deck)return;
 
+  var BACK_CARD='https://cdn.jsdelivr.net/gh/usmcgeek/meccg/Card%20Backs/CardBack300dpi.png';
+  var BACK_SITE='https://cdn.jsdelivr.net/gh/usmcgeek/meccg/Card%20Backs/SiteCardBack300dpi.png';
+
   // Verzamel geselecteerde secties
   var selected={};
   document.querySelectorAll('.dp-chk:checked').forEach(function(cb){selected[cb.value]=true;});
@@ -3133,6 +3136,7 @@ function _executeDeckPrint(deckId){
   var cards=[];
   _DECK_SECTIONS.forEach(function(sec){
     if(!selected[sec.key])return;
+    var isSite=sec.key==='sites';
     (deck[sec.key]||[]).forEach(function(c){
       var imgUrl='';
       var ov=_cardOverrides&&_cardOverrides[c.name.toLowerCase()];
@@ -3141,39 +3145,76 @@ function _executeDeckPrint(deckId){
         var found=_allCards.filter(function(ac){return ac.name.toLowerCase()===c.name.toLowerCase();})[0];
         if(found)imgUrl=found.imgUrl||'';
       }
-      for(var i=0;i<c.qty;i++)cards.push({name:c.name,imgUrl:imgUrl});
+      for(var i=0;i<c.qty;i++)cards.push({name:c.name,imgUrl:imgUrl,isSite:isSite});
     });
   });
 
   if(!cards.length)return;
 
-  // Bouw print-HTML: 3×3 kaarten per A4 (63×88mm per kaart, 8mm marge, gap 2.5mm)
+  // Splits in pagina's van 9 (3×3)
+  var COLS=3, PER_PAGE=9;
+  var pages=[];
+  for(var p=0;p<cards.length;p+=PER_PAGE){pages.push(cards.slice(p,p+PER_PAGE));}
+
+  // Hulpfunctie: genereer een grid van kaarten
+  function makeGrid(pageCards,isBack){
+    var html='<div class="grid">';
+    // Voor achterzijde: mirror per rij (kolom 2,1,0 ipv 0,1,2) zodat duplex uitlijning klopt
+    var order=pageCards.slice();
+    if(isBack){
+      var mirrored=[];
+      for(var r=0;r<Math.ceil(order.length/COLS);r++){
+        var row=order.slice(r*COLS,(r+1)*COLS);
+        // Vul rij aan tot 3 met null-placeholders
+        while(row.length<COLS)row.push(null);
+        mirrored=mirrored.concat(row.reverse());
+      }
+      order=mirrored;
+    }
+    order.forEach(function(c){
+      html+='<div class="card">';
+      if(!c){
+        html+='<div class="card-ph"></div>'; // lege positie
+      } else if(isBack){
+        var backUrl=c.isSite?BACK_SITE:BACK_CARD;
+        html+='<img src="'+backUrl+'" alt="back" loading="eager">';
+      } else {
+        if(c.imgUrl){
+          html+='<img src="'+c.imgUrl.replace(/"/g,'&quot;')+'" alt="'+c.name.replace(/"/g,'&quot;')+'" loading="eager">';
+        } else {
+          html+='<div class="card-ph">'+c.name+'</div>';
+        }
+      }
+      html+='</div>';
+    });
+    html+='</div>';
+    return html;
+  }
+
+  // Bouw print-HTML: voorzijde pagina + achterzijde pagina afwisselend
   var h='<!DOCTYPE html><html><head><meta charset="UTF-8">';
   h+='<title>'+deck.deck_name+'</title>';
   h+='<style>';
   h+='@page{size:A4 portrait;margin:8mm}';
   h+='*{box-sizing:border-box;margin:0;padding:0}';
   h+='body{background:#fff;font-family:Georgia,serif}';
+  h+='.page{page-break-after:always}';
+  h+='.page:last-child{page-break-after:auto}';
   h+='.grid{display:flex;flex-wrap:wrap;gap:2.5mm}';
   h+='.card{width:63mm;height:88mm;border:.4mm solid #bbb;border-radius:2mm;overflow:hidden;';
   h+='break-inside:avoid;background:#ede6d5;display:flex;align-items:center;justify-content:center;flex-shrink:0}';
   h+='.card img{width:100%;height:100%;object-fit:cover;display:block}';
   h+='.card-ph{font-size:7.5pt;color:#444;text-align:center;padding:4mm;line-height:1.4}';
   h+='</style></head><body>';
-  h+='<div class="grid">';
-  cards.forEach(function(c){
-    h+='<div class="card">';
-    if(c.imgUrl){
-      h+='<img src="'+c.imgUrl.replace(/"/g,'&quot;')+'" alt="'+c.name.replace(/"/g,'&quot;')+'" loading="eager">';
-    } else {
-      h+='<div class="card-ph">'+c.name+'</div>';
-    }
-    h+='</div>';
+
+  pages.forEach(function(pg){
+    h+='<div class="page">'+makeGrid(pg,false)+'</div>';
+    h+='<div class="page">'+makeGrid(pg,true)+'</div>';
   });
-  h+='</div>';
+
   h+='<scr'+'ipt>';
   h+='var imgs=document.querySelectorAll("img"),n=imgs.length,d=0;';
-  h+='function chk(){if(++d>=n)setTimeout(function(){window.print();},150);}';
+  h+='function chk(){if(++d>=n)setTimeout(function(){window.print();},200);}';
   h+='if(!n){setTimeout(function(){window.print();},300);}';
   h+='else{imgs.forEach(function(img){if(img.complete)chk();else{img.onload=chk;img.onerror=chk;}});}';
   h+='<\/script></body></html>';
