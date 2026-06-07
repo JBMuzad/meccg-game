@@ -193,6 +193,8 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 #cardImgCol img{width:100%;border-radius:4px;border:1px solid rgba(212,168,75,.2);display:block;}
 #cardDetailCol{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:18px 20px;gap:14px;}
 #cardClose{position:absolute;top:10px;right:14px;background:none;border:none;color:#d4a84b;font-size:22px;cursor:pointer;z-index:10;line-height:1;}
+.cd-set-label{font-size:10px;color:rgba(212,168,75,.55);font-style:italic;letter-spacing:.06em;margin-bottom:2px;}
+.cd-set-label.dreamcard{color:rgba(160,200,255,.55);}
 .cd-title{font-size:18px;color:#e8d88a;font-weight:700;line-height:1.2;}
 .cd-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(212,168,75,.15);color:#d4a84b;margin-right:4px;margin-top:4px;}
 .cd-section{background:rgba(255,255,255,.03);border:1px solid rgba(212,168,75,.12);border-radius:5px;padding:12px 14px;}
@@ -482,6 +484,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
     <div id="cardDetailCol">
       <div id="cdRouteBack" style="display:none;"></div>
       <div>
+        <div class="cd-set-label" id="cdSetLabel"></div>
         <div class="cd-title" id="cdTitle"></div>
         <div id="cdBadges"></div>
       </div>
@@ -560,6 +563,38 @@ var DB_URL='https://raw.githubusercontent.com/council-of-elrond-meccg/meccg-card
 var TL={W:'Wilderness',B:'Border-land',S:'Shadow-land',D:'Dark-domain',F:'Free-domain',C:'Coastal Sea'};
 var SC={haven:'#c8a020',free:'#1060c0',border:'#9a6510',ruins:'#606060',shadow:'#8a1525',dark:'#1a1848'};
 var SL={haven:'Haven',free:'Free-hold',border:'Border-hold',ruins:'Ruins & Lairs',shadow:'Shadow-hold',dark:'Dark-hold',darkhaven:'Darkhaven',lordhaven:'Lordhaven',wizardhaven:'Wizardhaven','elf-hold':'Elf-hold',unknown:'?'};
+var SET_NAMES={
+  // Official published sets
+  'METW':'The Wizards',
+  'MELE':'The Lidless Eye',
+  'MEDM':'Dark Minions',
+  'METD':'The Dragons',
+  'MEAS':'Against the Shadow',
+  'MEBA':'The Balrog',
+  'MEWH':'The White Hand',
+  'MEUL':'Under the Shadow',
+  // Dream card sets
+  'MEFB':'DC: The Firstborn',
+  'MEDF':'DC: Durin\'s Folk',
+  'MENE':'DC: The Necromancer',
+  'MENW':'DC: Northern Wastes',
+  'MEML':'DC: Morgoth\'s Legacy',
+  'MEBO':'DC: The Bounty',
+  'MEBU':'DC: Beyond the Sunset',
+  'MECA':'DC: Children of Arda',
+  'MECP':'DC: Corrupted Powers',
+  'MEDS':'DC: Dawnless Sorrow',
+  'MEGW':'DC: The Great Worm',
+  'MEKN':'DC: Knights of Middle-earth',
+  'MEMM':'DC: Many Meetings',
+  'MERN':'DC: Riders of the North',
+  'MERS':'DC: Riders of the South',
+  'MESL':'DC: Shadows and Lies',
+  'METI':'DC: Tides of Time',
+  'MEWR':'DC: War of the Ring',
+  'MEXW':'DC: Extra Wizards',
+  'MEXX':'DC: Extended'
+};
 var sc=.5,tx=0,ty=0,pan=false,lx=0,ly=0,sel=null,imgW=0,imgH=0,_sc=[];
 
 
@@ -1934,13 +1969,20 @@ function openCardOverlay(c){
     '</body></html>');
     w.document.close();
   };
+  // Set label bovenaan
+  var setCode=(c.set||'').toUpperCase();
+  var setFull=SET_NAMES[setCode]||(setCode?setCode:'');
+  var setEl=document.getElementById('cdSetLabel');
+  setEl.textContent=setFull;
+  setEl.className='cd-set-label'+(c.dreamcard?' dreamcard':'');
+  setEl.style.display=setFull?'':'none';
+
   document.getElementById('cdTitle').textContent=c.name;
 
-  // Badges
+  // Badges (type en alignment; set staat al bovenaan)
   var badges='';
   if(c.type)badges+='<span class="cd-badge">'+c.type+'</span>';
   if(c.alignment)badges+='<span class="cd-badge">'+c.alignment+'</span>';
-  if(c.set)badges+='<span class="cd-badge">'+c.set+'</span>';
   document.getElementById('cdBadges').innerHTML=badges;
 
   // Attributen (origineel + overrides samenvoegen)
