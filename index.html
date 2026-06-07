@@ -98,6 +98,13 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 #minfo{background:#080f1a;border:1px solid rgba(212,168,75,.2);padding:14px;border-radius:5px;min-width:150px;font-size:13px;}
 #mload{color:rgba(212,168,75,.6);font-size:11px;margin-bottom:8px;}
 
+#deckOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:250;align-items:center;justify-content:center;padding:20px;}
+#deckOverlay.open{display:flex;}
+#deckOverlayPanel{position:relative;background:#040810;border:1px solid rgba(212,168,75,.35);border-radius:8px;width:100%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,.9);}
+#deckOverlayClose{position:absolute;top:-11px;right:-11px;width:26px;height:26px;background:#d4a84b;color:#060c14;border:none;border-radius:50%;font-size:14px;cursor:pointer;font-weight:bold;z-index:1;line-height:26px;text-align:center;}
+#deckOverlayBody{overflow-y:auto;flex:1;padding:0 8px 10px;}
+#deckOverlayBody::-webkit-scrollbar{width:4px;}
+#deckOverlayBody::-webkit-scrollbar-thumb{background:rgba(212,168,75,.25);}
 #siteOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;}
 #siteOverlay.open{display:flex;}
 #soClose{position:absolute;top:12px;right:16px;background:none;border:none;color:#d4a84b;font-size:22px;cursor:pointer;z-index:201;}
@@ -359,6 +366,12 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="mload">Laden&#8230;</div>
       <div id="mname"></div>
     </div>
+  </div>
+</div>
+<div id="deckOverlay" onclick="if(event.target===this)closeDeckOverlay()">
+  <div id="deckOverlayPanel">
+    <button id="deckOverlayClose" onclick="closeDeckOverlay()">&#10005;</button>
+    <div id="deckOverlayBody"></div>
   </div>
 </div>
 <div id="siteOverlay">
@@ -769,6 +782,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
     document.getElementById('modal').classList.remove('open');
     if(document.getElementById('rulesOverlay').classList.contains('open'))closeRules();
+    if(document.getElementById('deckOverlay').classList.contains('open'))closeDeckOverlay();
   }
 });
 function setFilter(f,btn){
@@ -2888,7 +2902,7 @@ function deleteOwnDeck(id){
   _saveOwnDecks(decks);
   _deleteDeckFromSb(id);
   _refreshDeckDropdowns('');
-  document.getElementById('deckDetail').innerHTML='<div class="placeholder">Deck verwijderd.</div>';
+  document.getElementById('deckOverlay').classList.remove('open');
 }
 
 function addCardToDeck(deckId,section,cardName){
@@ -3016,15 +3030,20 @@ var _DECK_SECTIONS=[
   {key:'sideboard',label:'Sideboard'}
 ];
 
+function closeDeckOverlay(){
+  document.getElementById('deckOverlay').classList.remove('open');
+  document.getElementById('deckSelect').value='';
+}
+
 function renderDeckDetail(deckId){
   document.getElementById('deckSelect').value=deckId;
-  var div=document.getElementById('deckDetail');
-  if(!deckId){div.innerHTML='<div class="placeholder">Selecteer een deck om de samenstelling te bekijken.</div>';return;}
+  var div=document.getElementById('deckOverlayBody');
+  if(!deckId){document.getElementById('deckOverlay').classList.remove('open');return;}
 
   // Zoek in challenge decks én eigen decks
   var deck=_decksData.filter(function(d){return d.id===deckId;})[0]
     ||_loadOwnDecks().filter(function(d){return d.id===deckId;})[0];
-  if(!deck){div.innerHTML='<div class="placeholder">Deck niet gevonden.</div>';return;}
+  if(!deck){div.innerHTML='<div class="placeholder">Deck niet gevonden.</div>';document.getElementById('deckOverlay').classList.add('open');return;}
 
   var isOwn=!!deck.custom;
   var aColor=deck.alignment==='Hero'?'#4a7aaa':deck.alignment==='Minion'?'#aa4a4a':'#8a5a8a';
@@ -3071,6 +3090,7 @@ function renderDeckDetail(deckId){
   });
 
   div.innerHTML=h;
+  document.getElementById('deckOverlay').classList.add('open');
 }
 
 function _deckOpenCard(name){
