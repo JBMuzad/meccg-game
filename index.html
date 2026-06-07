@@ -1803,6 +1803,7 @@ function _renderDreamSitesInOverlay(regionName){
 var _allCards=[], _curCardId=null, _curCard=null, _cardsLoaded=false;
 var CARDNUM_URL='https://raw.githubusercontent.com/rezwits/cardnum/master/fdata/cards-dc.json';
 var COUNCIL_URL='https://raw.githubusercontent.com/council-of-elrond-meccg/meccg-cards-database/master/cards.json';
+var CARDNUM_IMG_BASE='https://cardnum.net/img/meccg/';
 
 // Dreamcard set code → folder in vastorper/dc repo
 var DC_SET_FOLDER={
@@ -1884,7 +1885,7 @@ function _buildCardList(){
       var name=c.NameEN||'';
       if(!name)return;
       var imgUrl=imgLookup[name.toLowerCase()+'|'+(c.Set||'')]||imgLookup[name.toLowerCase()]||'';
-      if(!imgUrl&&c.dreamcard&&c.Set)imgUrl=getDCImgUrl(c.Set,name);
+      if(!imgUrl&&c.ImageName)imgUrl=CARDNUM_IMG_BASE+c.ImageName;
       var attrs={};
       if(c.Primary)attrs.Type=c.Primary;
       if(c.Secondary&&c.Secondary!==c.Primary)attrs.Subtype=c.Secondary;
