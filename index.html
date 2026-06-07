@@ -196,6 +196,10 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .cd-set-label{font-size:10px;color:rgba(212,168,75,.55);font-style:italic;letter-spacing:.06em;margin-bottom:2px;}
 .cd-set-label.dreamcard{color:rgba(160,200,255,.55);}
 .cd-title{font-size:18px;color:#e8d88a;font-weight:700;line-height:1.2;}
+#cdVersions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.cd-ver-btn{font-size:9px;padding:2px 8px;border-radius:3px;border:1px solid rgba(212,168,75,.3);background:transparent;color:rgba(212,168,75,.6);cursor:pointer;font-family:Georgia,serif;}
+.cd-ver-btn:hover{background:rgba(212,168,75,.12);color:#d4a84b;}
+.cd-ver-btn.active{background:rgba(212,168,75,.22);color:#d4a84b;border-color:#d4a84b;}
 .cd-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(212,168,75,.15);color:#d4a84b;margin-right:4px;margin-top:4px;}
 .cd-section{background:rgba(255,255,255,.03);border:1px solid rgba(212,168,75,.12);border-radius:5px;padding:12px 14px;}
 .cd-section-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(212,168,75,.45);margin-bottom:6px;}
@@ -487,6 +491,7 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
         <div class="cd-set-label" id="cdSetLabel"></div>
         <div class="cd-title" id="cdTitle"></div>
         <div id="cdBadges"></div>
+        <div id="cdVersions"></div>
       </div>
       <div class="cd-section" id="cdAttrsSection" style="display:none">
         <div class="cd-section-label">Attributen</div>
@@ -1984,6 +1989,32 @@ function openCardOverlay(c){
   if(c.type)badges+='<span class="cd-badge">'+c.type+'</span>';
   if(c.alignment)badges+='<span class="cd-badge">'+c.alignment+'</span>';
   document.getElementById('cdBadges').innerHTML=badges;
+
+  // Versie-knoppen: toon alle versies van dezelfde kaart (andere reeks / alignment)
+  var verDiv=document.getElementById('cdVersions');
+  verDiv.innerHTML='';
+  if(_cardsLoaded){
+    var allVers=_allCards.filter(function(x){return x.name.toLowerCase()===c.name.toLowerCase();});
+    // Dedupleer op set+alignment combinatie
+    var seen={};
+    var uniqueVers=allVers.filter(function(x){
+      var k=(x.set||'')+'|'+(x.alignment||'');
+      if(seen[k])return false;
+      seen[k]=true;
+      return true;
+    });
+    if(uniqueVers.length>1){
+      uniqueVers.forEach(function(v){
+        var btn=document.createElement('button');
+        btn.className='cd-ver-btn'+(v.id===c.id?' active':'');
+        var sc=(v.set||'').toUpperCase();
+        btn.textContent=(SET_NAMES[sc]||sc||'?')+(v.alignment?' · '+v.alignment:'');
+        btn.title='Versie: '+(SET_NAMES[sc]||sc);
+        btn.onclick=function(){openCardOverlay(v);};
+        verDiv.appendChild(btn);
+      });
+    }
+  }
 
   // Attributen (origineel + overrides samenvoegen)
   var mergedAttrs=Object.assign({},c.attrs||{},ovAttrs);
