@@ -1090,7 +1090,7 @@
       { "qty": 2, "name": "Marvels Told" },
       { "qty": 1, "name": "Men of Dorwinion" },
       { "qty": 1, "name": "Not at Home" },
-      { "qty": 1, "name": "The Old Thrush" },
+      { "qty": 2, "name": "The Old Thrush" },
       { "qty": 1, "name": "Quickbeam" },
       { "qty": 1, "name": "Returned Exiles" },
       { "qty": 2, "name": "Ringlore" },
@@ -1101,7 +1101,6 @@
     "hazards": [
       { "qty": 1, "name": "Bairanax at Home" },
       { "qty": 3, "name": "Doors of Night" },
-      { "qty": 1, "name": "Earcaraxe at Home" },
       { "qty": 1, "name": "Gothmog" },
       { "qty": 3, "name": "Hobgoblins" },
       { "qty": 1, "name": "Itangast at Home" },
@@ -1133,7 +1132,9 @@
       { "qty": 1, "name": "Rivendell" },
       { "qty": 1, "name": "Shrel Kain" },
       { "qty": 1, "name": "The Wind Throne" },
-      { "qty": 1, "name": "Zarak Dum" }
+      { "qty": 1, "name": "Zarak Dum" },
+      { "qty": 1, "name": "Amon Hen" },
+      { "qty": 1, "name": "Bandit Lair" }
     ],
     "sideboard": [
       { "qty": 1, "name": "A Friend or Three" },
