@@ -1803,8 +1803,6 @@ function _renderDreamSitesInOverlay(regionName){
 var _allCards=[], _curCardId=null, _curCard=null, _cardsLoaded=false;
 var CARDNUM_URL='https://raw.githubusercontent.com/rezwits/cardnum/master/fdata/cards-dc.json';
 var COUNCIL_URL='https://raw.githubusercontent.com/council-of-elrond-meccg/meccg-cards-database/master/cards.json';
-var CARDNUM_IMG_BASE='https://cardnum.net/img/meccg/';
-
 // Dreamcard set code → folder in vastorper/dc repo
 var DC_SET_FOLDER={
   'MEBO':'BayOrmal','MEBU':'MorgothsLegacy','MECA':'Court',
@@ -1816,7 +1814,7 @@ var DC_SET_FOLDER={
   'MEXX':'WarRing','MEAG':'AgainstShadow','MEBA':'Balrog',
   'MEDK':'DarkMinions','MELE':'LidlessEye','MERS':'ReturnShadow'
 };
-var DC_IMG_BASE='https://raw.githubusercontent.com/vastorper/dc/master/graphics/Metw/';
+var DC_IMG_BASE='https://cdn.jsdelivr.net/gh/vastorper/dc/graphics/Metw/';
 
 function getDCImgUrl(set,name){
   var folder=DC_SET_FOLDER[set];
@@ -1885,7 +1883,7 @@ function _buildCardList(){
       var name=c.NameEN||'';
       if(!name)return;
       var imgUrl=imgLookup[name.toLowerCase()+'|'+(c.Set||'')]||imgLookup[name.toLowerCase()]||'';
-      if(!imgUrl&&c.ImageName)imgUrl=CARDNUM_IMG_BASE+c.ImageName;
+      if(!imgUrl&&c.DCpath)imgUrl=DC_IMG_BASE+c.DCpath.split('/').map(encodeURIComponent).join('/');
       var attrs={};
       if(c.Primary)attrs.Type=c.Primary;
       if(c.Secondary&&c.Secondary!==c.Primary)attrs.Subtype=c.Secondary;
