@@ -1236,5 +1236,115 @@
       { "qty": 1, "name": "Winds of Wrath" },
       { "qty": 2, "name": "Wizard Uncloaked" }
     ]
+  },
+  {
+    "id": "redirection_resource",
+    "deck_name": "Redirection Resource",
+    "wizard": "Alatar",
+    "alignment": "Hero",
+    "source": "MECCG Strategy",
+    "description": "A redirection-style avoidance deck built around Alatar's inherent redirection ability. Hazard creatures are redirected to gain their marshalling points while cancelling their attacks. Gates of Morning keeps Cloudless Day and day-bonus cards active. Best run as two companies: Glorfindel II, Balin/Glóin, Kili and Fili in one; Gimli, Annalena and Ioreth in the other. Gollum rounds out the scouts.",
+    "strategy": "Redirect creature hazards onto opponents to gain marshalling points from them. Once opponents recognise the strategy they may stop playing creatures, so attacks get cancelled for free. Concealment handles auto-attacks and very risky attacks where no MP gain is possible. Alatar teleports to a company that must face a strike; that company should always return to a Haven the following turn and move first so Alatar can teleport again. Gates of Morning (×3) enables Cloudless Day and the day-combat bonuses. The best two companies are Glorfindel II with Balin or Glóin, Kili and Fili, and Gimli with Annalena and Ioreth. Gollum fills out the scouts in Gimli's company.",
+    "starting_company": [
+      { "qty": 1, "name": "Annalena" },
+      { "qty": 1, "name": "Fili" },
+      { "qty": 1, "name": "Gimli" },
+      { "qty": 1, "name": "Glorfindel II" },
+      { "qty": 1, "name": "Ioreth" },
+      { "qty": 1, "name": "Cram" },
+      { "qty": 1, "name": "Healing Herbs" }
+    ],
+    "characters": [
+      { "qty": 1, "name": "Alatar" },
+      { "qty": 1, "name": "Arwen" },
+      { "qty": 1, "name": "Balin" },
+      { "qty": 1, "name": "Kili" },
+      { "qty": 1, "name": "Pallando" }
+    ],
+    "resources": [
+      { "qty": 2, "name": "And Forth He Hastened" },
+      { "qty": 1, "name": "Bounty of the Hoard" },
+      { "qty": 1, "name": "Bow of Dragon-horn" },
+      { "qty": 2, "name": "Cloudless Day" },
+      { "qty": 1, "name": "Concealment" },
+      { "qty": 2, "name": "Dark Quarrels" },
+      { "qty": 1, "name": "Echo of All Joy" },
+      { "qty": 1, "name": "Emerald of the Mariner" },
+      { "qty": 3, "name": "Gates of Morning" },
+      { "qty": 1, "name": "Glamdring" },
+      { "qty": 1, "name": "Gollum" },
+      { "qty": 1, "name": "Iron Hill Dwarves" },
+      { "qty": 3, "name": "Many Foes He Fought" },
+      { "qty": 1, "name": "Marvels Told" },
+      { "qty": 1, "name": "Men of Dorwinion" },
+      { "qty": 2, "name": "More Sense Than You" },
+      { "qty": 1, "name": "Muster" },
+      { "qty": 2, "name": "Risky Blow" },
+      { "qty": 1, "name": "Wormsbane" }
+    ],
+    "hazards": [],
+    "sites": [],
+    "sideboard": [
+      { "qty": 3, "name": "A Friend or Three" },
+      { "qty": 2, "name": "Dark Quarrels" },
+      { "qty": 2, "name": "Elf-song" },
+      { "qty": 1, "name": "Men of Dorwinion" },
+      { "qty": 1, "name": "More Sense Than You" },
+      { "qty": 2, "name": "Not at Home" }
+    ]
+  },
+  {
+    "id": "riddling_resource",
+    "deck_name": "Riddling Resource",
+    "wizard": "Gandalf",
+    "alignment": "Hero",
+    "source": "MECCG Strategy",
+    "description": "A unique discard-from-hand strategy built around The Riddle Game and Bilbo. Bilbo gains +3 on all riddling rolls and is the centrepiece of the deck. Riddling Talk cancels attacks, removes the hazard limit without warning, and discards from the opponent's hand. The Palantir of Orthanc lets you recycle sideboard cards back into your play deck. Not recommended for friendly games.",
+    "strategy": "The deck discards named cards from the opponent's hand with The Riddle Game. Position Bilbo — who has an inherent +3 on all riddling rolls — at a site adjacent to an opponent's company. Riddling Talk is the engine: it cancels an attack, immediately removes the hazard limit with no warning, and discards from the opponent's hand. Most resource energy goes to getting Bilbo untapped at the right moment. Fellowship (×2) speeds movement to Grey Havens or Rivendell to bring in Gandalf or Saruman. Align Palantir (×2) and Palantir of Orthanc enable the sideboard recycling trick: dump sideboard cards to discard en masse, then pop them into your play deck via the Palantir. The Mirror of Galadriel and Far-sight provide information control. Old Friendship (×3, sideboard) is your only faction — note that you must bring it in from the sideboard. Consider adding Foolish Words to the hazard mix.",
+    "starting_company": [
+      { "qty": 1, "name": "Balin" },
+      { "qty": 1, "name": "Bilbo" },
+      { "qty": 1, "name": "Ioreth" },
+      { "qty": 1, "name": "Thrain II" },
+      { "qty": 1, "name": "Dagger of Westernesse" },
+      { "qty": 1, "name": "Healing Herbs" }
+    ],
+    "characters": [
+      { "qty": 1, "name": "Celeborn" },
+      { "qty": 1, "name": "Erkenbrand" },
+      { "qty": 1, "name": "Gandalf" },
+      { "qty": 1, "name": "Hama" },
+      { "qty": 1, "name": "Saruman" },
+      { "qty": 1, "name": "Wacho" }
+    ],
+    "resources": [
+      { "qty": 2, "name": "Align Palantir" },
+      { "qty": 2, "name": "Escape" },
+      { "qty": 1, "name": "Far-sight" },
+      { "qty": 2, "name": "Fellowship" },
+      { "qty": 2, "name": "Halfling Stealth" },
+      { "qty": 1, "name": "Healing Herbs" },
+      { "qty": 2, "name": "Marvels Told" },
+      { "qty": 1, "name": "Mirror of Galadriel" },
+      { "qty": 1, "name": "Palantir of Orthanc" },
+      { "qty": 1, "name": "Palantir of Osgiliath" },
+      { "qty": 1, "name": "Red Arrow" },
+      { "qty": 3, "name": "Riddling Talk" },
+      { "qty": 1, "name": "Secret News" },
+      { "qty": 3, "name": "The Riddle Game" },
+      { "qty": 1, "name": "Treebeard" },
+      { "qty": 1, "name": "When You Know More" },
+      { "qty": 2, "name": "Wit" }
+    ],
+    "hazards": [],
+    "sites": [],
+    "sideboard": [
+      { "qty": 1, "name": "Eowyn" },
+      { "qty": 1, "name": "Helm of Her Secrecy" },
+      { "qty": 3, "name": "Old Friendship" },
+      { "qty": 1, "name": "Riders of Rohan" },
+      { "qty": 1, "name": "Wizard Uncloaked" },
+      { "qty": 2, "name": "Wizard's Laughter" }
+    ]
   }
 ]
