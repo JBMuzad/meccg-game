@@ -3248,6 +3248,7 @@ function _executeDeckPrint(deckId){
   h+='html,body{margin:0!important;padding:0!important;font-size:0;line-height:0;background:#fff}';
   h+='.page{display:block;break-after:page;page-break-after:always;margin:0;padding:0}';
   h+='.page:last-child{break-after:auto;page-break-after:auto}';
+  h+='.page.back .grid{margin-top:4mm}';
   h+='.grid{display:flex;flex-wrap:wrap;gap:2.5mm;margin:0;padding:0}';
   h+='.card{width:63mm;height:88mm;border:.4mm solid #bbb;border-radius:2mm;overflow:hidden;';
   h+='break-inside:avoid;background:#ede6d5;display:flex;align-items:center;justify-content:center;flex-shrink:0}';
@@ -3256,8 +3257,8 @@ function _executeDeckPrint(deckId){
   h+='</style></head><body>';
 
   pages.forEach(function(pg){
-    h+='<div class="page">'+makeGrid(pg,false)+'</div>';
-    h+='<div class="page">'+makeGrid(pg,true)+'</div>';
+    h+='<div class="page front">'+makeGrid(pg,false)+'</div>';
+    h+='<div class="page back">'+makeGrid(pg,true)+'</div>';
   });
 
   h+='<scr'+'ipt>';
