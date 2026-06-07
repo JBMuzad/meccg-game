@@ -1830,14 +1830,22 @@ function _buildCardList(){
   ]).then(function(results){
     var councilData=results[0], cardnumData=results[1];
 
-    // Bouw image URL lookup vanuit council-of-elrond (naam → imgUrl)
+    // Bouw image URL lookup vanuit council-of-elrond
+    // Sleutels: "naam" (fallback) én "naam|MECODE" (versie-specifiek)
+    var COUNCIL_SET_MAP={'AS':'MEAS','BA':'MEBA','DM':'MEDM','LE':'MELE',
+                         'TD':'METD','TW':'METW','WH':'MEWH','FW':'MEFW'};
     var imgLookup={};
-    Object.values(councilData).forEach(function(set){
+    Object.keys(councilData).forEach(function(setKey){
+      var set=councilData[setKey];
       if(!set.cards)return;
       var base=(set.imageBaseUrl&&set.imageBaseUrl.en)||'';
+      var meCode=COUNCIL_SET_MAP[setKey.toUpperCase()]||setKey.toUpperCase();
       Object.values(set.cards).forEach(function(c){
         var name=(c.name&&c.name.en)||'';
-        if(name&&c.image)imgLookup[name.toLowerCase()]=base+c.image;
+        if(!name||!c.image)return;
+        var url=base+c.image;
+        imgLookup[name.toLowerCase()+'|'+meCode]=url;  // versie-specifiek
+        if(!imgLookup[name.toLowerCase()])imgLookup[name.toLowerCase()]=url; // fallback
       });
     });
 
@@ -1868,7 +1876,7 @@ function _buildCardList(){
     cardnumData.forEach(function(c){
       var name=c.NameEN||'';
       if(!name)return;
-      var imgUrl=imgLookup[name.toLowerCase()]||'';
+      var imgUrl=imgLookup[name.toLowerCase()+'|'+(c.Set||'')]||imgLookup[name.toLowerCase()]||'';
       if(!imgUrl&&c.dreamcard&&c.Set)imgUrl=getDCImgUrl(c.Set,name);
       var attrs={};
       if(c.Primary)attrs.Type=c.Primary;
