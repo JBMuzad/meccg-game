@@ -3365,16 +3365,17 @@ function _executeDeckPrint(deckId){
 
   // Bouw print-HTML: voorzijde pagina + achterzijde pagina afwisselend
   var h='<!DOCTYPE html><html><head><meta charset="UTF-8">';
+  h+='<meta name="viewport" content="width=734,initial-scale=1,shrink-to-fit=no">';
   h+='<title>'+deck.deck_name+'</title>';
   h+='<style>';
-  /* Geen expliciete page-breedte in CSS: iOS Safari zou dan de inhoud
-     schalen om te passen en kaarten worden te klein afgedrukt.
-     mm-eenheden zijn absolute fysieke maten in print-CSS en worden
-     correct gerenderd zolang we de browser de paginagrootte laten bepalen. */
+  /* viewport width=734 = 194mm printbaar oppervlak bij 96dpi (A4 - 2×8mm marge).
+     Zonder dit gebruikt iOS Safari 980px standaard viewport en schaalt alles naar
+     beneden waardoor kaarten te klein zijn.
+     Geen expliciete mm-breedte op .page: dat zou iOS opnieuw laten schalen. */
   h+='@page{size:A4 portrait;margin:8mm}';
   h+='@page:left{margin:8mm}@page:right{margin:8mm}';
   h+='*{box-sizing:border-box;margin:0;padding:0}';
-  h+='html,body{margin:0;padding:0;font-size:0;line-height:0;background:#fff}';
+  h+='html,body{margin:0;padding:0;font-size:0;line-height:0;background:#fff;max-width:194mm}';
   h+='.page{display:block;break-after:page;page-break-after:always}';
   h+='.page:last-child{break-after:auto;page-break-after:auto}';
   h+='.page.back{padding-top:4mm}';
