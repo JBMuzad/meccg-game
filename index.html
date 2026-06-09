@@ -251,7 +251,33 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .res-loc:hover span:last-child{color:#d4a84b!important;}
 .ep-status{font-size:9px;margin-left:8px;color:rgba(212,168,75,.5);
   opacity:1;transition:opacity 1s;}
+
+/* ── Profiel / Auth ──────────────────────────────────────── */
+#profileBtn{font-size:10px;padding:4px 9px;border:1px solid rgba(212,168,75,.4);background:rgba(212,168,75,.06);color:rgba(212,168,75,.7);cursor:pointer;border-radius:4px;font-family:Georgia,serif;white-space:nowrap;flex-shrink:0;}
+#profileBtn:hover{background:rgba(212,168,75,.18);color:#d4a84b;}
+#profileBtn.logged-in{border-color:#d4a84b;color:#d4a84b;background:rgba(212,168,75,.12);}
+#authModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;align-items:center;justify-content:center;}
+#authModal.open{display:flex;}
+#authBox{background:#080f1a;border:1px solid rgba(212,168,75,.3);border-radius:8px;padding:24px 28px;min-width:300px;max-width:370px;width:calc(100vw - 40px);position:relative;box-shadow:0 8px 48px rgba(0,0,0,.95);}
+#authClose{position:absolute;top:10px;right:14px;background:none;border:none;color:#d4a84b;font-size:20px;cursor:pointer;line-height:1;}
+.auth-tabs{display:flex;border-bottom:1px solid rgba(212,168,75,.2);margin-bottom:18px;}
+.auth-tab{flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(212,168,75,.45);font-size:12px;cursor:pointer;font-family:Georgia,serif;}
+.auth-tab.on{color:#d4a84b;border-bottom-color:#d4a84b;}
+.auth-field{margin-bottom:12px;}
+.auth-field label{display:block;font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.auth-field input,.auth-field select{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:#e8dcc8;font-size:12px;padding:7px 10px;outline:none;font-family:Georgia,serif;}
+.auth-field input:focus,.auth-field select:focus{border-color:rgba(212,168,75,.4);}
+.auth-field select option{background:#12100c;}
+.auth-btn{width:100%;padding:9px;background:rgba(212,168,75,.12);border:1px solid rgba(212,168,75,.35);border-radius:5px;color:#d4a84b;font-size:12px;cursor:pointer;font-family:Georgia,serif;margin-top:4px;}
+.auth-btn:hover{background:rgba(212,168,75,.22);}
+.auth-btn.danger{background:rgba(180,40,40,.12);border-color:rgba(180,40,40,.35);color:rgba(255,150,150,.8);}
+.auth-btn.danger:hover{background:rgba(180,40,40,.22);}
+#authStatus{font-size:11px;color:rgba(212,168,75,.65);margin-top:10px;min-height:18px;text-align:center;}
+.auth-sep{border:none;border-top:1px solid rgba(212,168,75,.15);margin:14px 0;}
+.auth-profile-name{font-size:16px;color:#e8d88a;font-weight:700;text-align:center;margin-bottom:3px;}
+.auth-profile-email{font-size:10px;color:rgba(212,168,75,.4);text-align:center;margin-bottom:16px;font-style:italic;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -280,6 +306,8 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
   <button class="b on" id="btnSites" onclick="toggleSiteMarkers(this)">&#128205; Sites</button>
   <div class="sep"></div>
   <span id="cacheStatus" style="font-size:9px;color:rgba(212,168,75,.45);font-style:italic">laden...</span>
+  <div class="sep" style="margin-left:auto"></div>
+  <button id="profileBtn" onclick="openAuthModal()">&#128100; Login</button>
 </div>
 <div class="ws">
   <div class="mw" id="mw">
@@ -3365,7 +3393,7 @@ function _executeDeckPrint(deckId){
 
   // Bouw print-HTML: voorzijde pagina + achterzijde pagina afwisselend
   var h='<!DOCTYPE html><html><head><meta charset="UTF-8">';
-  h+='<meta name="viewport" content="width=794,initial-scale=1,shrink-to-fit=no">';
+  h+='<meta name="viewport" content="width=756,initial-scale=1,shrink-to-fit=no">';
   h+='<title>'+deck.deck_name+'</title>';
   h+='<style>';
   /* viewport width=794 = volledige A4-breedte bij 96dpi (210mm).
@@ -3638,6 +3666,218 @@ function startApp(){
   setTimeout(function(){ splash.style.display='none'; }, 800);
 }
 
+// ── Auth / Profiel ──────────────────────────────────────────────────────────
+var _sb=null;
+var _authUser=null;
+
+function _initSupabase(){
+  if(window.supabase&&window.supabase.createClient){
+    _sb=window.supabase.createClient(SB_URL,SB_KEY);
+    _sb.auth.onAuthStateChange(function(event,session){
+      _authUser=session?session.user:null;
+      _updateProfileBtn();
+      if(event==='SIGNED_IN')_loadUserProfile();
+    });
+    _sb.auth.getSession().then(function(result){
+      _authUser=result.data&&result.data.session?result.data.session.user:null;
+      _updateProfileBtn();
+      if(_authUser)_loadUserProfile();
+    });
+  }
+}
+
+function _updateProfileBtn(){
+  var btn=document.getElementById('profileBtn');
+  if(!btn)return;
+  if(_authUser){
+    var name=localStorage.getItem('meccg_profile_name')||_authUser.email.split('@')[0];
+    btn.innerHTML='&#128100; '+name;
+    btn.classList.add('logged-in');
+  }else{
+    btn.innerHTML='&#128100; Login';
+    btn.classList.remove('logged-in');
+  }
+}
+
+function openAuthModal(){
+  var modal=document.getElementById('authModal');
+  modal.classList.add('open');
+  if(_authUser){
+    _populateProfilePanel();
+    switchAuthTab('profile');
+  }else{
+    document.getElementById('atLogin').style.display='';
+    document.getElementById('atRegister').style.display='';
+    document.getElementById('atProfile').style.display='none';
+    switchAuthTab('login');
+  }
+}
+
+function closeAuthModal(){
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function switchAuthTab(tab){
+  ['login','register','profile'].forEach(function(t){
+    var panel=document.getElementById('ap'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(panel)panel.style.display=(t===tab)?'':'none';
+    var btn=document.getElementById('at'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn)btn.className='auth-tab'+(t===tab?' on':'');
+  });
+  document.getElementById('authStatus').textContent='';
+}
+
+function _authLogin(){
+  if(!_sb)return;
+  var email=document.getElementById('loginEmail').value.trim();
+  var pass=document.getElementById('loginPass').value;
+  if(!email||!pass){document.getElementById('authStatus').textContent='Vul email en wachtwoord in.';return;}
+  document.getElementById('authStatus').textContent='Inloggen\u2026';
+  _sb.auth.signInWithPassword({email:email,password:pass}).then(function(res){
+    if(res.error){document.getElementById('authStatus').textContent='Fout: '+res.error.message;return;}
+    document.getElementById('authStatus').textContent='Ingelogd!';
+    setTimeout(closeAuthModal,800);
+  });
+}
+
+function _authRegister(){
+  if(!_sb)return;
+  var name=document.getElementById('regName').value.trim();
+  var email=document.getElementById('regEmail').value.trim();
+  var pass=document.getElementById('regPass').value;
+  var wizard=document.getElementById('regWizard').value;
+  if(!name||!email||!pass){document.getElementById('authStatus').textContent='Vul alle velden in.';return;}
+  if(pass.length<6){document.getElementById('authStatus').textContent='Wachtwoord min. 6 tekens.';return;}
+  document.getElementById('authStatus').textContent='Account aanmaken\u2026';
+  _sb.auth.signUp({
+    email:email,
+    password:pass,
+    options:{data:{display_name:name,wizard:wizard}}
+  }).then(function(res){
+    if(res.error){document.getElementById('authStatus').textContent='Fout: '+res.error.message;return;}
+    if(res.data&&res.data.user){
+      _upsertProfile(res.data.user.id,name,wizard);
+    }
+    document.getElementById('authStatus').textContent='Account aangemaakt! Controleer je e-mail ter bevestiging.';
+  });
+}
+
+function _authLogout(){
+  if(!_sb)return;
+  _sb.auth.signOut().then(function(){
+    _authUser=null;
+    _updateProfileBtn();
+    localStorage.removeItem('meccg_profile_name');
+    localStorage.removeItem('meccg_profile_wizard');
+    closeAuthModal();
+  });
+}
+
+function _loadUserProfile(){
+  if(!_authUser||!_sb)return;
+  _sb.from('profiles').select('*').eq('id',_authUser.id).single().then(function(res){
+    if(res.data){
+      localStorage.setItem('meccg_profile_name',res.data.display_name||'');
+      localStorage.setItem('meccg_profile_wizard',res.data.wizard||'');
+      _updateProfileBtn();
+    }else{
+      // Nog geen profiel: aanmaken vanuit user_metadata
+      var meta=_authUser.user_metadata||{};
+      if(meta.display_name)_upsertProfile(_authUser.id,meta.display_name||'',meta.wizard||'');
+    }
+  });
+}
+
+function _upsertProfile(userId,name,wizard){
+  if(!_sb)return;
+  _sb.from('profiles').upsert({
+    id:userId,
+    display_name:name,
+    wizard:wizard,
+    updated_at:new Date().toISOString()
+  }).then(function(){
+    localStorage.setItem('meccg_profile_name',name);
+    localStorage.setItem('meccg_profile_wizard',wizard);
+    _updateProfileBtn();
+  });
+}
+
+function _populateProfilePanel(){
+  if(!_authUser)return;
+  var name=localStorage.getItem('meccg_profile_name')||'';
+  var wizard=localStorage.getItem('meccg_profile_wizard')||'';
+  document.getElementById('profName').textContent=name||_authUser.email.split('@')[0];
+  document.getElementById('profEmail').textContent=_authUser.email;
+  document.getElementById('profNameEdit').value=name;
+  document.getElementById('profWizard').value=wizard;
+  document.getElementById('atProfile').style.display='';
+  document.getElementById('atLogin').style.display='none';
+  document.getElementById('atRegister').style.display='none';
+}
+
+function _saveProfile(){
+  if(!_authUser)return;
+  var name=document.getElementById('profNameEdit').value.trim();
+  var wizard=document.getElementById('profWizard').value;
+  _upsertProfile(_authUser.id,name,wizard);
+  document.getElementById('profName').textContent=name||_authUser.email.split('@')[0];
+  document.getElementById('authStatus').textContent='Opgeslagen!';
+  setTimeout(function(){document.getElementById('authStatus').textContent='';},1500);
+}
+
+_initSupabase();
 </script>
+
+<!-- ── Auth Modal ── -->
+<div id="authModal">
+  <div id="authBox">
+    <button id="authClose" onclick="closeAuthModal()">&#10005;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="atLogin" onclick="switchAuthTab('login')">Inloggen</button>
+      <button class="auth-tab" id="atRegister" onclick="switchAuthTab('register')">Registreren</button>
+      <button class="auth-tab" id="atProfile" style="display:none" onclick="switchAuthTab('profile')">&#9881; Profiel</button>
+    </div>
+    <!-- Inloggen -->
+    <div id="apLogin">
+      <div class="auth-field"><label>E-mailadres</label><input type="email" id="loginEmail" placeholder="jouw@email.com" autocomplete="email"></div>
+      <div class="auth-field"><label>Wachtwoord</label><input type="password" id="loginPass" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password" onkeydown="if(event.key==='Enter')_authLogin()"></div>
+      <button class="auth-btn" onclick="_authLogin()">Inloggen</button>
+      <p style="font-size:10px;color:rgba(212,168,75,.35);text-align:center;margin-top:12px;">Nog geen account? Klik op <em>Registreren</em>.</p>
+    </div>
+    <!-- Registreren -->
+    <div id="apRegister" style="display:none">
+      <div class="auth-field"><label>Weergavenaam</label><input type="text" id="regName" placeholder="Je naam in het spel" maxlength="40"></div>
+      <div class="auth-field"><label>E-mailadres</label><input type="email" id="regEmail" placeholder="jouw@email.com" autocomplete="email"></div>
+      <div class="auth-field"><label>Wachtwoord</label><input type="password" id="regPass" placeholder="Minimaal 6 tekens" autocomplete="new-password"></div>
+      <div class="auth-field"><label>Favoriete tovenaar</label>
+        <select id="regWizard">
+          <option value="">&#8212; Geen voorkeur &#8212;</option>
+          <option>Gandalf</option><option>Saruman</option><option>Radagast</option>
+          <option>Alatar</option><option>Pallando</option>
+        </select>
+      </div>
+      <button class="auth-btn" onclick="_authRegister()">Account aanmaken</button>
+    </div>
+    <!-- Profiel -->
+    <div id="apProfile" style="display:none">
+      <div class="auth-profile-name" id="profName"></div>
+      <div class="auth-profile-email" id="profEmail"></div>
+      <hr class="auth-sep">
+      <div class="auth-field"><label>Weergavenaam</label><input type="text" id="profNameEdit" maxlength="40"></div>
+      <div class="auth-field"><label>Favoriete tovenaar</label>
+        <select id="profWizard">
+          <option value="">&#8212; Geen voorkeur &#8212;</option>
+          <option>Gandalf</option><option>Saruman</option><option>Radagast</option>
+          <option>Alatar</option><option>Pallando</option>
+        </select>
+      </div>
+      <button class="auth-btn" onclick="_saveProfile()">Opslaan</button>
+      <hr class="auth-sep">
+      <button class="auth-btn danger" onclick="_authLogout()">Uitloggen</button>
+    </div>
+    <div id="authStatus"></div>
+  </div>
+</div>
+
 </body>
 </html>
