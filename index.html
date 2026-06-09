@@ -3006,6 +3006,10 @@ function _getUserId(){
   }
   return uid;
 }
+// Gebruik auth-ID wanneer ingelogd, anders anonieme UUID
+function _getEffectiveUserId(){
+  return _authUser?_authUser.id:_getUserId();
+}
 
 // --- localStorage helpers (snelle cache) ---
 function _loadOwnDecks(){
@@ -3020,7 +3024,7 @@ function _deckToSbRow(deck){
   // Sla kaartdata op in jsonb 'cards' kolom
   return {
     id: deck.id,
-    user_id: _getUserId(),
+    user_id: _getEffectiveUserId(),
     deck_name: deck.deck_name,
     alignment: deck.alignment||'Hero',
     cards: {
@@ -3054,12 +3058,12 @@ function _upsertDeckToSb(deck){
   sbUpsert('user_decks',_deckToSbRow(deck),null);
 }
 function _deleteDeckFromSb(id){
-  _sbWrite('DELETE','user_decks','id=eq.'+encodeURIComponent(id)+'&user_id=eq.'+encodeURIComponent(_getUserId()),null,null);
+  _sbWrite('DELETE','user_decks','id=eq.'+encodeURIComponent(id)+'&user_id=eq.'+encodeURIComponent(_getEffectiveUserId()),null,null);
 }
 
 // Haal eigen decks op uit Supabase en merge in localStorage
 function _fetchOwnDecksFromSb(cb){
-  var uid=_getUserId();
+  var uid=_getEffectiveUserId();
   _sbFetch('user_decks','select=*&user_id=eq.'+encodeURIComponent(uid)+'&order=updated_at.asc',function(rows){
     if(!rows||!Array.isArray(rows)){if(cb)cb();return;}
     // Merge: SB is leading voor bestaande IDs, localStorage voor nieuwe (nog niet gesyncte)
@@ -3676,7 +3680,22 @@ function _initSupabase(){
     _sb.auth.onAuthStateChange(function(event,session){
       _authUser=session?session.user:null;
       _updateProfileBtn();
-      if(event==='SIGNED_IN')_loadUserProfile();
+      if(event==='SIGNED_IN'){
+        _loadUserProfile();
+        // Migreer anonieme decks naar auth-ID en herlaad decktab
+        _migrateAnonDecksToAuth(function(){
+          _fetchOwnDecksFromSb(function(){
+            if(_curTab==='decks')renderDecksTab();
+          });
+        });
+      }
+      if(event==='SIGNED_OUT'){
+        // Leeg lokale deckcache: deze was van de ingelogde gebruiker
+        _saveOwnDecks([]);
+        _fetchOwnDecksFromSb(function(){
+          if(_curTab==='decks')renderDecksTab();
+        });
+      }
     });
     _sb.auth.getSession().then(function(result){
       _authUser=result.data&&result.data.session?result.data.session.user:null;
@@ -3684,6 +3703,17 @@ function _initSupabase(){
       if(_authUser)_loadUserProfile();
     });
   }
+}
+
+// Verplaats anonieme decks naar het auth-gebruikers-ID bij eerste login
+function _migrateAnonDecksToAuth(cb){
+  if(!_authUser){if(cb)cb();return;}
+  var anonId=_getUserId();
+  if(anonId===_authUser.id){if(cb)cb();return;}
+  // PATCH: zet user_id van alle anonieme rijen over naar auth-ID
+  sbPatch('user_decks','user_id=eq.'+encodeURIComponent(anonId),{user_id:_authUser.id},function(){
+    if(cb)cb();
+  });
 }
 
 function _updateProfileBtn(){
