@@ -92,6 +92,10 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 .deck-print-chk input[type=checkbox]{accent-color:#d4a84b;cursor:pointer;width:12px;height:12px;}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;align-items:center;justify-content:center;}
 .modal.open{display:flex;}
+#seContent{font-family:Georgia,serif;}
+#seBannerTitle{color:#d4a84b;text-align:center;font-weight:bold;text-shadow:0 2px 6px #000;}
+#seBannerCount{color:#f0e4bf;text-align:center;text-shadow:0 1px 4px #000;}
+#seList .se-item{break-inside:avoid;color:#efe3bf;font-size:11px;line-height:1.5;padding:1px 4px;text-shadow:0 1px 3px #000;border-bottom:1px solid rgba(212,168,75,.12);}
 .mbox{position:relative;display:flex;gap:12px;align-items:flex-start;max-width:90vw;}
 .mcl{position:absolute;top:-10px;right:-10px;width:26px;height:26px;background:#d4a84b;color:#060c14;border:none;border-radius:50%;font-size:14px;cursor:pointer;font-weight:bold;}
 #modalImg{max-height:85vh;max-width:340px;border-radius:6px;display:none;}
@@ -419,17 +423,14 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
       <div id="seTitle" style="color:#d4a84b;font-family:Georgia,serif;font-size:14px;font-weight:bold;"></div>
       <button onclick="closeSetExport()" style="background:none;border:none;color:#d4a84b;font-size:18px;cursor:pointer;line-height:1;">&#10005;</button>
     </div>
-    <div id="sePreview" style="position:relative;height:68vh;aspect-ratio:210/297;background:#000;border:1px solid rgba(212,168,75,.25);overflow:hidden;border-radius:4px;">
-      <img id="seBg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-      <div style="position:absolute;top:0;left:0;right:0;padding:18px 16px 30px;text-align:center;font-family:Georgia,serif;background:linear-gradient(to bottom,rgba(0,0,0,.82) 0%,rgba(0,0,0,.5) 55%,rgba(0,0,0,0) 100%);">
-        <div id="seBannerTitle" style="color:#d4a84b;font-size:clamp(16px,3.4vh,30px);font-weight:bold;text-shadow:0 2px 6px #000;"></div>
-        <div id="seBannerCount" style="color:#f0e4bf;font-size:clamp(11px,1.8vh,15px);margin-top:6px;text-shadow:0 1px 4px #000;"></div>
+    <div id="sePreview" style="position:relative;height:74vh;aspect-ratio:210/297;background:#120d0a;border:1px solid rgba(212,168,75,.25);overflow:hidden;border-radius:4px;">
+      <div id="seBgHost" style="position:absolute;inset:0;"></div>
+      <div id="seContent" style="position:absolute;inset:0;overflow:auto;padding:7% 8%;">
+        <div id="seBannerTitle" style="font-size:clamp(18px,3.6vh,30px);"></div>
+        <div id="seBannerCount" style="font-size:clamp(11px,1.9vh,15px);margin-top:5px;"></div>
+        <div style="height:1px;background:linear-gradient(to right,transparent,rgba(212,168,75,.6),transparent);margin:10px 6%;"></div>
+        <div id="seList" style="column-gap:14px;"></div>
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
-      <button onclick="setExportNav(-1)" style="background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.35);color:#d4a84b;border-radius:5px;cursor:pointer;font-size:16px;padding:2px 12px;">&#8249;</button>
-      <div id="seCardName" style="color:#e8d8a0;font-family:Georgia,serif;font-size:12px;min-width:200px;text-align:center;"></div>
-      <button onclick="setExportNav(1)" style="background:rgba(212,168,75,.15);border:1px solid rgba(212,168,75,.35);color:#d4a84b;border-radius:5px;cursor:pointer;font-size:16px;padding:2px 12px;">&#8250;</button>
     </div>
     <button onclick="printSetExport()" style="width:100%;box-sizing:border-box;padding:9px;background:rgba(212,168,75,.85);border:1px solid #d4a84b;color:#1a1410;font-weight:bold;border-radius:6px;cursor:pointer;font-size:13px;font-family:Georgia,serif;">&#10515; Opslaan als PDF</button>
     <div style="color:rgba(212,168,75,.5);font-size:10px;text-align:center;">Kies in het printdialoog &ldquo;Opslaan als PDF&rdquo;, papierformaat A4, marges &ldquo;Geen&rdquo;.</div>
@@ -1998,68 +1999,89 @@ function _onCardSetChange(){
   if(_exp)_exp.style.display=(document.getElementById('cardSetFilter').value?'':'none');
 }
 
-// ── Reeks exporteren naar A4-PDF (kaartillustratie als achtergrond) ──
-var _seSet='',_seCards=[],_seIdx=0,_seCount=0;
+// ── Reeks exporteren naar A4-PDF (zelfgemaakte achtergrond + kaartlijst) ──
+var _seSet='',_seNames=[];
 function _seEsc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function _seCols(n){return n>60?4:(n>24?3:2);}
+function _seBgSvg(){
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 594" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;">'+
+    '<defs>'+
+      '<linearGradient id="seBgg" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#241b12"/><stop offset="0.5" stop-color="#1a1410"/><stop offset="1" stop-color="#120d0a"/>'+
+      '</linearGradient>'+
+      '<radialGradient id="seVig" cx="0.5" cy="0.4" r="0.78">'+
+        '<stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/>'+
+      '</radialGradient>'+
+    '</defs>'+
+    '<rect width="420" height="594" fill="url(#seBgg)"/>'+
+    '<circle cx="210" cy="232" r="150" fill="none" stroke="#d4a84b" stroke-opacity="0.07" stroke-width="2"/>'+
+    '<circle cx="210" cy="232" r="138" fill="none" stroke="#d4a84b" stroke-opacity="0.05" stroke-width="1"/>'+
+    '<path d="M0,556 L60,470 L112,520 L172,440 L232,520 L300,452 L360,524 L420,474 L420,594 L0,594 Z" fill="#d4a84b" fill-opacity="0.06"/>'+
+    '<path d="M0,574 L72,506 L142,546 L210,486 L290,546 L360,500 L420,548 L420,594 L0,594 Z" fill="#d4a84b" fill-opacity="0.05"/>'+
+    '<rect width="420" height="594" fill="url(#seVig)"/>'+
+    '<rect x="15" y="15" width="390" height="564" fill="none" stroke="#d4a84b" stroke-opacity="0.55" stroke-width="2"/>'+
+    '<rect x="21" y="21" width="378" height="552" fill="none" stroke="#d4a84b" stroke-opacity="0.28" stroke-width="1"/>'+
+    '<g fill="#d4a84b" fill-opacity="0.75">'+
+      '<path d="M18,11 l4,4 l-4,4 l-4,-4 z"/><path d="M402,11 l4,4 l-4,4 l-4,-4 z"/>'+
+      '<path d="M18,575 l4,4 l-4,4 l-4,-4 z"/><path d="M402,575 l4,4 l-4,4 l-4,-4 z"/>'+
+    '</g>'+
+  '</svg>';
+}
+function _seListItems(){
+  return _seNames.map(function(n){return '<div class="se-item">'+_seEsc(n)+'</div>';}).join('');
+}
 function openSetExport(){
   if(!_cardsLoaded){_buildCardList();alert('Kaartdatabank wordt geladen — probeer zo nog eens.');return;}
   var set=document.getElementById('cardSetFilter').value;
   if(!set){return;}
   _seSet=set;
-  var inSet=_allCards.filter(function(c){return c.set===set;});
-  _seCount=inSet.length;
-  _seCards=inSet.filter(function(c){return c.imgUrl;});
-  _seIdx=0;
+  var seen={},names=[];
+  _allCards.forEach(function(c){
+    if(c.set!==set||!c.name)return;
+    var k=c.name.toLowerCase();
+    if(seen[k])return;
+    seen[k]=1;names.push(c.name);
+  });
+  names.sort(function(a,b){return a.localeCompare(b);});
+  _seNames=names;
   var setCode=(set||'').toUpperCase();
   var title=SET_NAMES[setCode]||set;
   document.getElementById('seTitle').textContent='Exporteer: '+title;
   document.getElementById('seBannerTitle').textContent=title;
-  document.getElementById('seBannerCount').textContent=_seCount+' kaart'+(_seCount===1?'':'en');
-  if(!_seCards.length){
-    document.getElementById('seBg').removeAttribute('src');
-    document.getElementById('seCardName').textContent='(geen kaartillustraties in deze reeks)';
-  }else{
-    _renderSetExport();
-  }
+  document.getElementById('seBannerCount').textContent=_seNames.length+' kaart'+(_seNames.length===1?'':'en');
+  document.getElementById('seBgHost').innerHTML=_seBgSvg();
+  var list=document.getElementById('seList');
+  list.style.columnCount=_seCols(_seNames.length);
+  list.innerHTML=_seListItems();
+  document.getElementById('seContent').scrollTop=0;
   document.getElementById('setExport').classList.add('open');
-}
-function _renderSetExport(){
-  var c=_seCards[_seIdx];if(!c)return;
-  document.getElementById('seBg').src=c.imgUrl;
-  document.getElementById('seCardName').textContent='Achtergrond: '+c.name+'  ('+(_seIdx+1)+'/'+_seCards.length+')';
-}
-function setExportNav(d){
-  if(!_seCards.length)return;
-  _seIdx=(_seIdx+d+_seCards.length)%_seCards.length;
-  _renderSetExport();
 }
 function closeSetExport(){document.getElementById('setExport').classList.remove('open');}
 function printSetExport(){
-  if(!_seCards.length){alert('Geen kaartillustratie beschikbaar in deze reeks.');return;}
-  var c=_seCards[_seIdx];
+  if(!_seNames.length){alert('Geen kaarten in deze reeks.');return;}
   var setCode=(_seSet||'').toUpperCase();
   var title=_seEsc(SET_NAMES[setCode]||_seSet||'');
-  var count=_seCount+' kaart'+(_seCount===1?'':'en');
-  var src=c.imgUrl;
+  var count=_seNames.length+' kaart'+(_seNames.length===1?'':'en');
+  var cols=_seCols(_seNames.length);
   var w=window.open('','_blank','width=794,height=1123');
   if(!w){alert('Pop-up geblokkeerd — sta pop-ups toe om te exporteren.');return;}
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+'</title><style>'+
     '@page{size:A4;margin:0;}'+
     '*{margin:0;padding:0;box-sizing:border-box;}'+
-    'html,body{width:210mm;height:297mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
-    '.page{position:relative;width:210mm;height:297mm;overflow:hidden;background:#000;}'+
-    '.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}'+
-    '.banner{position:absolute;top:0;left:0;right:0;padding:16mm 12mm 12mm;text-align:center;'+
-      'font-family:Georgia,"Times New Roman",serif;'+
-      'background:linear-gradient(to bottom,rgba(0,0,0,.82) 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,0) 100%);}'+
-    '.banner h1{color:#d4a84b;font-size:30pt;font-weight:bold;letter-spacing:.5px;text-shadow:0 2px 6px #000;}'+
-    '.banner .cnt{color:#f0e4bf;font-size:14pt;margin-top:4mm;text-shadow:0 1px 4px #000;}'+
+    'html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:Georgia,"Times New Roman",serif;color:#efe3bf;}'+
+    '.bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;}'+
+    '.content{position:relative;z-index:1;padding:20mm 16mm;}'+
+    'h1{text-align:center;color:#d4a84b;font-size:26pt;font-weight:bold;letter-spacing:.5px;text-shadow:0 2px 6px #000;}'+
+    '.cnt{text-align:center;color:#f0e4bf;font-size:13pt;margin-top:3mm;text-shadow:0 1px 4px #000;}'+
+    '.divider{height:1px;background:linear-gradient(to right,transparent,rgba(212,168,75,.7),transparent);margin:6mm 12mm 7mm;}'+
+    '.list{column-count:'+cols+';column-gap:8mm;}'+
+    '.se-item{break-inside:avoid;color:#efe3bf;font-size:10.5pt;line-height:1.55;padding:0 2mm;text-shadow:0 1px 3px #000;border-bottom:1px solid rgba(212,168,75,.18);}'+
     '</style></head><body>'+
-    '<div class="page">'+
-      '<img class="bg" src="'+src+'" onload="window.print()" onerror="window.print()">'+
-      '<div class="banner"><h1>'+title+'</h1><div class="cnt">'+count+'</div></div>'+
+    '<div class="bg">'+_seBgSvg()+'</div>'+
+    '<div class="content"><h1>'+title+'</h1><div class="cnt">'+count+'</div><div class="divider"></div>'+
+      '<div class="list">'+_seListItems()+'</div>'+
     '</div>'+
-    '<scr'+'ipt>window.onafterprint=function(){window.close();};</scr'+'ipt>'+
+    '<scr'+'ipt>window.onload=function(){window.print();};window.onafterprint=function(){window.close();};</scr'+'ipt>'+
     '</body></html>');
   w.document.close();
 }
