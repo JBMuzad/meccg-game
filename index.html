@@ -95,7 +95,11 @@ h1{font-family:Georgia,serif;font-size:13px;color:#d4a84b;white-space:nowrap;}
 #seContent{font-family:Georgia,serif;}
 #seBannerTitle{color:#d4a84b;text-align:center;font-weight:bold;text-shadow:0 2px 6px #000;}
 #seBannerCount{color:#f0e4bf;text-align:center;text-shadow:0 1px 4px #000;}
-#seList .se-item{break-inside:avoid;color:#efe3bf;font-size:11px;line-height:1.5;padding:1px 4px;text-shadow:0 1px 3px #000;border-bottom:1px solid rgba(212,168,75,.12);}
+#seList{column-count:3;column-gap:12px;}
+#seList .se-cat-h{color:#d4a84b;font-weight:bold;font-size:11px;margin:6px 0 2px;border-bottom:1px solid rgba(212,168,75,.4);break-after:avoid;}
+#seList .se-cat-n{color:#c8b070;font-weight:normal;font-size:9px;}
+#seList .se-sub-h{color:#cdb87e;font-style:italic;font-size:9px;margin:3px 0 1px;break-after:avoid;}
+#seList .se-item{break-inside:avoid;color:#efe3bf;font-size:8.5px;line-height:1.35;text-shadow:0 1px 2px #000;}
 .mbox{position:relative;display:flex;gap:12px;align-items:flex-start;max-width:90vw;}
 .mcl{position:absolute;top:-10px;right:-10px;width:26px;height:26px;background:#d4a84b;color:#060c14;border:none;border-radius:50%;font-size:14px;cursor:pointer;font-weight:bold;}
 #modalImg{max-height:85vh;max-width:340px;border-radius:6px;display:none;}
@@ -2000,9 +2004,43 @@ function _onCardSetChange(){
 }
 
 // ── Reeks exporteren naar A4-PDF (zelfgemaakte achtergrond + kaartlijst) ──
-var _seSet='',_seNames=[];
+var _seSet='',_seCards=[];
 function _seEsc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function _seCols(n){return n>60?4:(n>24?3:2);}
+function _seCategory(t){
+  t=(t||'').toLowerCase();
+  if(t.indexOf('character')>=0||t.indexOf('avatar')>=0)return 'Characters';
+  if(t.indexOf('resource')>=0)return 'Resources';
+  if(t.indexOf('hazard')>=0)return 'Hazards';
+  if(t.indexOf('site')>=0)return 'Sites';
+  if(t.indexOf('region')>=0)return 'Regions';
+  return 'Overige';
+}
+var _seCatOrder=['Characters','Resources','Hazards','Sites','Regions','Overige'];
+function _seGroupedHtml(){
+  var cats={};
+  _seCards.forEach(function(c){
+    var cat=_seCategory(c.type);
+    var sub=(c.attrs&&c.attrs.Subtype)||'';
+    if(!cats[cat])cats[cat]={subs:{},order:[]};
+    if(!cats[cat].subs[sub]){cats[cat].subs[sub]=[];cats[cat].order.push(sub);}
+    cats[cat].subs[sub].push(c.name);
+  });
+  var html='';
+  _seCatOrder.forEach(function(cat){
+    var g=cats[cat];if(!g)return;
+    var total=0,kk;for(kk in g.subs)total+=g.subs[kk].length;
+    html+='<div class="se-cat"><div class="se-cat-h">'+_seEsc(cat)+' <span class="se-cat-n">('+total+')</span></div>';
+    var subKeys=g.order.slice().sort(function(a,b){if(!a)return -1;if(!b)return 1;return a.localeCompare(b);});
+    var showSubs=subKeys.filter(function(s){return !!s;}).length>=2;
+    subKeys.forEach(function(sub){
+      var names=g.subs[sub].slice().sort(function(a,b){return a.localeCompare(b);});
+      if(showSubs&&sub)html+='<div class="se-sub-h">'+_seEsc(sub)+'</div>';
+      html+=names.map(function(n){return '<div class="se-item">'+_seEsc(n)+'</div>';}).join('');
+    });
+    html+='</div>';
+  });
+  return html;
+}
 function _seBgSvg(){
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 594" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;">'+
     '<defs>'+
@@ -2027,42 +2065,36 @@ function _seBgSvg(){
     '</g>'+
   '</svg>';
 }
-function _seListItems(){
-  return _seNames.map(function(n){return '<div class="se-item">'+_seEsc(n)+'</div>';}).join('');
-}
 function openSetExport(){
   if(!_cardsLoaded){_buildCardList();alert('Kaartdatabank wordt geladen — probeer zo nog eens.');return;}
   var set=document.getElementById('cardSetFilter').value;
   if(!set){return;}
   _seSet=set;
-  var seen={},names=[];
+  var seen={},cards=[];
   _allCards.forEach(function(c){
     if(c.set!==set||!c.name)return;
     var k=c.name.toLowerCase();
     if(seen[k])return;
-    seen[k]=1;names.push(c.name);
+    seen[k]=1;cards.push(c);
   });
-  names.sort(function(a,b){return a.localeCompare(b);});
-  _seNames=names;
+  cards.sort(function(a,b){return a.name.localeCompare(b.name);});
+  _seCards=cards;
   var setCode=(set||'').toUpperCase();
   var title=SET_NAMES[setCode]||set;
   document.getElementById('seTitle').textContent='Exporteer: '+title;
   document.getElementById('seBannerTitle').textContent=title;
-  document.getElementById('seBannerCount').textContent=_seNames.length+' kaart'+(_seNames.length===1?'':'en');
+  document.getElementById('seBannerCount').textContent=_seCards.length+' kaart'+(_seCards.length===1?'':'en');
   document.getElementById('seBgHost').innerHTML=_seBgSvg();
-  var list=document.getElementById('seList');
-  list.style.columnCount=_seCols(_seNames.length);
-  list.innerHTML=_seListItems();
+  document.getElementById('seList').innerHTML=_seGroupedHtml();
   document.getElementById('seContent').scrollTop=0;
   document.getElementById('setExport').classList.add('open');
 }
 function closeSetExport(){document.getElementById('setExport').classList.remove('open');}
 function printSetExport(){
-  if(!_seNames.length){alert('Geen kaarten in deze reeks.');return;}
+  if(!_seCards.length){alert('Geen kaarten in deze reeks.');return;}
   var setCode=(_seSet||'').toUpperCase();
   var title=_seEsc(SET_NAMES[setCode]||_seSet||'');
-  var count=_seNames.length+' kaart'+(_seNames.length===1?'':'en');
-  var cols=_seCols(_seNames.length);
+  var count=_seCards.length+' kaart'+(_seCards.length===1?'':'en');
   var w=window.open('','_blank','width=794,height=1123');
   if(!w){alert('Pop-up geblokkeerd — sta pop-ups toe om te exporteren.');return;}
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+'</title><style>'+
@@ -2070,16 +2102,19 @@ function printSetExport(){
     '*{margin:0;padding:0;box-sizing:border-box;}'+
     'html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:Georgia,"Times New Roman",serif;color:#efe3bf;}'+
     '.bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;}'+
-    '.content{position:relative;z-index:1;padding:20mm 16mm;}'+
-    'h1{text-align:center;color:#d4a84b;font-size:26pt;font-weight:bold;letter-spacing:.5px;text-shadow:0 2px 6px #000;}'+
-    '.cnt{text-align:center;color:#f0e4bf;font-size:13pt;margin-top:3mm;text-shadow:0 1px 4px #000;}'+
-    '.divider{height:1px;background:linear-gradient(to right,transparent,rgba(212,168,75,.7),transparent);margin:6mm 12mm 7mm;}'+
-    '.list{column-count:'+cols+';column-gap:8mm;}'+
-    '.se-item{break-inside:avoid;color:#efe3bf;font-size:10.5pt;line-height:1.55;padding:0 2mm;text-shadow:0 1px 3px #000;border-bottom:1px solid rgba(212,168,75,.18);}'+
+    '.content{position:relative;z-index:1;padding:14mm 13mm;}'+
+    'h1{text-align:center;color:#d4a84b;font-size:22pt;font-weight:bold;letter-spacing:.5px;text-shadow:0 2px 6px #000;}'+
+    '.cnt{text-align:center;color:#f0e4bf;font-size:11pt;margin-top:2mm;text-shadow:0 1px 4px #000;}'+
+    '.divider{height:1px;background:linear-gradient(to right,transparent,rgba(212,168,75,.7),transparent);margin:4mm 14mm 5mm;}'+
+    '.list{column-count:3;column-gap:7mm;}'+
+    '.se-cat-h{color:#d4a84b;font-weight:bold;font-size:10pt;margin:2.5mm 0 1mm;border-bottom:1px solid rgba(212,168,75,.45);break-after:avoid;}'+
+    '.se-cat-n{color:#c8b070;font-weight:normal;font-size:8pt;}'+
+    '.se-sub-h{color:#cdb87e;font-style:italic;font-size:8pt;margin:1.5mm 0 .5mm;break-after:avoid;}'+
+    '.se-item{break-inside:avoid;color:#efe3bf;font-size:7.5pt;line-height:1.3;text-shadow:0 1px 2px #000;}'+
     '</style></head><body>'+
     '<div class="bg">'+_seBgSvg()+'</div>'+
     '<div class="content"><h1>'+title+'</h1><div class="cnt">'+count+'</div><div class="divider"></div>'+
-      '<div class="list">'+_seListItems()+'</div>'+
+      '<div class="list">'+_seGroupedHtml()+'</div>'+
     '</div>'+
     '<scr'+'ipt>window.onload=function(){window.print();};window.onafterprint=function(){window.close();};</scr'+'ipt>'+
     '</body></html>');
